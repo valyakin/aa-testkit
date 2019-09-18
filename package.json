@@ -1,0 +1,33 @@
+{
+  "name": "aa-testkit",
+  "version": "0.1.0",
+  "main": "main.js",
+  "author": "Obyte",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node main.js --run run-predefined"
+  },
+  "dependencies": {
+    "config": "^3.2.2",
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte.git#aa",
+    "joi": "^14.3.1",
+    "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
+    "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",
+    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",
+    "uniqid": "^5.0.3",
+    "yargs": "^14.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^6.3.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-chai-friendly": "^0.4.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-mocha": "^6.1.1",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^6.2.0"
+  }
+}
