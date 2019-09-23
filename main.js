@@ -12,6 +12,9 @@ const isSilent = true
 
 fs.mkdirSync(config.TEST_RUN_HOME, { recursive: true })
 
+const network = new Network()
+const wallet = new HeadlessWallet(network, {})
+
 const hub = new ObyteHub({ silent: isSilent, id: 'obyte-hub-001' })
 const witness = new ObyteWitness({ silent: isSilent, id: 'obyte-witness-001' })
 const explorer = new ObyteExplorer({ silent: isSilent, id: 'obyte-explorer-001' })
