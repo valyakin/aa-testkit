@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
-const { MessagePasswordRequired, MessageChildError, MessageGenesisCreated, MessageChildReady } = requireRoot('src/messages')
+const { MessagePasswordRequired, MessageChildError, MessageGenesisCreated, MessageChildReady, CommandPostWitness } = requireRoot('src/messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
@@ -14,6 +14,7 @@ class GenesisNodeChild extends AbstractChild {
 		this
 			.on('command_login_to_hub', () => this.loginToHub())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
+			.on('command_post_witness', () => this.postWitness())
 	}
 
 	static unpackArgv (argv) {
@@ -28,11 +29,14 @@ class GenesisNodeChild extends AbstractChild {
 
 	start () {
 		super.start()
+		require('obyte-witness')
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
 		this.device = require('ocore/device.js')
 		this.db = require('ocore/db.js')
 		this.constants = require('ocore/constants.js')
+		this.composer = require('ocore/composer.js')
+		this.network = require('ocore/network.js')
 
 		this.sendParent(new MessagePasswordRequired())
 		this.eventBus.once('headless_wallet_ready', () => this.genesis())
@@ -42,9 +46,25 @@ class GenesisNodeChild extends AbstractChild {
 		this.device.loginToHub()
 	}
 
+	postWitness () {
+		const callbacks = this.composer.getSavingCallbacks({
+			ifNotEnoughFunds: (err) => this.sendParent(new MessageChildError(err)),
+			ifError: (err) => this.sendParent(new MessageChildError(err)),
+			ifOk: (objJoint) => {
+				this.network.broadcastJoint(objJoint)
+			},
+		})
+
+		const datafeed = {
+			time: new Date().toString(),
+			timestamp: Date.now(),
+		}
+		this.composer.composeDataFeedJoint(this.address, datafeed, this.headlessWallet.signer, callbacks)
+	}
+
 	sendBytes ({ toAddress, amount }) {
+		console.log('sendBytes ({ toAddress, amount }) { :', { toAddress, amount })
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
-			console.log('err, unit', err, unit)
 			if (err) {
 				this.sendParent(new MessageChildError({ error: err }))
 			}
@@ -59,13 +79,15 @@ class GenesisNodeChild extends AbstractChild {
 		try {
 			const genesisHash = await this.createGenesisUnit(address)
 			await this.addMyWitness(address)
+			this.composer.setGenesis(false)
+			this.address = address
 
 			this.sendParent(new MessageGenesisCreated({ address, genesisUnit: genesisHash }))
 
 			//
 			//
-			this.constants.initial_witnesses = [address]
-			require('obyte-witness')
+			// this.constants.initial_witnesses = [address]
+			// require('obyte-witness')
 			this.sendParent(new MessageChildReady())
 		} catch (error) {
 			this.sendParent(new MessageChildError(error))
@@ -80,20 +102,17 @@ class GenesisNodeChild extends AbstractChild {
 
 	createGenesisUnit (witness) {
 		return new Promise((resolve, reject) => {
-			var composer = require('ocore/composer.js')
-			var network = require('ocore/network.js')
-
-			var savingCallbacks = composer.getSavingCallbacks({
+			var savingCallbacks = this.composer.getSavingCallbacks({
 				ifNotEnoughFunds: reject,
 				ifError: reject,
-				ifOk: function (objJoint) {
-					network.broadcastJoint(objJoint)
+				ifOk: (objJoint) => {
+					this.network.broadcastJoint(objJoint)
 					resolve(objJoint.unit.unit)
 				},
 			})
 
-			composer.setGenesis(true)
-			composer.composeJoint({
+			this.composer.setGenesis(true)
+			this.composer.composeJoint({
 				witnesses: [witness],
 				paying_addresses: [witness],
 				outputs: [

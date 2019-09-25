@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
-const { MessagePasswordRequired, MessageChildReady, MessageMyAddress } = requireRoot('src/messages')
+const { MessagePasswordRequired, MessageChildReady, MessageMyAddress, MessageChildError } = requireRoot('src/messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
@@ -14,6 +14,7 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this
 			.on('command_get_address', () => this.getAddress())
+			.on('command_send_bytes', (m) => this.sendBytes(m))
 	}
 
 	static unpackArgv (argv) {
@@ -46,6 +47,16 @@ class HeadlessWalletChild extends AbstractChild {
 	getAddress () {
 		this.headlessWallet.readFirstAddress(address => {
 			this.sendParent(new MessageMyAddress({ address }))
+		})
+	}
+
+	sendBytes ({ toAddress, amount }) {
+		console.log('!!!!!!!!!!+========+++!!!!!!!!!=here')
+		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
+			console.log('err, unit', err, unit)
+			if (err) {
+				this.sendParent(new MessageChildError({ error: err }))
+			}
 		})
 	}
 }

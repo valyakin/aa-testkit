@@ -8,6 +8,7 @@ const MessagePasswordRequired = require('./lib/MessagePasswordRequired')
 const CommandSendBytes = require('./lib/CommandSendBytes')
 const CommandGetAddress = require('./lib/CommandGetAddress')
 const CommandLoginToHub = require('./lib/CommandLoginToHub')
+const CommandPostWitness = require('./lib/CommandPostWitness')
 
 const fromMessage = (m) => {
 	const message = JSON.parse(m)
@@ -23,6 +24,7 @@ const fromMessage = (m) => {
 	case 'command_send_bytes': return new CommandSendBytes(message)
 	case 'command_get_address': return new CommandGetAddress(message)
 	case 'command_login_to_hub': return new CommandLoginToHub(message)
+	case 'command_post_witness': return new CommandPostWitness(message)
 
 	default: throw new Error(`Unsupported message topic '${message.topic}'`)
 	}
@@ -41,4 +43,5 @@ module.exports = {
 	CommandSendBytes,
 	CommandGetAddress,
 	CommandLoginToHub,
+	CommandPostWitness,
 }

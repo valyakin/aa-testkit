@@ -6,8 +6,7 @@ const schemaFactory = () => ({
 	rundir: Joi.string().required(),
 	silent: Joi.boolean().default(true),
 	genesisUnit: Joi.string().required(),
-	initialWitness: Joi.string().required(),
-	trustedRegistry: Joi.string().required(),
+	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 })
 
 class ObyteHub extends AbstractNode {
@@ -23,8 +22,8 @@ class ObyteHub extends AbstractNode {
 		return [
 			this.id,
 			this.genesisUnit,
-			this.initialWitness,
-			this.trustedRegistry,
+			this.initialWitnesses.length,
+			this.initialWitnesses,
 		]
 	}
 }

@@ -1,5 +1,4 @@
 const path = require('path')
-const uniqid = require('uniqid')
 const Joi = require('joi')
 const config = require('config')
 
@@ -9,8 +8,7 @@ const { HeadlessWallet, GenesisNode, ObyteHub } = requireRoot('src/nodes')
 const paramsSchema = () => ({
 	runid: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
-	initialWitness: Joi.string().required(),
-	trustedRegistry: Joi.string().required(),
+	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 })
 
 class Network {
@@ -41,8 +39,7 @@ class Network {
 		const network = new Network({
 			runid,
 			genesisUnit,
-			initialWitness: genesisAddress,
-			trustedRegistry: genesisAddress,
+			initialWitnesses: [genesisAddress],
 		})
 		network.genesisNode = genesisNode
 		return network
@@ -63,8 +60,7 @@ class Network {
 			id: getIdForPrefix(this.rundir, 'obyte-hub-'),
 			rundir: this.rundir,
 			genesisUnit: this.genesisUnit,
-			initialWitness: this.initialWitness,
-			trustedRegistry: this.trustedRegistry,
+			initialWitnesses: this.initialWitnesses,
 			...params,
 		})
 	}

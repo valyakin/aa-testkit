@@ -1,5 +1,5 @@
 const Joi = require('joi')
-const { CommandLoginToHub, CommandSendBytes } = requireRoot('src/messages')
+const { CommandLoginToHub, CommandSendBytes, CommandPostWitness } = requireRoot('src/messages')
 const AbstractNode = require('../AbstractNode/AbstractNode')
 
 const schemaFactory = () => ({
@@ -45,6 +45,10 @@ class GenesisNode extends AbstractNode {
 
 	sendBytes ({ toAddress, amount }) {
 		this.sendChild(new CommandSendBytes({ toAddress, amount }))
+	}
+
+	postWitness () {
+		this.sendChild(new CommandPostWitness())
 	}
 }
 
