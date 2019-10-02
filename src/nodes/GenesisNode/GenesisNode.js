@@ -33,8 +33,11 @@ class GenesisNode extends AbstractNode {
 		})
 	}
 
-	loginToHub () {
-		this.sendChild(new CommandLoginToHub())
+	async loginToHub () {
+		return new Promise(resolve => {
+			this.once('connected_to_hub', () => resolve(this))
+			this.sendChild(new CommandLoginToHub())
+		})
 	}
 
 	sendPassword () {
@@ -43,11 +46,15 @@ class GenesisNode extends AbstractNode {
 		}, 2000)
 	}
 
-	sendBytes ({ toAddress, amount }) {
-		this.sendChild(new CommandSendBytes({ toAddress, amount }))
+	async sendBytes ({ toAddress, amount }) {
+		return new Promise(resolve => {
+			this.once('sent_bytes', () => resolve(this))
+			this.sendChild(new CommandSendBytes({ toAddress, amount }))
+		})
 	}
 
-	postWitness () {
+	async postWitness () {
+		console.log('post witness')
 		this.sendChild(new CommandPostWitness())
 	}
 }

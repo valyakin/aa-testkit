@@ -1,6 +1,13 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
-const { MessagePasswordRequired, MessageChildReady, MessageMyAddress, MessageChildError } = requireRoot('src/messages')
+const {
+	MessageSentBytes,
+	MessageMyAddress,
+	MessageMyBalance,
+	MessageChildReady,
+	MessageChildError,
+	MessagePasswordRequired,
+} = requireRoot('src/messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
@@ -15,6 +22,7 @@ class HeadlessWalletChild extends AbstractChild {
 		this
 			.on('command_get_address', () => this.getAddress())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
+			.on('command_get_balance', (m) => this.getBalance(m))
 	}
 
 	static unpackArgv (argv) {
@@ -51,59 +59,26 @@ class HeadlessWalletChild extends AbstractChild {
 	}
 
 	sendBytes ({ toAddress, amount }) {
-		console.log('!!!!!!!!!!+========+++!!!!!!!!!=here')
+		console.log('sendBytes ({ toAddress, amount }) { :', { toAddress, amount })
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
-			console.log('err, unit', err, unit)
 			if (err) {
 				this.sendParent(new MessageChildError({ error: err }))
+			} else {
+				setTimeout(() => { this.sendParent(new MessageSentBytes({ unit })) }, 100)
 			}
+		})
+	}
+
+	getBalance () {
+		this.headlessWallet.readSingleWallet(walletId => {
+			const wallet = require('ocore/wallet')
+			wallet.readBalance(walletId, (assocBalances) => {
+				console.log('assocBalances', assocBalances)
+				this.sendParent(new MessageMyBalance({ balance: assocBalances }))
+			})
 		})
 	}
 }
 
 const child = new HeadlessWalletChild(process.argv)
 child.start()
-
-// const fs = require('fs')
-
-// const [,,
-// 	id,
-// 	genesisUnit,
-// ] = process.argv
-// fs.mkdirSync(process.env.HOME, { recursive: true })
-
-// const conf = require('ocore/conf.js')
-// conf.deviceName = id
-
-// const constants = require('ocore/constants.js')
-// constants.GENESIS_UNIT = genesisUnit
-// console.log('constants.GENESIS_UNIT :', constants.GENESIS_UNIT)
-
-// const headlessWallet = require('headless-obyte')
-// const eventBus = require('ocore/event_bus.js')
-
-// process.send({ topic: 'password_required' })
-
-// eventBus.once('headless_wallet_ready', function () {
-// 	process.send({ topic: 'started' })
-// })
-
-// process.on('message', message => {
-// 	if (message.topic === 'get_address') {
-// 		headlessWallet.readFirstAddress(address => {
-// 			process.send({ topic: 'address', address })
-// 		})
-// 	}
-// })
-
-// process.on('message', message => {
-// 	if (message.topic === 'send_bytes') {
-// 		headlessWallet.issueChangeAddressAndSendPayment(null, message.amount, message.toAddress, null, function (err, unit) {
-// 			process.send({
-// 				topic: 'bytes_sent',
-// 				err,
-// 				unit: err ? undefined : unit,
-// 			})
-// 		})
-// 	}
-// })

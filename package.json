@@ -6,15 +6,15 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node main.js --run run-predefined"
+    "test": "mocha 'test/**/**spec.js'"
   },
   "dependencies": {
     "config": "^3.2.2",
     "headless-obyte": "git+https://github.com/byteball/headless-obyte.git#aa",
     "joi": "^14.3.1",
+    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",
     "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
     "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",
-    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",
     "uniqid": "^5.0.3",
     "yargs": "^14.0.0"
   },

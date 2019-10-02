@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const AbstractNode = require('../AbstractNode/AbstractNode')
-const { CommandGetAddress, CommandSendBytes } = requireRoot('src/messages')
+const { CommandGetAddress, CommandSendBytes, CommandGetBalance } = requireRoot('src/messages')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),
@@ -39,26 +39,19 @@ class HeadlessWallet extends AbstractNode {
 		})
 	}
 
-	sendBytes ({ toAddress, amount }) {
-		this.sendChild(new CommandSendBytes({ toAddress, amount }))
+	async sendBytes ({ toAddress, amount }) {
+		return new Promise(resolve => {
+			this.once('sent_bytes', () => resolve(this))
+			this.sendChild(new CommandSendBytes({ toAddress, amount }))
+		})
 	}
 
-	// async sendBytes ({ toAddress, amount }) {
-	// 	return new Promise((resolve, reject) => {
-	// 		const handler = (message) => {
-	// 			if (message.topic === 'bytes_sent') {
-	// 				this.child.removeListener('message', handler)
-	// 				if (message.err) {
-	// 					reject(message.err)
-	// 				} else {
-	// 					resolve(message.unit)
-	// 				}
-	// 			}
-	// 		}
-	// 		this.child.on('message', handler)
-	// 		this.child.send({ topic: 'send_bytes', toAddress, amount })
-	// 	})
-	// }
+	getBalance () {
+		return new Promise((resolve) => {
+			this.once('my_balance', m => resolve(m.balance))
+			this.sendChild(new CommandGetBalance())
+		})
+	}
 }
 
 module.exports = HeadlessWallet

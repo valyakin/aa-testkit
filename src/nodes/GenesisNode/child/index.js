@@ -1,6 +1,13 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
-const { MessagePasswordRequired, MessageChildError, MessageGenesisCreated, MessageChildReady, CommandPostWitness } = requireRoot('src/messages')
+const {
+	MessageSentBytes,
+	MessageChildReady,
+	MessageChildError,
+	MessageConnectedToHub,
+	MessageGenesisCreated,
+	MessagePasswordRequired,
+} = requireRoot('src/messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
@@ -29,7 +36,7 @@ class GenesisNodeChild extends AbstractChild {
 
 	start () {
 		super.start()
-		require('obyte-witness')
+		// require('obyte-witness')
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
 		this.device = require('ocore/device.js')
@@ -43,6 +50,9 @@ class GenesisNodeChild extends AbstractChild {
 	}
 
 	loginToHub () {
+		this.eventBus.once('connected', () => {
+			this.sendParent(new MessageConnectedToHub())
+		})
 		this.device.loginToHub()
 	}
 
@@ -67,6 +77,8 @@ class GenesisNodeChild extends AbstractChild {
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
 				this.sendParent(new MessageChildError({ error: err }))
+			} else {
+				setTimeout(() => { this.sendParent(new MessageSentBytes({ unit })) }, 100)
 			}
 		})
 	}

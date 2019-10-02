@@ -2,7 +2,7 @@ require('../../../../require')
 const EventEmitter = require('events')
 const Joi = require('joi')
 const fs = require('fs')
-const { fromMessage, MessageChildStarted } = requireRoot('src/messages')
+const { fromMessage, MessageChildStarted, MessageMciBecameStable } = requireRoot('src/messages')
 
 class AbstractChild extends EventEmitter {
 	constructor (params, paramsSchema, options) {
@@ -24,6 +24,12 @@ class AbstractChild extends EventEmitter {
 		process
 			.on('message', this.handleParentMessage.bind(this))
 			.setMaxListeners(20)
+
+		this
+			.on('command_child_stop', () => this.stop())
+
+		const eventBus = require('ocore/event_bus')
+		eventBus.on('mci_became_stable', () => setTimeout(() => this.sendParent(new MessageMciBecameStable()), 100))
 	}
 
 	static unpackArgv (argv) {
@@ -32,6 +38,13 @@ class AbstractChild extends EventEmitter {
 
 	start () {
 		this.sendParent(new MessageChildStarted())
+	}
+
+	stop () {
+		console.log('Received command to stop')
+		setTimeout(() => {
+			process.exit()
+		}, 100)
 	}
 
 	sendParent (message) {

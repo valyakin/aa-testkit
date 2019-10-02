@@ -3,12 +3,13 @@ const EventEmitter = require('events')
 const path = require('path')
 const Joi = require('joi')
 
-const { fromMessage, MessageChildError } = requireRoot('src/messages')
+const { fromMessage, MessageChildError, CommandChildStop } = requireRoot('src/messages')
 
 class AbstractNode extends EventEmitter {
 	constructor (params, schema, options = {}) {
 		super()
 		this.setMaxListeners(20)
+		this.isReady = false
 
 		const { error, value } = Joi.validate(
 			params,
@@ -40,11 +41,36 @@ class AbstractNode extends EventEmitter {
 			.on('error', this.handleChildError.bind(this))
 			.on('message', this.handleChildMessage.bind(this))
 			.setMaxListeners(20)
+
+		this
+			.on('child_ready', () => { this.isReady = true })
+	}
+
+	async stop () {
+		return new Promise((resolve) => {
+			this.child.once('exit', () => {
+				resolve(this)
+			})
+			this.sendChild(new CommandChildStop())
+		})
 	}
 
 	async ready () {
+		if (this.isReady) return this
 		return new Promise((resolve) => {
-			this.once('child_ready', () => resolve(this))
+			this.once('child_ready', () => {
+				this.isReady = true
+				resolve(this)
+			})
+		})
+	}
+
+	async stabilize () {
+		return new Promise(resolve => {
+			this.once('mci_became_stable', () => {
+				console.log('stabilized', this.id)
+				resolve(this)
+			})
 		})
 	}
 
