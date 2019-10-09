@@ -3,7 +3,7 @@ const Joi = require('joi')
 const config = require('config')
 
 const { getIdForPrefix } = requireRoot('src/utils')
-const { HeadlessWallet, GenesisNode, ObyteHub } = requireRoot('src/nodes')
+const { HeadlessWallet, AgentDeployer, GenesisNode, ObyteHub } = requireRoot('src/nodes')
 
 const paramsSchema = () => ({
 	runid: Joi.string().required(),
@@ -18,7 +18,10 @@ class NetworkFromGenesis {
 		Object.assign(this, value)
 
 		this.rundir = path.join(config.TESTDATA_DIR, this.runid)
-		this.wallets = []
+		this.nodes = {
+			headlessWallets: [],
+			agentDeployers: [],
+		}
 	}
 
 	getGenesisNode () {
@@ -29,20 +32,27 @@ class NetworkFromGenesis {
 		return this.hub
 	}
 
+	get nodesList () {
+		return [
+			...this.nodes.headlessWallets,
+			...this.nodes.agentDeployers,
+			this.genesisNode,
+			this.hub,
+		]
+	}
+
 	async stop () {
-		return Promise.all([
-			...this.wallets.map(w => w.stop()),
-			this.hub.stop(),
-			this.genesisNode.stop(),
-		])
+		return Promise.all(this.nodesList.map(n => n.stop()))
+	}
+
+	async witness (n = 1) {
+		for (let i = 0; i < n; i++) {
+			await this.witnessAndStabilize()
+		}
 	}
 
 	async witnessAndStabilize () {
-		const stabilization = Promise.all([
-			...this.wallets.map(w => w.stabilize()),
-			this.genesisNode.stabilize(),
-			this.hub.stabilize(),
-		])
+		const stabilization = Promise.all(this.nodesList.map(n => n.stabilize()))
 
 		await this.genesisNode.postWitness()
 		return stabilization
@@ -56,8 +66,20 @@ class NetworkFromGenesis {
 			passphrase: config.DEFAULT_PASSPHRASE,
 			...params,
 		})
-		this.wallets.push(wallet)
+		this.nodes.headlessWallets.push(wallet)
 		return wallet
+	}
+
+	newAgentDeployer (params) {
+		const deployer = new AgentDeployer({
+			rundir: this.rundir,
+			genesisUnit: this.genesisUnit,
+			id: getIdForPrefix(this.rundir, 'agent-deployer-'),
+			passphrase: config.DEFAULT_PASSPHRASE,
+			...params,
+		})
+		this.nodes.agentDeployers.push(deployer)
+		return deployer
 	}
 }
 

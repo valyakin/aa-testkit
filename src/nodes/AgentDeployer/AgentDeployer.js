@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const AbstractNode = require('../AbstractNode/AbstractNode')
-const { CommandGetAddress, CommandSendBytes, CommandGetBalance, CommandSendData } = requireRoot('src/messages')
+const { CommandGetAddress, CommandGetBalance, CommandDeployAgent, CommandReadAAStateVars } = requireRoot('src/messages')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),
@@ -10,7 +10,7 @@ const schemaFactory = () => ({
 	genesisUnit: Joi.string().required(),
 })
 
-class HeadlessWallet extends AbstractNode {
+class AgentDeployer extends AbstractNode {
 	constructor (params = {}) {
 		super(params, schemaFactory)
 		this.runChild(__dirname)
@@ -39,17 +39,17 @@ class HeadlessWallet extends AbstractNode {
 		})
 	}
 
-	async sendData ({ toAddress, amount, payload }) {
-		return new Promise(resolve => {
-			this.once('sent_data', (m) => resolve(m.unit))
-			this.sendChild(new CommandSendData({ toAddress, amount, payload }))
+	async deployAgent (agent) {
+		this.sendChild(new CommandDeployAgent({ agent }))
+		return new Promise((resolve) => {
+			this.once('agent_deployed', m => resolve({ address: m.address, unit: m.unit }))
 		})
 	}
 
-	async sendBytes ({ toAddress, amount }) {
-		return new Promise(resolve => {
-			this.once('sent_bytes', (m) => resolve(m.unit))
-			this.sendChild(new CommandSendBytes({ toAddress, amount }))
+	async readAAStateVars (address) {
+		this.sendChild(new CommandReadAAStateVars({ address }))
+		return new Promise((resolve) => {
+			this.once('aa_state_vars', m => resolve({ vars: m.vars }))
 		})
 	}
 
@@ -61,4 +61,4 @@ class HeadlessWallet extends AbstractNode {
 	}
 }
 
-module.exports = HeadlessWallet
+module.exports = AgentDeployer

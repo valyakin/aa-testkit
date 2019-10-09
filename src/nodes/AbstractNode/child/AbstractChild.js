@@ -48,7 +48,7 @@ class AbstractChild extends EventEmitter {
 	}
 
 	sendParent (message) {
-		process.send(message.serialize())
+		setTimeout(() => process.send(message.serialize()), 100)
 	}
 
 	handleParentMessage (m) {

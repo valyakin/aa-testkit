@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "mocha 'test/**/**spec.js'"
+    "test": "mocha 'test/**/**spec.js'",
+    "test:aa": "mocha 'test/aa/**spec.js'"
   },
   "dependencies": {
     "config": "^3.2.2",

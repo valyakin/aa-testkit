@@ -1,3 +1,5 @@
+const fs = require('fs')
+var util = require('util')
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const { MessageChildReady } = requireRoot('src/messages')
@@ -41,7 +43,26 @@ class ObyteHubChild extends AbstractChild {
 		this.conf.initial_witnesses = this.initialWitnesses
 
 		this.hub = require('obyte-hub')
-		this.sendParent(new MessageChildReady())
+
+		this.replaceConsoleLog().then(() => this.sendParent(new MessageChildReady()))
+	}
+
+	replaceConsoleLog () {
+		return new Promise(resolve => {
+			const desktopApp = require('ocore/desktop_app.js')
+			const appDataDir = desktopApp.getAppDataDir()
+			const logFilename = this.conf.LOG_FILENAME || (appDataDir + '/log.txt')
+			const writeStream = fs.createWriteStream(logFilename)
+			console.log('---------------')
+			console.log('From this point, output will be redirected to ' + logFilename)
+			console.log = function () {
+				writeStream.write(Date().toString() + ': ')
+				writeStream.write(util.format.apply(null, arguments) + '\n')
+			}
+			console.warn = console.log
+			console.info = console.log
+			setTimeout(resolve, 1000)
+		})
 	}
 }
 

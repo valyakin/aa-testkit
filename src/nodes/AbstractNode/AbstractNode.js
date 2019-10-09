@@ -68,7 +68,7 @@ class AbstractNode extends EventEmitter {
 	async stabilize () {
 		return new Promise(resolve => {
 			this.once('mci_became_stable', () => {
-				console.log('stabilized', this.id)
+				// console.log('stabilized', this.id)
 				resolve(this)
 			})
 		})

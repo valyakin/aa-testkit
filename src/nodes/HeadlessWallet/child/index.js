@@ -6,6 +6,7 @@ const {
 	MessageMyBalance,
 	MessageChildReady,
 	MessageChildError,
+	MessageSentData,
 	MessagePasswordRequired,
 } = requireRoot('src/messages')
 
@@ -20,6 +21,7 @@ class HeadlessWalletChild extends AbstractChild {
 		super(params, paramsSchema)
 
 		this
+			.on('command_send_data', (m) => this.sendData(m))
 			.on('command_get_address', () => this.getAddress())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
 			.on('command_get_balance', (m) => this.getBalance(m))
@@ -48,7 +50,7 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this.sendParent(new MessagePasswordRequired())
 		this.eventBus.once('headless_wallet_ready', () => {
-			this.sendParent(new MessageChildReady())
+			setTimeout(() => this.sendParent(new MessageChildReady()), 1000)
 		})
 	}
 
@@ -59,13 +61,41 @@ class HeadlessWalletChild extends AbstractChild {
 	}
 
 	sendBytes ({ toAddress, amount }) {
-		console.log('sendBytes ({ toAddress, amount }) { :', { toAddress, amount })
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
 				this.sendParent(new MessageChildError({ error: err }))
 			} else {
-				setTimeout(() => { this.sendParent(new MessageSentBytes({ unit })) }, 100)
+				this.sendParent(new MessageSentBytes({ unit }))
 			}
+		})
+	}
+
+	sendData (message) {
+		const { payload, toAddress, amount } = message
+		this.headlessWallet.readFirstAddress(firstAddress => {
+			const objectHash = require('ocore/object_hash.js')
+
+			const messages = [
+				{
+					app: 'data',
+					payload_location: 'inline',
+					payload_hash: objectHash.getBase64Hash(payload),
+					payload: payload,
+				},
+			]
+			const opts = {
+				paying_addresses: [firstAddress],
+				to_address: toAddress,
+				amount,
+				messages,
+			}
+
+			this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
+				if (err) {
+					this.sendParent(new MessageChildError({ error: err }))
+				}
+				this.sendParent(new MessageSentData({ unit }))
+			})
 		})
 	}
 

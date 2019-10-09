@@ -54,7 +54,7 @@ class GenesisNode extends AbstractNode {
 	}
 
 	async postWitness () {
-		console.log('post witness')
+		// console.log('post witness')
 		this.sendChild(new CommandPostWitness())
 	}
 }

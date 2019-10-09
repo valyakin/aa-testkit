@@ -36,7 +36,6 @@ class GenesisNodeChild extends AbstractChild {
 
 	start () {
 		super.start()
-		// require('obyte-witness')
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
 		this.device = require('ocore/device.js')
@@ -95,11 +94,6 @@ class GenesisNodeChild extends AbstractChild {
 			this.address = address
 
 			this.sendParent(new MessageGenesisCreated({ address, genesisUnit: genesisHash }))
-
-			//
-			//
-			// this.constants.initial_witnesses = [address]
-			// require('obyte-witness')
 			this.sendParent(new MessageChildReady())
 		} catch (error) {
 			this.sendParent(new MessageChildError(error))
