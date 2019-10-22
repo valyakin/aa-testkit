@@ -1,12 +1,13 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const {
+	MessageSentData,
+	MessageSentMulti,
 	MessageSentBytes,
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageChildReady,
 	MessageChildError,
-	MessageSentData,
 	MessagePasswordRequired,
 } = requireRoot('src/messages')
 
@@ -22,6 +23,7 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this
 			.on('command_send_data', (m) => this.sendData(m))
+			.on('command_send_multi', (m) => this.sendMulti(m))
 			.on('command_get_address', () => this.getAddress())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
 			.on('command_get_balance', (m) => this.getBalance(m))
@@ -67,6 +69,15 @@ class HeadlessWalletChild extends AbstractChild {
 			} else {
 				this.sendParent(new MessageSentBytes({ unit }))
 			}
+		})
+	}
+
+	sendMulti ({ opts }) {
+		this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
+			if (err) {
+				this.sendParent(new MessageChildError({ error: err }))
+			}
+			this.sendParent(new MessageSentMulti({ unit }))
 		})
 	}
 

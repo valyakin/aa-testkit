@@ -2,12 +2,12 @@ require('../../require')
 const chai = require('chai')
 const Network = requireRoot('src/networks')
 const expect = chai.expect
-const { varsSettingCheck } = require('./agents')
+const { justABouncer } = require('./agents')
 const ojson = require('ocore/formula/parse_ojson')
 const { promisify } = require('util')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
 
-describe('Check AA state vars setting', function () {
+describe('Check `just a bouncer` AA ', function () {
 	this.timeout(60000)
 
 	before(async () => {
@@ -28,29 +28,26 @@ describe('Check AA state vars setting', function () {
 		await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 		await network.witness()
 
-		const agent = await promisify(ojson.parse)(varsSettingCheck)
+		const agent = await promisify(ojson.parse)(justABouncer)
 		const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agent)
+
+		let walletBalance = await wallet.getBalance()
 
 		expect(isValidAddress(agentAddress)).to.be.true
 		expect(agentUnit).to.be.a('string')
+		expect(walletBalance.base.stable).to.be.equal(1000000)
 		await network.witness(2)
 
-		const newUnit = await wallet.sendData({
+		const newUnit = await wallet.sendBytes({
 			toAddress: agentAddress,
 			amount: 10000,
-			payload: {
-				var: 'trigger_var',
-			},
 		})
 
 		expect(newUnit).to.be.a('string')
 		await network.witness(2)
 
-		const { vars } = await deployer.readAAStateVars(agentAddress)
-
-		expect(vars.constant_var).to.be.equal('constant_var')
-		expect(vars.trigger_var).to.be.equal('trigger_var')
-		expect(vars.sum_var).to.be.equal('579')
+		walletBalance = await wallet.getBalance()
+		expect(walletBalance.base.pending).to.be.equal(9000)
 	}).timeout(30000)
 
 	after(async () => {

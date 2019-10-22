@@ -3,7 +3,7 @@ const Joi = require('joi')
 const config = require('config')
 
 const { getIdForPrefix } = requireRoot('src/utils')
-const { HeadlessWallet, AgentDeployer, GenesisNode, ObyteHub } = requireRoot('src/nodes')
+const { HeadlessWallet, AgentDeployer, GenesisNode, ObyteHub, ObyteExplorer } = requireRoot('src/nodes')
 
 const paramsSchema = () => ({
 	runid: Joi.string().required(),
@@ -21,6 +21,7 @@ class NetworkFromGenesis {
 		this.nodes = {
 			headlessWallets: [],
 			agentDeployers: [],
+			obyteExplorers: [],
 		}
 	}
 
@@ -36,6 +37,7 @@ class NetworkFromGenesis {
 		return [
 			...this.nodes.headlessWallets,
 			...this.nodes.agentDeployers,
+			...this.nodes.obyteExplorers,
 			this.genesisNode,
 			this.hub,
 		]
@@ -81,11 +83,24 @@ class NetworkFromGenesis {
 		this.nodes.agentDeployers.push(deployer)
 		return deployer
 	}
+
+	newObyteExplorer (params) {
+		const explorer = new ObyteExplorer({
+			rundir: this.rundir,
+			genesisUnit: this.genesisUnit,
+			id: getIdForPrefix(this.rundir, 'obyte-explorer-'),
+			initialWitnesses: this.initialWitnesses,
+			...params,
+		})
+		this.nodes.obyteExplorers.push(explorer)
+		return explorer
+	}
 }
 
 const genesis = async () => {
 	const runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
 	const rundir = path.join(config.TESTDATA_DIR, runid)
+	console.log('rundir', rundir)
 
 	const genesisNode = new GenesisNode({
 		rundir,
