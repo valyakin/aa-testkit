@@ -8,6 +8,7 @@ const MessageChildReady = require('./lib/MessageChildReady')
 const MessageAAStateVars = require('./lib/MessageAAStateVars')
 const MessageChildStarted = require('./lib/MessageChildStarted')
 const MessageAgentDeployed = require('./lib/MessageAgentDeployed')
+const MessageTimeTravelDone = require('./lib/MessageTimeTravelDone')
 const MessageConnectedToHub = require('./lib/MessageConnectedToHub')
 const MessageGenesisCreated = require('./lib/MessageGenesisCreated')
 const MessageMciBecameStable = require('./lib/MessageMciBecameStable')
@@ -20,6 +21,7 @@ const CommandSendBytes = require('./lib/CommandSendBytes')
 const CommandGetAddress = require('./lib/CommandGetAddress')
 const CommandLoginToHub = require('./lib/CommandLoginToHub')
 const CommandGetBalance = require('./lib/CommandGetBalance')
+const CommandTimeTravel = require('./lib/CommandTimeTravel')
 const CommandDeployAgent = require('./lib/CommandDeployAgent')
 const CommandPostWitness = require('./lib/CommandPostWitness')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
@@ -39,6 +41,7 @@ const fromMessage = (m) => {
 	case 'child_started': return new MessageChildStarted(message)
 	case 'agent_deployed': return new MessageAgentDeployed(message)
 	case 'genesis_created': return new MessageGenesisCreated(message)
+	case 'time_travel_done': return new MessageTimeTravelDone(message)
 	case 'connected_to_hub': return new MessageConnectedToHub(message)
 	case 'mci_became_stable': return new MessageMciBecameStable(message)
 	case 'password_required': return new MessagePasswordRequired(message)
@@ -49,6 +52,7 @@ const fromMessage = (m) => {
 	case 'command_send_bytes': return new CommandSendBytes(message)
 	case 'command_get_address': return new CommandGetAddress(message)
 	case 'command_get_balance': return new CommandGetBalance(message)
+	case 'command_time_travel': return new CommandTimeTravel(message)
 	case 'command_login_to_hub': return new CommandLoginToHub(message)
 	case 'command_deploy_agent': return new CommandDeployAgent(message)
 	case 'command_post_witness': return new CommandPostWitness(message)
@@ -72,6 +76,7 @@ module.exports = {
 	MessageChildStarted,
 	MessageAgentDeployed,
 	MessageConnectedToHub,
+	MessageTimeTravelDone,
 	MessageGenesisCreated,
 	MessageMciBecameStable,
 	MessagePasswordRequired,
@@ -82,6 +87,7 @@ module.exports = {
 	CommandSendBytes,
 	CommandGetAddress,
 	CommandLoginToHub,
+	CommandTimeTravel,
 	CommandGetBalance,
 	CommandDeployAgent,
 	CommandPostWitness,

@@ -1,5 +1,5 @@
 const fs = require('fs')
-var util = require('util')
+const util = require('util')
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const { MessageChildReady } = requireRoot('src/messages')

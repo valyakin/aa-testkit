@@ -1,7 +1,4 @@
-require('../../require')
-const chai = require('chai')
 const Network = requireRoot('src/networks')
-const expect = chai.expect
 
 describe('Check payments', function () {
 	this.timeout(60000)

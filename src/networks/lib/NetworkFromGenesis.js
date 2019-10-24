@@ -47,6 +47,10 @@ class NetworkFromGenesis {
 		return Promise.all(this.nodesList.map(n => n.stop()))
 	}
 
+	async timetravelTo (to) {
+		return Promise.all(this.nodesList.map(n => n.timeTravel({ to })))
+	}
+
 	async witness (n = 1) {
 		for (let i = 0; i < n; i++) {
 			await this.witnessAndStabilize()

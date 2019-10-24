@@ -1,6 +1,7 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const {
+	MessageMyAddress,
 	MessageSentBytes,
 	MessageChildReady,
 	MessageChildError,
@@ -22,6 +23,7 @@ class GenesisNodeChild extends AbstractChild {
 			.on('command_login_to_hub', () => this.loginToHub())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
 			.on('command_post_witness', () => this.postWitness())
+			.on('command_get_address', (m) => this.getAddress(m))
 	}
 
 	static unpackArgv (argv) {
@@ -139,6 +141,12 @@ class GenesisNodeChild extends AbstractChild {
 					},
 				},
 			})
+		})
+	}
+
+	getAddress () {
+		this.headlessWallet.readFirstAddress(address => {
+			this.sendParent(new MessageMyAddress({ address }))
 		})
 	}
 }

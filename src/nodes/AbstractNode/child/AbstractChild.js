@@ -1,11 +1,13 @@
 require('../../../../require')
+const mockdate = require('mockdate')
 const EventEmitter = require('events')
 const Joi = require('joi')
 const fs = require('fs')
-const { fromMessage, MessageChildStarted, MessageMciBecameStable } = requireRoot('src/messages')
+const { fromMessage, MessageChildStarted, MessageMciBecameStable, MessageTimeTravelDone } = requireRoot('src/messages')
 
 class AbstractChild extends EventEmitter {
 	constructor (params, paramsSchema, options) {
+		console.log('Date :', new Date())
 		super()
 		this.setMaxListeners(20)
 
@@ -27,6 +29,7 @@ class AbstractChild extends EventEmitter {
 
 		this
 			.on('command_child_stop', () => this.stop())
+			.on('command_time_travel', (m) => this.timeTravel(m))
 
 		const eventBus = require('ocore/event_bus')
 		eventBus.on('mci_became_stable', () => setTimeout(() => this.sendParent(new MessageMciBecameStable()), 100))
@@ -48,13 +51,19 @@ class AbstractChild extends EventEmitter {
 	}
 
 	sendParent (message) {
+		console.log('sendParent', JSON.stringify(message.serialize(), null, 2))
 		setTimeout(() => process.send(message.serialize()), 100)
 	}
 
 	handleParentMessage (m) {
-		console.log('message', JSON.stringify(m, null, 2))
+		console.log('handleParentMessage', JSON.stringify(m, null, 2))
 		const message = fromMessage(m)
 		this.emit(message.topic, message)
+	}
+
+	timeTravel ({ to }) {
+		mockdate.set(to)
+		this.sendParent(new MessageTimeTravelDone())
 	}
 }
 

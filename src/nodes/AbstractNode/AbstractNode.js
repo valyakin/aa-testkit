@@ -3,7 +3,7 @@ const EventEmitter = require('events')
 const path = require('path')
 const Joi = require('joi')
 
-const { fromMessage, MessageChildError, CommandChildStop } = requireRoot('src/messages')
+const { fromMessage, MessageChildError, CommandChildStop, CommandTimeTravel } = requireRoot('src/messages')
 
 class AbstractNode extends EventEmitter {
 	constructor (params, schema, options = {}) {
@@ -68,9 +68,17 @@ class AbstractNode extends EventEmitter {
 	async stabilize () {
 		return new Promise(resolve => {
 			this.once('mci_became_stable', () => {
-				// console.log('stabilized', this.id)
 				resolve(this)
 			})
+		})
+	}
+
+	async timeTravel ({ to }) {
+		return new Promise(resolve => {
+			this.once('time_travel_done', () => {
+				resolve(this)
+			})
+			this.sendChild(new CommandTimeTravel({ to }))
 		})
 	}
 

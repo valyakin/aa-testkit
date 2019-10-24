@@ -1,13 +1,10 @@
-require('../../require')
-const chai = require('chai')
 const Network = requireRoot('src/networks')
-const expect = chai.expect
 const { varsSettingCheck } = require('./agents')
 const ojson = require('ocore/formula/parse_ojson')
 const { promisify } = require('util')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
 
-describe('Check AA state vars setting', function () {
+describe('AA state vars', function () {
 	this.timeout(60000)
 
 	before(async () => {
@@ -35,7 +32,15 @@ describe('Check AA state vars setting', function () {
 		expect(agentUnit).to.be.a('string')
 		await network.witness(2)
 
-		const newUnit = await wallet.sendData({
+		this.agentAddress = agentAddress
+		this.deployer = deployer
+		this.wallet = wallet
+	}).timeout(30000)
+
+	it('Check agent state vars read', async () => {
+		const { agentAddress, wallet, network, deployer } = this
+
+		const unit = await wallet.sendData({
 			toAddress: agentAddress,
 			amount: 10000,
 			payload: {
@@ -43,7 +48,7 @@ describe('Check AA state vars setting', function () {
 			},
 		})
 
-		expect(newUnit).to.be.a('string')
+		expect(unit).to.be.a('string')
 		await network.witness(2)
 
 		const { vars } = await deployer.readAAStateVars(agentAddress)

@@ -6,13 +6,15 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "mocha 'test/**/**spec.js'",
-    "test:aa": "mocha 'test/aa/**spec.js'"
+    "test": "mocha --require test/bootload.js",
+    "test:aa": "mocha --require test/bootload.js 'test/aa/**spec.js'",
+    "test:all": "mocha --require test/bootload.js 'test/**/**spec.js'"
   },
   "dependencies": {
     "config": "^3.2.2",
     "headless-obyte": "git+https://github.com/byteball/headless-obyte.git#aa",
     "joi": "^14.3.1",
+    "mockdate": "^2.0.5",
     "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",
     "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
     "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",

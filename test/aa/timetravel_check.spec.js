@@ -1,17 +1,17 @@
 const Network = requireRoot('src/networks')
-const { justABouncer } = require('./agents')
+const { timeDependentAA } = require('./agents')
 const ojson = require('ocore/formula/parse_ojson')
 const { promisify } = require('util')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
 
-describe('Check `just a bouncer` AA', function () {
-	this.timeout(120000)
+describe('Network time travel function', function () {
+	this.timeout(60000)
 
 	before(async () => {
 		this.network = await Network.genesis()
 	})
 
-	it('Check agent deployment', async () => {
+	it('Check agent dependent on time', async () => {
 		const network = this.network
 		const genesis = await network.getGenesisNode().ready()
 
@@ -25,27 +25,37 @@ describe('Check `just a bouncer` AA', function () {
 		await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 		await network.witness()
 
-		const agent = await promisify(ojson.parse)(justABouncer)
+		const agent = await promisify(ojson.parse)(timeDependentAA)
 		const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agent)
-
-		let walletBalance = await wallet.getBalance()
 
 		expect(isValidAddress(agentAddress)).to.be.true
 		expect(agentUnit).to.be.a('string')
-		expect(walletBalance.base.stable).to.be.equal(1000000)
 		await network.witness(2)
 
-		const newUnit = await wallet.sendBytes({
+		const unitBeforeTravel = await wallet.sendBytes({
 			toAddress: agentAddress,
 			amount: 10000,
 		})
-
-		expect(newUnit).to.be.a('string')
+		expect(unitBeforeTravel).to.be.a('string')
 		await network.witness(2)
 
-		walletBalance = await wallet.getBalance()
-		expect(walletBalance.base.pending).to.be.equal(9000)
-	}).timeout(60000)
+		let state = await deployer.readAAStateVars(agentAddress)
+
+		expect(state.vars.time).to.be.equal('past')
+
+		await network.timetravelTo('2050-01-01')
+
+		const unitAfterTravel = await wallet.sendBytes({
+			toAddress: agentAddress,
+			amount: 10000,
+		})
+		expect(unitAfterTravel).to.be.a('string')
+		await network.witness(2)
+
+		state = await deployer.readAAStateVars(agentAddress)
+
+		expect(state.vars.time).to.be.equal('future')
+	}).timeout(30000)
 
 	after(async () => {
 		await this.network.stop()
