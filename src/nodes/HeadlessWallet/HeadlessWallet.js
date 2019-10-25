@@ -6,7 +6,7 @@ const {
 	CommandSendMulti,
 	CommandGetAddress,
 	CommandGetBalance,
-} = requireRoot('src/messages')
+} = require('../../messages')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),

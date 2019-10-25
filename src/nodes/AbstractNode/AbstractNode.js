@@ -3,7 +3,13 @@ const EventEmitter = require('events')
 const path = require('path')
 const Joi = require('joi')
 
-const { fromMessage, MessageChildError, CommandChildStop, CommandTimeTravel } = requireRoot('src/messages')
+const {
+	fromMessage,
+	CommandChildStop,
+	CommandTimeTravel,
+	MessageChildError,
+	CommandGetUnitInfo,
+} = require('../../messages')
 
 class AbstractNode extends EventEmitter {
 	constructor (params, schema, options = {}) {
@@ -38,12 +44,13 @@ class AbstractNode extends EventEmitter {
 		}
 
 		this.child = childProcess.fork('index.js', argv, options)
+			.on('exit', this.handleChildExit.bind(this))
 			.on('error', this.handleChildError.bind(this))
 			.on('message', this.handleChildMessage.bind(this))
 			.setMaxListeners(20)
 
 		this
-			.on('child_ready', () => { this.isReady = true })
+			.on('child_ready', () => this.childReady())
 	}
 
 	async stop () {
@@ -82,12 +89,30 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
+	childReady () {
+		console.log(`[INFO][${this.id}] Child started`)
+		this.isReady = true
+	}
+
+	async getUnitInfo ({ unit }) {
+		return new Promise(resolve => {
+			this.once('unit_info', (message) => {
+				resolve(message.unitObj)
+			})
+			this.sendChild(new CommandGetUnitInfo({ unit }))
+		})
+	}
+
 	sendChild (message) {
 		this.child.send(message.serialize())
 	}
 
 	handleChildError (e) {
 		console.log(`[Error][${this.id}]`, e)
+	}
+
+	handleChildExit () {
+		console.log(`[INFO][${this.id}] Child exited`)
 	}
 
 	handleChildMessage (m) {

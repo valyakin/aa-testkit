@@ -1,3 +1,4 @@
+const MessageUnitInfo = require('./lib/MessageUnitInfo')
 const MessageSentData = require('./lib/MessageSentData')
 const MessageSentMulti = require('./lib/MessageSentMulti')
 const MessageSentBytes = require('./lib/MessageSentBytes')
@@ -24,12 +25,14 @@ const CommandGetBalance = require('./lib/CommandGetBalance')
 const CommandTimeTravel = require('./lib/CommandTimeTravel')
 const CommandDeployAgent = require('./lib/CommandDeployAgent')
 const CommandPostWitness = require('./lib/CommandPostWitness')
+const CommandGetUnitInfo = require('./lib/CommandGetUnitInfo')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
 
 const fromMessage = (m) => {
 	const message = JSON.parse(m)
 
 	switch (message.topic) {
+	case 'unit_info': return new MessageUnitInfo(message)
 	case 'sent_data': return new MessageSentData(message)
 	case 'sent_multi': return new MessageSentMulti(message)
 	case 'sent_bytes': return new MessageSentBytes(message)
@@ -56,6 +59,7 @@ const fromMessage = (m) => {
 	case 'command_login_to_hub': return new CommandLoginToHub(message)
 	case 'command_deploy_agent': return new CommandDeployAgent(message)
 	case 'command_post_witness': return new CommandPostWitness(message)
+	case 'command_get_unit_info': return new CommandGetUnitInfo(message)
 	case 'command_read_aa_state_vars': return new CommandReadAAStateVars(message)
 
 	default: throw new Error(`Unsupported message topic '${message.topic}'`)
@@ -65,6 +69,7 @@ const fromMessage = (m) => {
 module.exports = {
 	fromMessage,
 
+	MessageUnitInfo,
 	MessageSentData,
 	MessageSentMulti,
 	MessageSentBytes,
@@ -91,5 +96,6 @@ module.exports = {
 	CommandGetBalance,
 	CommandDeployAgent,
 	CommandPostWitness,
+	CommandGetUnitInfo,
 	CommandReadAAStateVars,
 }

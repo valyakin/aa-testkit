@@ -8,7 +8,7 @@ const {
 	MessageConnectedToHub,
 	MessageGenesisCreated,
 	MessagePasswordRequired,
-} = requireRoot('src/messages')
+} = require('../../../messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),

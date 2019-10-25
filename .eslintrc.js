@@ -19,6 +19,7 @@ module.exports = {
     "comma-dangle": ["error", "always-multiline"],
     "mocha/no-exclusive-tests": "error",
     "no-unused-expressions": 0,
-    "chai-friendly/no-unused-expressions": 2
+    "chai-friendly/no-unused-expressions": 2,
+    'no-warning-comments': ['error', {'terms': ['fixme'], 'location': 'start'}],
   }
 }

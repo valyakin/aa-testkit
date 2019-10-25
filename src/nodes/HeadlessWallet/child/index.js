@@ -9,7 +9,7 @@ const {
 	MessageChildReady,
 	MessageChildError,
 	MessagePasswordRequired,
-} = requireRoot('src/messages')
+} = require('../../../messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),

@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
-const { MessageChildReady } = requireRoot('src/messages')
+const { MessageChildReady } = require('../../../messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),

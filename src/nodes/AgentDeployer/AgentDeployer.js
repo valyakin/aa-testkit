@@ -1,6 +1,6 @@
 const Joi = require('joi')
 const AbstractNode = require('../AbstractNode/AbstractNode')
-const { CommandGetAddress, CommandGetBalance, CommandDeployAgent, CommandReadAAStateVars } = requireRoot('src/messages')
+const { CommandGetAddress, CommandGetBalance, CommandDeployAgent, CommandReadAAStateVars } = require('../../messages')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),

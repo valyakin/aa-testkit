@@ -1,5 +1,5 @@
 const Joi = require('joi')
-const { CommandLoginToHub, CommandSendBytes, CommandPostWitness, CommandGetAddress } = requireRoot('src/messages')
+const { CommandLoginToHub, CommandSendBytes, CommandPostWitness, CommandGetAddress } = require('../../messages')
 const AbstractNode = require('../AbstractNode/AbstractNode')
 
 const schemaFactory = () => ({

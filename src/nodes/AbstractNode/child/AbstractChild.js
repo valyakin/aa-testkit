@@ -1,13 +1,17 @@
-require('../../../../require')
 const mockdate = require('mockdate')
 const EventEmitter = require('events')
 const Joi = require('joi')
 const fs = require('fs')
-const { fromMessage, MessageChildStarted, MessageMciBecameStable, MessageTimeTravelDone } = requireRoot('src/messages')
+const {
+	fromMessage,
+	MessageUnitInfo,
+	MessageChildStarted,
+	MessageTimeTravelDone,
+	MessageMciBecameStable,
+} = require('../../../messages')
 
 class AbstractChild extends EventEmitter {
 	constructor (params, paramsSchema, options) {
-		console.log('Date :', new Date())
 		super()
 		this.setMaxListeners(20)
 
@@ -30,6 +34,7 @@ class AbstractChild extends EventEmitter {
 		this
 			.on('command_child_stop', () => this.stop())
 			.on('command_time_travel', (m) => this.timeTravel(m))
+			.on('command_get_unit_info', (m) => this.getUnitInfo(m))
 
 		const eventBus = require('ocore/event_bus')
 		eventBus.on('mci_became_stable', () => setTimeout(() => this.sendParent(new MessageMciBecameStable()), 100))
@@ -64,6 +69,14 @@ class AbstractChild extends EventEmitter {
 	timeTravel ({ to }) {
 		mockdate.set(to)
 		this.sendParent(new MessageTimeTravelDone())
+	}
+
+	getUnitInfo ({ unit }) {
+		const { getInfoOnUnit } = require('obyte-explorer/controllers/units')
+		getInfoOnUnit(unit, (unitObj) => {
+			console.log('unitObj', JSON.stringify(unitObj, null, 2))
+			this.sendParent(new MessageUnitInfo({ unitObj }))
+		})
 	}
 }
 

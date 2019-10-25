@@ -1,9 +1,10 @@
-const path = require('path')
+const fs = require('fs')
 const Joi = require('joi')
-const config = require('config')
+const path = require('path')
+const config = require('config')['aa-testkit']
 
-const { getIdForPrefix } = requireRoot('src/utils')
-const { HeadlessWallet, AgentDeployer, GenesisNode, ObyteHub, ObyteExplorer } = requireRoot('src/nodes')
+const { getIdForPrefix } = require('../../utils')
+const { HeadlessWallet, AgentDeployer, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
 
 const paramsSchema = () => ({
 	runid: Joi.string().required(),
@@ -102,6 +103,7 @@ class NetworkFromGenesis {
 }
 
 const genesis = async () => {
+	fs.mkdirSync(config.TESTDATA_DIR, { recursive: true })
 	const runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
 	const rundir = path.join(config.TESTDATA_DIR, runid)
 	console.log('rundir', rundir)

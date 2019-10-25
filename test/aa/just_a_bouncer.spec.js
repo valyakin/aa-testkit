@@ -33,6 +33,7 @@ describe('Check `just a bouncer` AA', function () {
 		expect(isValidAddress(agentAddress)).to.be.true
 		expect(agentUnit).to.be.a('string')
 		expect(walletBalance.base.stable).to.be.equal(1000000)
+
 		await network.witness(2)
 
 		const newUnit = await wallet.sendBytes({
