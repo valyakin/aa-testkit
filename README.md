@@ -137,7 +137,7 @@ const network = await Network.genesis()
 
 ### __`network.getGenesisNode()`__ *`: <GenesisNode>`*
 
-Returns `GenesisNode` of this network
+__Returns__ `GenesisNode` of this network
 
 <details>
 <summary>Example</summary>
@@ -156,7 +156,7 @@ const genesis = await network.getGenesisNode().ready()
 
 ### __`network.getHub()`__ *`: <ObyteHub>`*
 
-Returns `ObyteHub` of this network
+__Returns__ `ObyteHub` of this network
 
 <details>
 <summary>Example</summary>
@@ -231,7 +231,7 @@ allows you to set the current network time in the future. This can be helpful fo
 
 #### Parameters
 
-*`to`* - Network will change its time to this. Can be either a timestamp or a string in the valid format of `Date()` function
+*`to`* - new time of the network. Can be either a timestamp or a string in the valid format of `Date()` function
 
 <details>
 <summary>Example</summary>
@@ -245,6 +245,8 @@ const genesis = await network.getGenesisNode().ready()
 
 await network.timetravelTo('2050-01-01')
 ```
+
+Also check in [Test Examples](#Test-Examples)
 </details>
 
 ---------------------------------------
@@ -384,19 +386,19 @@ Methods described in this section are applicable for any node
 
 ### __`node.ready()`__ *`: <Promise>`*
 
-Returns *Promise* that resolves when node child will be ready to operate
+__Returns__ *Promise* that resolves when node child will be ready to operate
 
 ---------------------------------------
 
 ### __`node.stop()`__ *`: <Promise>`*
 
-Returns *Promise* that resolves when node child exited its process
+__Returns__ *Promise* that resolves when node child exited its process
 
 ---------------------------------------
 
 ### __`node.stabilize()`__ *`: <Promise>`*
 
-Returns *Promise* that resolves when node child receives `mci_became_stable` event
+__Returns__ *Promise* that resolves when node child receives `mci_became_stable` event
 
 ---------------------------------------
 
@@ -406,11 +408,11 @@ Send the command to node child to change its time. This can be helpful for testi
 
 > **Note:** Timetravel should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
 
-Returns *Promise* that resolves when node child receives `mci_became_stable` event
+__Returns__ *Promise* that resolves when node child receives `mci_became_stable` event
 
 #### Parameters
 
-*`to`* - Node child will change its time to this. Can be either a timestamp or a string in the valid format of `Date()` function
+*`to`* - new time of the node's child. Can be either a timestamp or a string in the valid format of `Date()` function
 
 ---------------------------------------
 
@@ -530,7 +532,7 @@ Genesis node main function is to start new network and create genesis unit. Afte
 
 Creates network with new genesis unit.
 
-Returns *Promise* that resolves when genesis complete. *Promise* resolves to { genesisUnit, genesisAddress }
+__Returns__ *Promise* that resolves when genesis complete. *Promise* resolves to { genesisUnit, genesisAddress }
 
 <details>
 <summary>Example</summary>
@@ -558,7 +560,7 @@ const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 
 Send the command to node child to connect to hub. Usefull at network genesis, because hub node starts after genesis node.
 
-Returns *Promise* that resolves when node connected to hub
+__Returns__ *Promise* that resolves when node connected to hub
 </details>
 
 ---------------------------------------
@@ -567,7 +569,7 @@ Returns *Promise* that resolves when node connected to hub
 
 Broadcast new witness to network. Returns nothing and does not wait for joint to be broadcasted to other nodes. To wait for stabilization use `stabilize` method from [Common node methods](#Common-node-methods)
 
-Returns nothing
+__Returns__ nothing
 
 <details>
 <summary>Example</summary>
@@ -624,7 +626,7 @@ await wallet.stop()
 
 Request node address from child.
 
-Returns *Promise* that resolves to node address
+__Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
@@ -632,7 +634,7 @@ Returns *Promise* that resolves to node address
 
 Send Bytes to address
 
-Returns *Promise* that resolves to `{ unit, error }` after Bytes are sent. `error` will be null if sending was successfull
+__Returns__ *Promise* that resolves to `{ unit, error }` after Bytes are sent. `error` will be null if sending was successfull
 
 #### Parameters
 
@@ -682,7 +684,7 @@ Headless wallet node provides common network node functionality. It can receive 
 
 Request node address from child.
 
-Returns *Promise* that resolves to node address
+__Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
@@ -690,7 +692,7 @@ Returns *Promise* that resolves to node address
 
 Retrieve node balance from child.
 
-Returns *Promise* that resolves to node balance object
+__Returns__ *Promise* that resolves to node balance object
 
 <details>
 <summary>Balance object example</summary>
@@ -712,7 +714,7 @@ Returns *Promise* that resolves to node balance object
 
 Send Bytes to address
 
-Returns *Promise* that resolves to `{ unit, error }` after Bytes are sent. `error` will be null if sending was successfull
+__Returns__ *Promise* that resolves to `{ unit, error }` after Bytes are sent. `error` will be null if sending was successfull
 
 #### Parameters
 
@@ -726,7 +728,7 @@ Returns *Promise* that resolves to `{ unit, error }` after Bytes are sent. `erro
 
 Broadcast data message to network. Usefull to trigger AA execution with some data. For this, set `toAddress` to address of deployed AA
 
-Returns *Promise* that resolves to `{ unit, error }` after data is sent. `error` will be null if sending was successfull
+__Returns__ *Promise* that resolves to `{ unit, error }` after data is sent. `error` will be null if sending was successfull
 
 #### Parameters
 
@@ -742,7 +744,7 @@ Returns *Promise* that resolves to `{ unit, error }` after data is sent. `error`
 
 Allows to broadcast arbitrary message to network. Opts object forwards directly to [`issueChangeAddressAndSendMultiPayment`](https://developer.obyte.org/payments/data#data-with-any-structure) method of `headless-wallet`
 
-Returns *Promise* that resolves to `{ unit, error }` after message is sent. `error` will be null if sending was successfull
+__Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. `error` will be null if sending was successfull
 
 #### Parameters
 
@@ -771,7 +773,7 @@ Agent deployer node is responsible for AA deployment and control
 
 Request node address from child.
 
-Returns *Promise* that resolves to node address
+__Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
@@ -779,7 +781,7 @@ Returns *Promise* that resolves to node address
 
 Retrieve node balance from child.
 
-Returns *Promise* that resolves to node balance object
+__Returns__ *Promise* that resolves to node balance object
 
 <details>
 <summary>Balance object example</summary>
@@ -801,7 +803,7 @@ Returns *Promise* that resolves to node balance object
 
 Deploy an agent in the network.
 
-Returns *Promise* that resolves to `{ address, unit, error }`, where `adress` is the address of deployed agent and `unit` determines unit where agent was deployed. `error` will be null on success
+__Returns__ *Promise* that resolves to `{ address, unit, error }`, where `adress` is the address of deployed agent and `unit` determines unit where agent was deployed. `error` will be null on success
 
 #### Parameters
 
@@ -862,7 +864,7 @@ await network.stop()
 
 Retrieve current network vars state of agent
 
-Returns *Promise* that resolves to `{ vars }` where `vars` - state object of agent
+__Returns__ *Promise* that resolves to `{ vars }` where `vars` - state object of agent
 
 #### Parameters
 
@@ -1254,7 +1256,7 @@ await network.stop()
 
 ## Writing Tests With Mocha
 
-Although `aa-testkit` can be used with any test runner, we recommend using [mocha](https://www.npmjs.com/package/mocha) for writing tests.
+Although `aa-testkit` can be used with any test runner or even without one, we recommend using [mocha](https://www.npmjs.com/package/mocha) for writing tests.
 
 Some examples of mocha tests set up can be found inside `test` data of `aa-testkit` module
 
