@@ -9,20 +9,20 @@ Instant Obyte devnet network set up and testing
 * [Nodes API](#Nodes-API)
   * [Common node methods](#Common-node-methods)
   * [GenesisNode](#GenesisNode)
-	  * [GenesisNode constructor params](#GenesisNode-constructor-params)
-	  * [GenesisNode methods](#GenesisNode-methods)
+    * [GenesisNode constructor params](#GenesisNode-constructor-params)
+    * [GenesisNode methods](#GenesisNode-methods)
   * [ObyteHub](#ObyteHub)
-	  * [ObyteHub constructor params](#ObyteHub-constructor-params)
-	  * [ObyteHub methods](#ObyteHub-methods)
+    * [ObyteHub constructor params](#ObyteHub-constructor-params)
+    * [ObyteHub methods](#ObyteHub-methods)
   * [HeadlessWallet](#HeadlessWallet)
-	  * [HeadlessWallet constructor params](#HeadlessWallet-constructor-params)
-	  * [HeadlessWallet methods](#HeadlessWallet-methods)
+    * [HeadlessWallet constructor params](#HeadlessWallet-constructor-params)
+    * [HeadlessWallet methods](#HeadlessWallet-methods)
   * [AgentDeployer](#AgentDeployer)
-	  * [AgentDeployer constructor params](#AgentDeployer-constructor-params)
-	  * [AgentDeployer methods](#AgentDeployer-methods)
+    * [AgentDeployer constructor params](#AgentDeployer-constructor-params)
+    * [AgentDeployer methods](#AgentDeployer-methods)
   * [ObyteExplorer](#ObyteExplorer)
-	  * [ObyteExplorer constructor params](#ObyteExplorer-constructor-params)
-	  * [ObyteExplorer methods](#ObyteExplorer-methods)
+    * [ObyteExplorer constructor params](#ObyteExplorer-constructor-params)
+    * [ObyteExplorer methods](#ObyteExplorer-methods)
 * [Comprehensive Examples](#Comprehensive-Examples)
 * [Writing Tests](#Writing-Tests)
 
@@ -76,10 +76,10 @@ const Testkit = require('aa-testkit')
 const path = require('path')
 
 const { Network } = Testkit({
-	// should be absolute path
-	TESTDATA_DIR: path.join(__dirname, '../testdata'),
-	DEFAULT_PASSPHRASE: 'secret',
-	NETWORK_PORT: 5000,
+  // should be absolute path
+  TESTDATA_DIR: path.join(__dirname, '../testdata'),
+  DEFAULT_PASSPHRASE: 'secret',
+  NETWORK_PORT: 5000,
 })
 
 ```
@@ -95,11 +95,11 @@ Alternatively, if you are using [node-config](https://www.npmjs.com/package/conf
 const path = require('path')
 
 module.exports = {
-	'aa-testkit': {
-		TESTDATA_DIR: path.join(__dirname, '../testdata'),
-		DEFAULT_PASSPHRASE: '0000',
-		NETWORK_PORT: 6611,
-	},
+  'aa-testkit': {
+    TESTDATA_DIR: path.join(__dirname, '../testdata'),
+    DEFAULT_PASSPHRASE: '0000',
+    NETWORK_PORT: 6611,
+  },
 }
 
 // then you can import `aa-testkit` and `config` variables will be used
@@ -339,21 +339,21 @@ const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
 const { Nodes } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 const rundir = path.join(testdata, 'custom')
 const genesisNode = new Nodes.GenesisNode({
-	rundir,
-	id: 'genesis-node',
+  rundir,
+  id: 'genesis-node',
 })
 const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 
 // Hub will be created and started after genesis node because hub needs to know genesis unit and its main witness(genesis node)
 const hub = new Nodes.ObyteHub({
-	rundir: rundir,
-	genesisUnit: genesisUnit,
-	initialWitnesses: [genesisAddress],
-	id: 'obyte-hub',
+  rundir: rundir,
+  genesisUnit: genesisUnit,
+  initialWitnesses: [genesisAddress],
+  id: 'obyte-hub',
 })
 
 await genesisNode.ready()
@@ -362,9 +362,9 @@ await hub.ready()
 await genesisNode.loginToHub()
 
 const wallet = new Nodes.HeadlessWallet({
-	rundir: rundir,
-	genesisUnit: genesisUnit,
-	id: 'headless-wallet-1',
+  rundir: rundir,
+  genesisUnit: genesisUnit,
+  id: 'headless-wallet-1',
 })
 await wallet.ready()
 
@@ -541,12 +541,12 @@ const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
 const { Nodes } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 const rundir = path.join(testdata, 'custom')
 const genesisNode = new Nodes.GenesisNode({
-	rundir,
-	id: 'genesis-node',
+  rundir,
+  id: 'genesis-node',
 })
 const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 ```
@@ -578,20 +578,20 @@ const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
 const { Nodes } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 const rundir = path.join(testdata, 'custom')
 const genesisNode = new Nodes.GenesisNode({
-	rundir,
-	id: 'genesis-node',
+  rundir,
+  id: 'genesis-node',
 })
 const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 
 const hub = new Nodes.ObyteHub({
-	rundir: rundir,
-	genesisUnit: genesisUnit,
-	initialWitnesses: [genesisAddress],
-	id: 'obyte-hub',
+  rundir: rundir,
+  genesisUnit: genesisUnit,
+  initialWitnesses: [genesisAddress],
+  id: 'obyte-hub',
 })
 
 await genesisNode.ready()
@@ -599,9 +599,9 @@ await hub.ready()
 await genesisNode.loginToHub()
 
 const wallet = new Nodes.HeadlessWallet({
-	rundir: rundir,
-	genesisUnit: genesisUnit,
-	id: 'headless-wallet-1',
+  rundir: rundir,
+  genesisUnit: genesisUnit,
+  id: 'headless-wallet-1',
 })
 await wallet.ready()
 
@@ -841,17 +841,17 @@ await network.stop()
 
 ```javascript
 `{
-	bounce_fees: { base: 10000 },
-	messages: [
-		{
-			app: 'state',
-			state: "{
-				var['constant_var'] = 'constant_var';
-				var['trigger_var'] = trigger.data.var;
-				var['sum_var'] = 123 + 456;
-			}"
-		}
-	]
+  bounce_fees: { base: 10000 },
+  messages: [
+    {
+      app: 'state',
+      state: "{
+        var['constant_var'] = 'constant_var';
+        var['trigger_var'] = trigger.data.var;
+        var['sum_var'] = 123 + 456;
+      }"
+    }
+  ]
 }`
 ```
 </details>
@@ -934,7 +934,7 @@ const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
 const { Network } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 
 const network = await Network.genesis()
@@ -987,22 +987,22 @@ const { promisify } = require('util')
 const path = require('path')
 
 const agentString = `{
-	bounce_fees: { base: 10000 },
-	messages: [
-		{
-			app: 'state',
-			state: "{
-				var['constant_var'] = 'constant_var';
-				var['trigger_var'] = trigger.data.var;
-				var['sum_var'] = 123 + 456;
-			}"
-		}
-	]
+  bounce_fees: { base: 10000 },
+  messages: [
+    {
+      app: 'state',
+      state: "{
+        var['constant_var'] = 'constant_var';
+        var['trigger_var'] = trigger.data.var;
+        var['sum_var'] = 123 + 456;
+      }"
+    }
+  ]
 }`
 
 const testdata = path.join(__dirname, '../testdata')
 const { Network } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 
 const network = await Network.genesis()
@@ -1027,11 +1027,11 @@ await network.witness(2)
 
 // reading state vars
 const { unit } = await wallet.sendData({
-	toAddress: agentAddress,
-	amount: 10000,
-	payload: {
-		var: 'trigger_var',
-	},
+  toAddress: agentAddress,
+  amount: 10000,
+  payload: {
+    var: 'trigger_var',
+  },
 })
 
 await network.witness(2)
@@ -1058,41 +1058,41 @@ const { promisify } = require('util')
 const path = require('path')
 
 const agentString = `{
-	bounce_fees: { base: 10000 },
-	init: '{
-		$future_ts = 1893456000; // Jan 1, 2030
-	}',
-	messages: {
-		cases: [
-			{
-				if: '{timestamp > $future_ts}',
-				messages: [
-					{
-						app: 'state',
-						state: '{
-							var['time'] = 'future';
-						}'
-					},
-				]
-			},
-			{
-				if: '{timestamp <= $future_ts}',
-				messages: [
-					{
-						app: 'state',
-						state: '{
-							var['time'] = 'past';
-						}'
-					},
-				]
-			}
-		]
-	}
+  bounce_fees: { base: 10000 },
+  init: '{
+    $future_ts = 1893456000; // Jan 1, 2030
+  }',
+  messages: {
+    cases: [
+      {
+        if: '{timestamp > $future_ts}',
+        messages: [
+          {
+            app: 'state',
+            state: '{
+              var['time'] = 'future';
+            }'
+          },
+        ]
+      },
+      {
+        if: '{timestamp <= $future_ts}',
+        messages: [
+          {
+            app: 'state',
+            state: '{
+              var['time'] = 'past';
+            }'
+          },
+        ]
+      }
+    ]
+  }
 }`
 
 const testdata = path.join(__dirname, '../testdata')
 const { Network } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 
 const network = await Network.genesis()
@@ -1116,8 +1116,8 @@ assert(isValidAddress(agentAddress))
 await network.witness(2)
 
 const { unit: unitBeforeTravel } = await wallet.sendBytes({
-	toAddress: agentAddress,
-	amount: 10000,
+  toAddress: agentAddress,
+  amount: 10000,
 })
 await network.witness(2)
 
@@ -1129,8 +1129,8 @@ assert(state.vars.time === 'past')
 await network.timetravelTo('2050-01-01')
 
 const { unit: unitAfterTravel } = await wallet.sendBytes({
-	toAddress: agentAddress,
-	amount: 10000,
+  toAddress: agentAddress,
+  amount: 10000,
 })
 await network.witness(2)
 
@@ -1152,7 +1152,7 @@ const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
 const { Network } = Testkit({
-	TESTDATA_DIR: testdata,
+  TESTDATA_DIR: testdata,
 })
 
 const network = await Network.genesis()
