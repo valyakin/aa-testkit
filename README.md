@@ -655,7 +655,7 @@ Obyte hub node serves as transport for network. Node receives incomming messages
 |      silent      |     Boolean     |   false  |  `true` | Set this to `false` if you want to see node's child console output          |
 |    genesisUnit   |      String     |   true   |         | The very first unit of the network                                          |
 |       port       |      Number     |   false  |   6611  | Port the hub will be running on                                             |
-| initialWitnesses | Array[<String>] |   true   |         | Trusted witnesses of this node                                              |
+| initialWitnesses |  Array[String]  |   true   |         | Trusted witnesses of this node                                              |
 
 ### ObyteHub methods
 
@@ -889,7 +889,7 @@ Obyte explorer node provides DAG explorer of the network for visualization and d
 |      silent      |     Boolean     |   false  |       `true`       | Set this to `false` if you want to see node's child console output          |
 |    genesisUnit   |      String     |   true   |                    | The very first unit of the network                                          |
 |      webPort     |      Number     |   false  |        8080        | Port theDAG explorer will be started on                                     |
-| initialWitnesses | Array[<String>] |   true   |                    | Trusted witnesses of this node                                              |
+| initialWitnesses |  Array[String]  |   true   |                    | Trusted witnesses of this node                                              |
 |        hub       |      String     |   false  | `'localhost:6611'` | Address of the hub to connect                                               |
 
 ### ObyteExplorer methods
