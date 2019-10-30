@@ -1,5 +1,5 @@
 exports.WS_PROTOCOL = 'ws://'
-exports.hub = 'localhost:6611'
+exports.hub = ''
 
 exports.webPort = 8080
 
@@ -13,4 +13,4 @@ exports.languagesAvailable = {
 }
 
 exports.aaResponsesListed = 10
-exports.initial_peers = ['ws://localhost:6611']
+exports.initial_peers = ['']

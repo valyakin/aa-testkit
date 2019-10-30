@@ -12,6 +12,7 @@ const {
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
+	hub: Joi.string().required(),
 })
 
 class GenesisNodeChild extends AbstractChild {
@@ -29,15 +30,21 @@ class GenesisNodeChild extends AbstractChild {
 	static unpackArgv (argv) {
 		const [,,
 			id,
+			hub,
 		] = argv
 
 		return {
 			id,
+			hub,
 		}
 	}
 
 	start () {
 		super.start()
+
+		this.conf = require('ocore/conf.js')
+		this.conf.hub = this.hub
+
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
 		this.device = require('ocore/device.js')
@@ -74,12 +81,11 @@ class GenesisNodeChild extends AbstractChild {
 	}
 
 	sendBytes ({ toAddress, amount }) {
-		console.log('sendBytes ({ toAddress, amount }) { :', { toAddress, amount })
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
-				this.sendParent(new MessageChildError({ error: err }))
+				this.sendParent(new MessageSentBytes({ error: err }))
 			} else {
-				setTimeout(() => { this.sendParent(new MessageSentBytes({ unit })) }, 100)
+				this.sendParent(new MessageSentBytes({ unit }))
 			}
 		})
 	}

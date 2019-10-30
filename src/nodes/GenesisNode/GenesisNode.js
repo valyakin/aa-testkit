@@ -1,12 +1,14 @@
 const Joi = require('joi')
+const config = require('config')['aa-testkit']
 const { CommandLoginToHub, CommandSendBytes, CommandPostWitness, CommandGetAddress } = require('../../messages')
 const AbstractNode = require('../AbstractNode/AbstractNode')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
-	passphrase: Joi.string().required(),
 	silent: Joi.boolean().default(true),
+	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
+	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 })
 
 class GenesisNode extends AbstractNode {
@@ -21,6 +23,7 @@ class GenesisNode extends AbstractNode {
 	packArgv () {
 		return [
 			this.id,
+			this.hub,
 		]
 	}
 
@@ -33,7 +36,7 @@ class GenesisNode extends AbstractNode {
 		})
 	}
 
-	async loginToHub () {
+	loginToHub () {
 		return new Promise(resolve => {
 			this.once('connected_to_hub', () => resolve(this))
 			this.sendChild(new CommandLoginToHub())
@@ -43,21 +46,21 @@ class GenesisNode extends AbstractNode {
 	sendPassword () {
 		setTimeout(() => {
 			this.child.stdin.write(this.passphrase + '\n')
-		}, 2000)
+		}, 1500)
 	}
 
-	async sendBytes ({ toAddress, amount }) {
+	sendBytes ({ toAddress, amount }) {
 		return new Promise(resolve => {
-			this.once('sent_bytes', () => resolve(this))
+			this.once('sent_bytes', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendChild(new CommandSendBytes({ toAddress, amount }))
 		})
 	}
 
-	async postWitness () {
+	postWitness () {
 		this.sendChild(new CommandPostWitness())
 	}
 
-	async getAddress () {
+	getAddress () {
 		this.sendChild(new CommandGetAddress())
 		return new Promise((resolve) => {
 			this.once('my_address', m => resolve(m.address))

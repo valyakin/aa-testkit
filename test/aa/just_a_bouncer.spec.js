@@ -1,4 +1,5 @@
-const Network = requireRoot('src/networks')
+const Testkit = require('../../main')
+const { Network } = Testkit()
 const { justABouncer } = require('./agents')
 const ojson = require('ocore/formula/parse_ojson')
 const { promisify } = require('util')
@@ -36,7 +37,7 @@ describe('Check `just a bouncer` AA', function () {
 
 		await network.witness(2)
 
-		const newUnit = await wallet.sendBytes({
+		const { unit: newUnit } = await wallet.sendBytes({
 			toAddress: agentAddress,
 			amount: 10000,
 		})

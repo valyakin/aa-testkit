@@ -96,8 +96,8 @@ class AbstractNode extends EventEmitter {
 
 	async getUnitInfo ({ unit }) {
 		return new Promise(resolve => {
-			this.once('unit_info', (message) => {
-				resolve(message.unitObj)
+			this.once('unit_info', (m) => {
+				resolve({ unitObj: m.unitObj, error: m.error })
 			})
 			this.sendChild(new CommandGetUnitInfo({ unit }))
 		})

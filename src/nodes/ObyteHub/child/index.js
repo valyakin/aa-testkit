@@ -6,6 +6,7 @@ const { MessageChildReady } = require('../../../messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
+	port: Joi.number().required(),
 	genesisUnit: Joi.string().required(),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 })
@@ -19,6 +20,7 @@ class ObyteHubChild extends AbstractChild {
 	static unpackArgv (argv) {
 		const [,,
 			id,
+			port,
 			genesisUnit,
 			initialWitnessesLength,
 			...rest
@@ -28,6 +30,7 @@ class ObyteHubChild extends AbstractChild {
 
 		return {
 			id,
+			port,
 			genesisUnit,
 			initialWitnesses,
 		}
@@ -41,6 +44,7 @@ class ObyteHubChild extends AbstractChild {
 
 		this.conf = require('ocore/conf.js')
 		this.conf.initial_witnesses = this.initialWitnesses
+		this.conf.port = this.port
 
 		this.hub = require('obyte-hub')
 

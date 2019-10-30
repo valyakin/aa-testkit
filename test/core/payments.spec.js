@@ -1,4 +1,5 @@
-const Network = requireRoot('src/networks')
+const Testkit = require('../../main')
+const { Network } = Testkit()
 
 describe('Check payments', function () {
 	this.timeout(60000)
@@ -15,18 +16,18 @@ describe('Check payments', function () {
 		const bob = await network.newHeadlessWallet().ready()
 
 		const aliceAddress = await alice.getAddress()
-		const bobAddress2 = await bob.getAddress()
+		const bobAddress = await bob.getAddress()
 
 		await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
 		let aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.pending).to.be.equal(100000)
 
-		await network.witnessAndStabilize()
+		await network.witness()
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.stable).to.be.equal(100000)
 
-		await alice.sendBytes({ toAddress: bobAddress2, amount: 50000 })
+		await alice.sendBytes({ toAddress: bobAddress, amount: 50000 })
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.pending).to.be.equal(49401)
@@ -34,8 +35,7 @@ describe('Check payments', function () {
 		let bobBalance = await bob.getBalance()
 		expect(bobBalance.base.pending).to.be.equal(50000)
 
-		await network.witnessAndStabilize()
-		await network.witnessAndStabilize()
+		await network.witness(2)
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.stable).to.be.equal(49756)

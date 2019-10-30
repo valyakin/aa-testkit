@@ -4,7 +4,6 @@ const {
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageChildReady,
-	MessageChildError,
 	MessageAAStateVars,
 	MessageAgentDeployed,
 	MessagePasswordRequired,
@@ -12,6 +11,7 @@ const {
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
+	hub: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
 })
 
@@ -30,11 +30,13 @@ class AgentDeployerChild extends AbstractChild {
 	static unpackArgv (argv) {
 		const [,,
 			id,
+			hub,
 			genesisUnit,
 		] = argv
 
 		return {
 			id,
+			hub,
 			genesisUnit,
 		}
 	}
@@ -44,6 +46,9 @@ class AgentDeployerChild extends AbstractChild {
 
 		this.constants = require('ocore/constants.js')
 		this.constants.GENESIS_UNIT = this.genesisUnit
+
+		this.conf = require('ocore/conf.js')
+		this.conf.hub = this.hub
 
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
@@ -71,8 +76,8 @@ class AgentDeployerChild extends AbstractChild {
 		}
 
 		const callbacks = this.composer.getSavingCallbacks({
-			ifNotEnoughFunds: (err) => this.sendParent(new MessageChildError(err)),
-			ifError: (err) => this.sendParent(new MessageChildError({ error: err })),
+			ifNotEnoughFunds: (err) => this.sendParent(new MessageAgentDeployed({ error: err })),
+			ifError: (err) => this.sendParent(new MessageAgentDeployed({ error: err })),
 			ifOk: (objJoint) => {
 				this.network.broadcastJoint(objJoint)
 				this.sendParent(new MessageAgentDeployed({ unit: objJoint.unit.unit, address: aaAddress }))

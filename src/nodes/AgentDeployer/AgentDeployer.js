@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const config = require('config')['aa-testkit']
 const AbstractNode = require('../AbstractNode/AbstractNode')
 const { CommandGetAddress, CommandGetBalance, CommandDeployAgent, CommandReadAAStateVars } = require('../../messages')
 
@@ -6,8 +7,9 @@ const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
 	silent: Joi.boolean().default(true),
-	passphrase: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
+	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
+	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 })
 
 class AgentDeployer extends AbstractNode {
@@ -22,6 +24,7 @@ class AgentDeployer extends AbstractNode {
 	packArgv () {
 		return [
 			this.id,
+			this.hub,
 			this.genesisUnit,
 		]
 	}
@@ -29,7 +32,7 @@ class AgentDeployer extends AbstractNode {
 	sendPassword () {
 		setTimeout(() => {
 			this.child.stdin.write(this.passphrase + '\n')
-		}, 2000)
+		}, 1500)
 	}
 
 	async getAddress () {
@@ -42,7 +45,7 @@ class AgentDeployer extends AbstractNode {
 	async deployAgent (agent) {
 		this.sendChild(new CommandDeployAgent({ agent }))
 		return new Promise((resolve) => {
-			this.once('agent_deployed', m => resolve({ address: m.address, unit: m.unit }))
+			this.once('agent_deployed', m => resolve({ address: m.address, unit: m.unit, error: m.error }))
 		})
 	}
 

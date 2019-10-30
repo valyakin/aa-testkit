@@ -72,10 +72,15 @@ class AbstractChild extends EventEmitter {
 	}
 
 	getUnitInfo ({ unit }) {
-		const { getInfoOnUnit } = require('obyte-explorer/controllers/units')
-		getInfoOnUnit(unit, (unitObj) => {
-			console.log('unitObj', JSON.stringify(unitObj, null, 2))
-			this.sendParent(new MessageUnitInfo({ unitObj }))
+		const db = require('ocore/db')
+		const { readJoint } = require('ocore/storage')
+		readJoint(db, unit, {
+			ifNotFound: () => {
+				this.sendParent(new MessageUnitInfo({ unitObj: null, error: 'Unit not found' }))
+			},
+			ifFound: (objJoint) => {
+				this.sendParent(new MessageUnitInfo({ unitObj: objJoint, error: null }))
+			},
 		})
 	}
 }

@@ -6,9 +6,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "mocha --require test/bootload.js",
-    "test:aa": "mocha --require test/bootload.js 'test/aa/**spec.js'",
-    "test:all": "mocha --require test/bootload.js 'test/**/**spec.js'"
+    "test": "mocha",
+    "test:aa": "mocha test/aa/**spec.js",
+    "test:all": "mocha test/**/**spec.js"
   },
   "dependencies": {
     "config": "^3.2.2",

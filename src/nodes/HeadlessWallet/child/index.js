@@ -7,12 +7,12 @@ const {
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageChildReady,
-	MessageChildError,
 	MessagePasswordRequired,
 } = require('../../../messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
+	hub: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
 })
 
@@ -32,11 +32,13 @@ class HeadlessWalletChild extends AbstractChild {
 	static unpackArgv (argv) {
 		const [,,
 			id,
+			hub,
 			genesisUnit,
 		] = argv
 
 		return {
 			id,
+			hub,
 			genesisUnit,
 		}
 	}
@@ -46,6 +48,9 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this.constants = require('ocore/constants.js')
 		this.constants.GENESIS_UNIT = this.genesisUnit
+
+		this.conf = require('ocore/conf.js')
+		this.conf.hub = this.hub
 
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
@@ -65,7 +70,7 @@ class HeadlessWalletChild extends AbstractChild {
 	sendBytes ({ toAddress, amount }) {
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
-				this.sendParent(new MessageChildError({ error: err }))
+				this.sendParent(new MessageSentBytes({ error: err }))
 			} else {
 				this.sendParent(new MessageSentBytes({ unit }))
 			}
@@ -75,7 +80,7 @@ class HeadlessWalletChild extends AbstractChild {
 	sendMulti ({ opts }) {
 		this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
 			if (err) {
-				this.sendParent(new MessageChildError({ error: err }))
+				this.sendParent(new MessageSentMulti({ error: err }))
 			}
 			this.sendParent(new MessageSentMulti({ unit }))
 		})
@@ -103,7 +108,7 @@ class HeadlessWalletChild extends AbstractChild {
 
 			this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
 				if (err) {
-					this.sendParent(new MessageChildError({ error: err }))
+					this.sendParent(new MessageSentData({ error: err }))
 				}
 				this.sendParent(new MessageSentData({ unit }))
 			})

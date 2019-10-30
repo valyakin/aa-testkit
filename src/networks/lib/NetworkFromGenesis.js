@@ -70,7 +70,6 @@ class NetworkFromGenesis {
 			rundir: this.rundir,
 			genesisUnit: this.genesisUnit,
 			id: getIdForPrefix(this.rundir, 'headless-wallet-'),
-			passphrase: config.DEFAULT_PASSPHRASE,
 			...params,
 		})
 		this.nodes.headlessWallets.push(wallet)
@@ -82,7 +81,6 @@ class NetworkFromGenesis {
 			rundir: this.rundir,
 			genesisUnit: this.genesisUnit,
 			id: getIdForPrefix(this.rundir, 'agent-deployer-'),
-			passphrase: config.DEFAULT_PASSPHRASE,
 			...params,
 		})
 		this.nodes.agentDeployers.push(deployer)
@@ -102,7 +100,7 @@ class NetworkFromGenesis {
 	}
 }
 
-const genesis = async () => {
+const genesis = async (genesisParams, hubParams) => {
 	fs.mkdirSync(config.TESTDATA_DIR, { recursive: true })
 	const runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
 	const rundir = path.join(config.TESTDATA_DIR, runid)
@@ -111,15 +109,16 @@ const genesis = async () => {
 	const genesisNode = new GenesisNode({
 		rundir,
 		id: 'genesis-node',
-		passphrase: config.DEFAULT_PASSPHRASE,
+		...genesisParams,
 	})
 	const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 
 	const hub = new ObyteHub({
-		id: getIdForPrefix(rundir, 'obyte-hub-'),
 		rundir: rundir,
 		genesisUnit: genesisUnit,
 		initialWitnesses: [genesisAddress],
+		id: getIdForPrefix(rundir, 'obyte-hub-'),
+		...hubParams,
 	})
 
 	const network = new NetworkFromGenesis({

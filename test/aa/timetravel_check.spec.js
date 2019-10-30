@@ -1,4 +1,5 @@
-const Network = requireRoot('src/networks')
+const Testkit = require('../../main')
+const { Network } = Testkit()
 const { timeDependentAA } = require('./agents')
 const ojson = require('ocore/formula/parse_ojson')
 const { promisify } = require('util')
@@ -32,7 +33,7 @@ describe('Network time travel function', function () {
 		expect(agentUnit).to.be.a('string')
 		await network.witness(2)
 
-		const unitBeforeTravel = await wallet.sendBytes({
+		const { unit: unitBeforeTravel } = await wallet.sendBytes({
 			toAddress: agentAddress,
 			amount: 10000,
 		})
@@ -45,7 +46,7 @@ describe('Network time travel function', function () {
 
 		await network.timetravelTo('2050-01-01')
 
-		const unitAfterTravel = await wallet.sendBytes({
+		const { unit: unitAfterTravel } = await wallet.sendBytes({
 			toAddress: agentAddress,
 			amount: 10000,
 		})

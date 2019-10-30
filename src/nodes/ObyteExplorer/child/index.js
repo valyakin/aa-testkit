@@ -4,6 +4,7 @@ const { MessageChildReady } = require('../../../messages')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
+	hub: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
 	webPort: Joi.number().default(8080),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),
@@ -18,6 +19,7 @@ class ObyteExplorerChild extends AbstractChild {
 	static unpackArgv (argv) {
 		const [,,
 			id,
+			hub,
 			genesisUnit,
 			webPort,
 			initialWitnessesLength,
@@ -28,6 +30,7 @@ class ObyteExplorerChild extends AbstractChild {
 
 		return {
 			id,
+			hub,
 			webPort,
 			genesisUnit,
 			initialWitnesses,
@@ -43,6 +46,10 @@ class ObyteExplorerChild extends AbstractChild {
 		this.conf = require('ocore/conf.js')
 		this.conf.initial_witnesses = this.initialWitnesses
 		this.conf.webPort = this.webPort
+
+		this.conf = require('ocore/conf.js')
+		this.conf.hub = this.hub
+		this.conf.initial_peers = [`${this.conf.WS_PROTOCOL}${this.hub}`]
 
 		this.explorer = require('obyte-explorer/explorer.js')
 		this.sendParent(new MessageChildReady())

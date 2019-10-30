@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const config = require('config')['aa-testkit']
 const AbstractNode = require('../AbstractNode/AbstractNode')
 const {
 	CommandSendData,
@@ -12,8 +13,9 @@ const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
 	silent: Joi.boolean().default(true),
-	passphrase: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
+	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
+	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 })
 
 class HeadlessWallet extends AbstractNode {
@@ -28,6 +30,7 @@ class HeadlessWallet extends AbstractNode {
 	packArgv () {
 		return [
 			this.id,
+			this.hub,
 			this.genesisUnit,
 		]
 	}
@@ -35,7 +38,7 @@ class HeadlessWallet extends AbstractNode {
 	sendPassword () {
 		setTimeout(() => {
 			this.child.stdin.write(this.passphrase + '\n')
-		}, 2000)
+		}, 1500)
 	}
 
 	async getAddress () {
@@ -47,21 +50,21 @@ class HeadlessWallet extends AbstractNode {
 
 	async sendMulti (opts) {
 		return new Promise(resolve => {
-			this.once('sent_multi', (m) => resolve(m.unit))
+			this.once('sent_multi', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendChild(new CommandSendMulti(opts))
 		})
 	}
 
 	async sendData ({ toAddress, amount, payload }) {
 		return new Promise(resolve => {
-			this.once('sent_data', (m) => resolve(m.unit))
+			this.once('sent_data', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendChild(new CommandSendData({ toAddress, amount, payload }))
 		})
 	}
 
 	async sendBytes ({ toAddress, amount }) {
 		return new Promise(resolve => {
-			this.once('sent_bytes', (m) => resolve(m.unit))
+			this.once('sent_bytes', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendChild(new CommandSendBytes({ toAddress, amount }))
 		})
 	}

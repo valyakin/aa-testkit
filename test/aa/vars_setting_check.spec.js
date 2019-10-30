@@ -1,4 +1,5 @@
-const Network = requireRoot('src/networks')
+const Testkit = require('../../main')
+const { Network } = Testkit()
 const { varsSettingCheck } = require('./agents')
 const ojson = require('ocore/formula/parse_ojson')
 const { promisify } = require('util')
@@ -40,7 +41,7 @@ describe('AA state vars', function () {
 	it('Check agent state vars read', async () => {
 		const { agentAddress, wallet, network, deployer } = this
 
-		const unit = await wallet.sendData({
+		const { unit } = await wallet.sendData({
 			toAddress: agentAddress,
 			amount: 10000,
 			payload: {

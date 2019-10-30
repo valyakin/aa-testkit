@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const config = require('config')['aa-testkit']
 const AbstractNode = require('../AbstractNode/AbstractNode')
 
 const schemaFactory = () => ({
@@ -8,6 +9,7 @@ const schemaFactory = () => ({
 	genesisUnit: Joi.string().required(),
 	webPort: Joi.number().default(8080),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),
+	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 })
 
 class ObyteExplorer extends AbstractNode {
@@ -21,6 +23,7 @@ class ObyteExplorer extends AbstractNode {
 	packArgv () {
 		return [
 			this.id,
+			this.hub,
 			this.genesisUnit,
 			this.webPort,
 			this.initialWitnesses.length,
