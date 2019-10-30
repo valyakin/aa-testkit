@@ -28,7 +28,7 @@ Instant Obyte devnet network set up and testing
 
 ## Usage
 ```javascript
-// set up test framework
+// import test framework
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
