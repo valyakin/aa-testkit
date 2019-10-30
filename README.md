@@ -23,8 +23,8 @@ Instant Obyte devnet network set up and testing
   * [ObyteExplorer](#ObyteExplorer)
     * [ObyteExplorer constructor params](#ObyteExplorer-constructor-params)
     * [ObyteExplorer methods](#ObyteExplorer-methods)
-* [Comprehensive Examples](#Comprehensive-Examples)
-* [Writing Tests](#Writing-Tests)
+* [Test Examples](#Test-Examples)
+* [Writing Tests With Mocha](#Writing-Tests-With-Mocha)
 
 ## Usage
 ```javascript
@@ -871,7 +871,7 @@ Returns *Promise* that resolves to `{ vars }` where `vars` - state object of age
 <details>
 <summary>Agent Deployment example</summary>
 
-See [Agent deployment comprehensive example](#Comprehensive-Examples)
+See [Agent deployment test example](#Test-Examples)
 </details>
 
 ---------------------------------------
@@ -922,7 +922,7 @@ const explorer = await network.newObyteExplorer().ready()
 
 ---------------------------------------
 
-## Comprehensive Examples
+## Test Examples
 
 <details>
 <summary>Setup network and send some payments over the network</summary>
@@ -1252,7 +1252,7 @@ await network.stop()
 
 </details>
 
-## Writing Tests
+## Writing Tests With Mocha
 
 Although `aa-testkit` can be used with any test runner, we recommend using [mocha](https://www.npmjs.com/package/mocha) for writing tests.
 
