@@ -522,7 +522,6 @@ Genesis node main function is to start new network and create genesis unit. Afte
 |:----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |     id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |   rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|   silent   | Boolean |   false  |       `true`       | Set this to `false` if you want to see node's child console output          |
 | passphrase |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
 |     hub    |  String |   false  | `'localhost:6611'` | Address of hub to connect                                                   |
 
@@ -654,7 +653,6 @@ Obyte hub node serves as transport for network. Node receives incomming messages
 |:----------------:|:---------------:|:--------:|:-------:|-----------------------------------------------------------------------------|
 |        id        |      String     |   true   |         | Unique id of this node. Also determines node folder in `testdata` directory |
 |      rundir      |      String     |   true   |         | Determines where this node will store its data. Absolute path               |
-|      silent      |     Boolean     |   false  |  `true` | Set this to `false` if you want to see node's child console output          |
 |    genesisUnit   |      String     |   true   |         | The very first unit of the network                                          |
 |       port       |      Number     |   false  |   6611  | Port the hub will be running on                                             |
 | initialWitnesses |  Array[String]  |   true   |         | Trusted witnesses of this node                                              |
@@ -673,7 +671,6 @@ Headless wallet node provides common network node functionality. It can receive 
 |:-----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |      id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |    rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|    silent   | Boolean |   false  |       `true`       | Set this to `false` if you want to see node's child console output          |
 |  passphrase |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
 | genesisUnit |  String |   true   |                    | The very first unit of the network                                          |
 |     hub     |  String |   false  | `'localhost:6611'` | Address of the hub to connect                                               |
@@ -762,7 +759,6 @@ Agent deployer node is responsible for AA deployment and control
 |:-----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |      id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |    rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|    silent   | Boolean |   false  |       `true`       | Set this to `false` if you want to see node's child console output          |
 |  passphrase |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
 | genesisUnit |  String |   true   |                    | The very first unit of the network                                          |
 |     hub     |  String |   false  | `'localhost:6611'` | Address of hub to connect                                                   |
@@ -888,7 +884,6 @@ Obyte explorer node provides DAG explorer of the network for visualization and d
 |:----------------:|:---------------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |        id        |      String     |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |      rundir      |      String     |   true   |                    | Determines where this node will store its data. Absolute path               |
-|      silent      |     Boolean     |   false  |       `true`       | Set this to `false` if you want to see node's child console output          |
 |    genesisUnit   |      String     |   true   |                    | The very first unit of the network                                          |
 |      webPort     |      Number     |   false  |        8080        | Port theDAG explorer will be started on                                     |
 | initialWitnesses |  Array[String]  |   true   |                    | Trusted witnesses of this node                                              |

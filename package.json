@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "config": "^3.2.2",
-    "headless-obyte": "git+https://github.com/byteball/headless-obyte.git#aa",
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte#aa",
     "joi": "^14.3.1",
     "mockdate": "^2.0.5",
     "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",

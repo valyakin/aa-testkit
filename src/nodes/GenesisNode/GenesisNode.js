@@ -6,7 +6,6 @@ const AbstractNode = require('../AbstractNode/AbstractNode')
 const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
-	silent: Joi.boolean().default(true),
 	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
 	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 })
@@ -44,9 +43,7 @@ class GenesisNode extends AbstractNode {
 	}
 
 	sendPassword () {
-		setTimeout(() => {
-			this.child.stdin.write(this.passphrase + '\n')
-		}, 1500)
+		this.child.stdin.write(this.passphrase + '\n')
 	}
 
 	sendBytes ({ toAddress, amount }) {

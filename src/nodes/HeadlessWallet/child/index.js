@@ -55,9 +55,12 @@ class HeadlessWalletChild extends AbstractChild {
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
 
-		this.sendParent(new MessagePasswordRequired())
+		this.eventBus.once('headless_wallet_need_pass', () => {
+			this.sendParent(new MessagePasswordRequired())
+		})
+
 		this.eventBus.once('headless_wallet_ready', () => {
-			setTimeout(() => this.sendParent(new MessageChildReady()), 1000)
+			this.sendParent(new MessageChildReady())
 		})
 	}
 

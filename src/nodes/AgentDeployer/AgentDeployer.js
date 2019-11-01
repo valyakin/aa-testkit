@@ -6,7 +6,6 @@ const { CommandGetAddress, CommandGetBalance, CommandDeployAgent, CommandReadAAS
 const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
-	silent: Joi.boolean().default(true),
 	genesisUnit: Joi.string().required(),
 	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
 	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
@@ -30,9 +29,7 @@ class AgentDeployer extends AbstractNode {
 	}
 
 	sendPassword () {
-		setTimeout(() => {
-			this.child.stdin.write(this.passphrase + '\n')
-		}, 1500)
+		this.child.stdin.write(this.passphrase + '\n')
 	}
 
 	async getAddress () {

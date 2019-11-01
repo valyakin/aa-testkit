@@ -5,7 +5,6 @@ const AbstractNode = require('../AbstractNode/AbstractNode')
 const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
-	silent: Joi.boolean().default(true),
 	genesisUnit: Joi.string().required(),
 	webPort: Joi.number().default(8080),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),

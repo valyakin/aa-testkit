@@ -1586,6 +1586,16 @@ he@1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
+"headless-obyte@git+https://github.com/byteball/headless-obyte#aa":
+  version "0.1.9"
+  resolved "git+https://github.com/byteball/headless-obyte#2c3e1ee74edc0f0cfd0cd1fe2565901b73b488f2"
+  dependencies:
+    bitcore-lib "^0.13.14"
+    bitcore-mnemonic "~1.0.0"
+    json-rpc2 "^1.0.2"
+    ocore "git+https://github.com/byteball/ocore.git#rocks-and-formulas"
+    yargs "^13.2.2"
+
 "headless-obyte@git+https://github.com/byteball/headless-obyte.git#aa":
   version "0.1.9"
   resolved "git+https://github.com/byteball/headless-obyte.git#16fb5872e3e00b2996c50782abf7b03b0dee18cf"

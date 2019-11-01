@@ -53,7 +53,10 @@ class GenesisNodeChild extends AbstractChild {
 		this.composer = require('ocore/composer.js')
 		this.network = require('ocore/network.js')
 
-		this.sendParent(new MessagePasswordRequired())
+		this.eventBus.once('headless_wallet_need_pass', () => {
+			this.sendParent(new MessagePasswordRequired())
+		})
+
 		this.eventBus.once('headless_wallet_ready', () => this.genesis())
 	}
 

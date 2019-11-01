@@ -1,6 +1,7 @@
 const mockdate = require('mockdate')
 const EventEmitter = require('events')
 const Joi = require('joi')
+const util = require('util')
 const fs = require('fs')
 const {
 	fromMessage,
@@ -45,6 +46,7 @@ class AbstractChild extends EventEmitter {
 	}
 
 	start () {
+		this.replaceConsoleLog()
 		this.sendParent(new MessageChildStarted())
 	}
 
@@ -53,17 +55,6 @@ class AbstractChild extends EventEmitter {
 		setTimeout(() => {
 			process.exit()
 		}, 100)
-	}
-
-	sendParent (message) {
-		console.log('sendParent', JSON.stringify(message.serialize(), null, 2))
-		setTimeout(() => process.send(message.serialize()), 100)
-	}
-
-	handleParentMessage (m) {
-		console.log('handleParentMessage', JSON.stringify(m, null, 2))
-		const message = fromMessage(m)
-		this.emit(message.topic, message)
 	}
 
 	timeTravel ({ to }) {
@@ -82,6 +73,38 @@ class AbstractChild extends EventEmitter {
 				this.sendParent(new MessageUnitInfo({ unitObj: objJoint, error: null }))
 			},
 		})
+	}
+
+	sendParent (message) {
+		console.log('sendParent', JSON.stringify(message.serialize(), null, 2))
+		setTimeout(() => process.send(message.serialize()), 100)
+	}
+
+	handleParentMessage (m) {
+		console.log('handleParentMessage', JSON.stringify(m, null, 2))
+		const message = fromMessage(m)
+		this.emit(message.topic, message)
+	}
+
+	replaceConsoleLog () {
+		const desktopApp = require('ocore/desktop_app.js')
+		const conf = require('ocore/conf.js')
+		const appDataDir = desktopApp.getAppDataDir()
+		fs.mkdirSync(appDataDir, { recursive: true })
+
+		const logFilename = conf.LOG_FILENAME || (appDataDir + '/log.txt')
+		const writeStream = fs.createWriteStream(logFilename, { flags: 'a' })
+		console.log = (...args) => {
+			writeStream.write(this.logPrefix())
+			writeStream.write(util.format.apply(null, args) + '\n')
+		}
+		console.error = console.log
+		console.warn = console.log
+		console.info = console.log
+	}
+
+	logPrefix () {
+		return Date().toString() + ': '
 	}
 }
 

@@ -7,7 +7,6 @@ const Joi = require('joi')
 
 const paramsSchemaFactory = () => ({
 	id: Joi.string().default(uniqid('obyte-witness-')),
-	silent: Joi.boolean().default(false),
 	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
 	childHome: Joi.string().default(config.TEST_RUN_HOME),
 	genesisUnit: Joi.string().default(config.GENESIS_UNIT),
@@ -28,7 +27,7 @@ class ObyteWitness extends EventEmitter {
 		]
 
 		const options = {
-			stdio: ['pipe', this.silent ? 'ignore' : 'inherit', 'inherit', 'ipc'],
+			stdio: ['pipe', 'ignore', 'inherit', 'ipc'],
 			cwd: path.join(__dirname, '/node'),
 			env: {
 				devnet: 1,

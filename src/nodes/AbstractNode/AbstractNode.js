@@ -34,7 +34,7 @@ class AbstractNode extends EventEmitter {
 		const argv = this.packArgv()
 
 		const options = {
-			stdio: ['pipe', this.silent ? 'ignore' : 'inherit', 'inherit', 'ipc'],
+			stdio: ['pipe', 'ignore', 'inherit', 'ipc'],
 			cwd: path.join(dirname, '/child'),
 			env: {
 				devnet: 1,

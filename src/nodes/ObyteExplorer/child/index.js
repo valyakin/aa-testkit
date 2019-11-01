@@ -54,6 +54,10 @@ class ObyteExplorerChild extends AbstractChild {
 		this.explorer = require('obyte-explorer/explorer.js')
 		this.sendParent(new MessageChildReady())
 	}
+
+	logPrefix () {
+		return ''
+	}
 }
 
 const child = new ObyteExplorerChild(process.argv)
