@@ -3,9 +3,12 @@ const EventEmitter = require('events')
 const Joi = require('joi')
 const util = require('util')
 const fs = require('fs')
+const { isString } = require('lodash')
 const {
 	fromMessage,
 	MessageUnitInfo,
+	MessageCurrentTime,
+	MessageAAStateVars,
 	MessageChildStarted,
 	MessageTimeTravelDone,
 	MessageMciBecameStable,
@@ -34,8 +37,10 @@ class AbstractChild extends EventEmitter {
 
 		this
 			.on('command_child_stop', () => this.stop())
-			.on('command_time_travel', (m) => this.timeTravel(m))
+			.on('command_get_time', (m) => this.getTime(m))
+			.on('command_time_travel', (m) => this.timetravel(m))
 			.on('command_get_unit_info', (m) => this.getUnitInfo(m))
+			.on('command_read_aa_state_vars', (m) => this.readAAStateVars(m))
 
 		const eventBus = require('ocore/event_bus')
 		eventBus.on('mci_became_stable', () => setTimeout(() => this.sendParent(new MessageMciBecameStable()), 100))
@@ -52,14 +57,54 @@ class AbstractChild extends EventEmitter {
 
 	stop () {
 		console.log('Received command to stop')
-		setTimeout(() => {
-			process.exit()
-		}, 100)
+		process.exit()
 	}
 
-	timeTravel ({ to }) {
-		mockdate.set(to)
-		this.sendParent(new MessageTimeTravelDone())
+	timetravel ({ to, shift }) {
+		const currentDate = Date.now()
+
+		try {
+			const newDate = to
+				? new Date(to)
+				: currentDate + this.shiftToMs(shift)
+
+			if (newDate < currentDate) {
+				throw new Error('Attempt to timetravel in past')
+			}
+			mockdate.set(newDate)
+			this.sendParent(new MessageTimeTravelDone({ error: null }))
+		} catch (error) {
+			this.sendParent(new MessageTimeTravelDone({ error: error.message }))
+		}
+	}
+
+	shiftToMs (shift) {
+		if (Number.isInteger(shift)) {
+			return shift
+		} else if (isString(shift)) {
+			const match = shift.match(/^(\d+)([smhd])$/)
+			if (match) {
+				const number = Number(match[1])
+				const duration = match[2]
+				switch (duration) {
+				case 's':
+					return number * 1000
+				case 'm':
+					return number * 1000 * 60
+				case 'h':
+					return number * 1000 * 60 * 60
+				case 'd':
+					return number * 1000 * 60 * 60 * 24
+				}
+			} else {
+				throw new Error(`Unsupported 'shift' format '${shift}'`)
+			}
+		}
+		return 0
+	}
+
+	getTime () {
+		this.sendParent(new MessageCurrentTime({ time: Date.now() }))
 	}
 
 	getUnitInfo ({ unit }) {
@@ -84,6 +129,20 @@ class AbstractChild extends EventEmitter {
 		console.log('handleParentMessage', JSON.stringify(m, null, 2))
 		const message = fromMessage(m)
 		this.emit(message.topic, message)
+	}
+
+	async readAAStateVars ({ address }) {
+		const vars = await this.getAAStateVarsFromStorage(address)
+		this.sendParent(new MessageAAStateVars({ vars }))
+	}
+
+	getAAStateVarsFromStorage (address) {
+		return new Promise(resolve => {
+			const storage = require('ocore/storage')
+			storage.readAAStateVars(address, (vars) => {
+				resolve(vars)
+			})
+		})
 	}
 
 	replaceConsoleLog () {

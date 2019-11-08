@@ -17,9 +17,6 @@ Instant Obyte devnet network set up and testing
   * [HeadlessWallet](#HeadlessWallet)
     * [HeadlessWallet constructor params](#HeadlessWallet-constructor-params)
     * [HeadlessWallet methods](#HeadlessWallet-methods)
-  * [AgentDeployer](#AgentDeployer)
-    * [AgentDeployer constructor params](#AgentDeployer-constructor-params)
-    * [AgentDeployer methods](#AgentDeployer-methods)
   * [ObyteExplorer](#ObyteExplorer)
     * [ObyteExplorer constructor params](#ObyteExplorer-constructor-params)
     * [ObyteExplorer methods](#ObyteExplorer-methods)
@@ -33,7 +30,7 @@ const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
 // spin up new devnet
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 // create new wallet and send some bytes from rich genesis node
@@ -112,7 +109,7 @@ const { Network } = Testkit()
 
 Primary way to operate with network. Contains common functions for network management
 
-### __`Network.genesis(genesisParams, hubParams)`__ *`: <network>`*
+### __`Network.create(genesisParams, hubParams)`__ *`: <network>`*
 
 Creates new devnet network from the scratch. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`10e15`) of Bytes on its account.
 
@@ -129,7 +126,7 @@ Creates new devnet network from the scratch. Starts `GenesisNode` and `ObyteHub`
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 ```
 </details>
 
@@ -146,7 +143,7 @@ __Returns__ `GenesisNode` of this network
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 // calling `.ready()` assures that node have started at this point
 const genesis = await network.getGenesisNode().ready()
 ```
@@ -165,7 +162,7 @@ __Returns__ `ObyteHub` of this network
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 // calling `.ready()` assures that node have started at this point
 const hub = await network.getHub().ready()
 ```
@@ -188,7 +185,7 @@ Send the command to `GenesisNode` to post and broadcast witness. Network will aw
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 // create wallet and send bytes to it
@@ -213,7 +210,7 @@ Send the command to every node to stop the process.
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 const wallet = await network.newHeadlessWallet().ready()
 
@@ -224,14 +221,27 @@ await network.stop()
 
 ---------------------------------------
 
-### __`network.timetravelTo()`__ *`: <Promise>`*
+### __`network.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
 
 allows you to set the current network time in the future. This can be helpful for testing time-dependent AA.
 > **Note:** Timetravel should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
 
+__Returns__ *Promise* that resolves to `{ error }` after timetravel is done. `error` will be null if timetravel was successfull
+
 #### Parameters
 
 *`to`* - new time of the network. Can be either a timestamp or a string in the valid format of `Date()` function
+
+*`shift`* - an offset for a current network time. You can pass a `Number` for a milliseconds or a `String` in format `%number%duration`
+
+| %duration | Example | Result              |
+|:---------:|:-------:|---------------------|
+|    's'    |   '5s'  | shift in 5 seconds  |
+|    'm'    |  '10m'  | shift in 10 minutes |
+|    'h'    |  '24h'  | shift in 24 hours   |
+|    'd'    |  '365d' | shift in 365 days   |
+
+If both of `to` and `shift` are present, `to` will be used
 
 <details>
 <summary>Example</summary>
@@ -240,10 +250,10 @@ allows you to set the current network time in the future. This can be helpful fo
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
-await network.timetravelTo('2050-01-01')
+const { error } = await network.timetravel({ to: '2050-01-01' })
 ```
 
 Also check in [Test Examples](#Test-Examples)
@@ -266,33 +276,9 @@ Creates and starts new `HeadlessWallet` node in network.
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 const wallet = await network.newHeadlessWallet().ready()
-```
-</details>
-
----------------------------------------
-
-### __`network.newAgentDeployer(params)`__ *`: <AgentDeployer>`*
-
-Creates and starts new `AgentDeployer` node in network.
-
-#### Parameters
-
-*`params`* - object passed to `AgentDeployer` constructor to override default values. See [AgentDeployer](#AgentDeployer-constructor-params) Nodes API section.
-
-<details>
-<summary>Example</summary>
-
-```javascript
-const Testkit = require('aa-testkit')
-const { Network } = Testkit()
-
-const network = await Network.genesis()
-const genesis = await network.getGenesisNode().ready()
-
-const deployer = await network.newAgentDeployer().ready()
 ```
 </details>
 
@@ -313,7 +299,7 @@ Creates and starts new `ObyteExplorer` node in network.
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 const explorer = await network.newObyteExplorer().ready()
@@ -402,21 +388,38 @@ __Returns__ *Promise* that resolves when node child receives `mci_became_stable`
 
 ---------------------------------------
 
-### __`node.timeTravel({ to })`__ *`: <Promise>`*
+### __`node.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
 
 Send the command to node child to change its time. This can be helpful for testing time-dependent AA.
 
 > **Note:** Timetravel should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
 
-__Returns__ *Promise* that resolves when node child receives `mci_became_stable` event
+__Returns__ *Promise* that resolves to `{ error }` when node child receives `mci_became_stable` event. `error` will be null if timetravel was successfull
 
 #### Parameters
 
-*`to`* - new time of the node's child. Can be either a timestamp or a string in the valid format of `Date()` function
+*`to`* - new time of the network. Can be either a timestamp or a string in the valid format of `Date()` function
+
+*`shift`* - an offset for a current network time. You can pass a `Number` for a milliseconds or a `String` in format `%number%duration`
+
+| %duration | Example | Result              |
+|:---------:|:-------:|---------------------|
+|    's'    |   '5s'  | shift in 5 seconds  |
+|    'm'    |  '10m'  | shift in 10 minutes |
+|    'h'    |  '24h'  | shift in 24 hours   |
+|    'd'    |  '365d' | shift in 365 days   |
+
+If both of `to` and `shift` are present, `to` will be used
 
 ---------------------------------------
 
-### __`node.getUnitInfo({ unit })`__ *`: <Promise>`*
+### __`node.getTime()`__ *`: Promise<{ time: number }>`*
+
+Receive details about unit from node. Uses `ocore/storage.readJoint` method
+
+*Promise* resolves as `{ time }` object and `time` is in milliseconds
+
+### __`node.getUnitInfo({ unit })`__ *`: Promise<unitObj>`*
 
 Receive details about unit from node. Uses `ocore/storage.readJoint` method
 
@@ -433,7 +436,7 @@ Receive details about unit from node. Uses `ocore/storage.readJoint` method
 const Testkit = require('aa-testkit')
 
 const { Network } = Testkit()
-const network = await Network.genesis()
+const network = await Network.create()
 
 const genesis = await network.getGenesisNode().ready()
 
@@ -508,6 +511,24 @@ await network.stop()
   "main_chain_index": 7
 }
 ```
+</details>
+
+---------------------------------------
+
+### __`node.readAAStateVars(address)`__ *`: Promise<{ vars }>`*
+
+Retrieve current network vars state of agent
+
+__Returns__ *Promise* that resolves to `{ vars }` where `vars` - state object of agent
+
+#### Parameters
+
+*`address : String`* - address of agent to retrieve state from
+
+<details>
+<summary>Agent Deployment example</summary>
+
+See [Agent deployment test example](#Test-Examples)
 </details>
 
 ---------------------------------------
@@ -749,53 +770,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. 
 
 ---------------------------------------
 
-## AgentDeployer
-
-Agent deployer node is responsible for AA deployment and control
-
-### AgentDeployer constructor params
-
-|   Property  |   Type  | Required |       Default      | Description                                                                 |
-|:-----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
-|      id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
-|    rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|  passphrase |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
-| genesisUnit |  String |   true   |                    | The very first unit of the network                                          |
-|     hub     |  String |   false  | `'localhost:6611'` | Address of hub to connect                                                   |
-
-### AgentDeployer methods
-
-### __`deployer.getAddress()`__ *`: <Promise>`*
-
-Request node address from child.
-
-__Returns__ *Promise* that resolves to node address
-
----------------------------------------
-
-### __`deployer.getBalance()`__ *`: <Promise>`*
-
-Retrieve node balance from child.
-
-__Returns__ *Promise* that resolves to node balance object
-
-<details>
-<summary>Balance object example</summary>
-
-```javascript
-{
-   base:{
-      stable:0,
-      pending:49401,
-      is_private:null
-   }
-}
-```
-</details>
-
----------------------------------------
-
-### __`deployer.deployAgent(agent)`__ *`: <Promise>`*
+### __`wallet.deployAgent(source)`__ *`: Promise<{ address, unit, error }>`*
 
 Deploy an agent in the network.
 
@@ -803,73 +778,50 @@ __Returns__ *Promise* that resolves to `{ address, unit, error }`, where `adress
 
 #### Parameters
 
-*`agent : Object`* - object of AA in OJSON format. String can be parsed into OJSON with `require('ocore/formula/parse_ojson').parse` method
+*`source : Path | String | OJSON`* - source of AA, can be:
+  * an absolute path to a file containing plaintext agent
+  * an absolute path to a javascript file that exports agent string
+  * an absolute path to a javascript file that exports object in OJSON format
+  * String with valid AA
+  * Javascript object in OJSON format
 
 <details>
 <summary>Example</summary>
 
 ```javascript
-const ojson = require('ocore/formula/parse_ojson')
-const { promisify } = require('util')
 const Testkit = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
-const deployer = await network.newAgentDeployer().ready()
+const deployer = await network.newHeadlessWallet().ready()
 const deployerAddress = await deployer.getAddress()
 
 // send some bytes to AgentDeployer so it will be able to broadcast message with agent to the network
 await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
 await network.witness()
 
-// conver agent string to OJSON fromat
-const agent = await promisify(ojson.parse)(agentString)
+// agent in OJSON fromat
+const agent = {
+  bounce_fees: { base: 10000 },
+  messages: [
+    {
+      app: 'state',
+      state: `{
+        var['constant_var'] = 'constant_var';
+        var['trigger_var'] = trigger.data.var;
+        var['sum_var'] = 123 + 456;
+      }`
+    }
+  ]
+}
 
 // deploy agent and confirm it on the network
 const { address, unit, error } = await deployer.deployAgent(agent)
 await network.witness(2)
 await network.stop()
 ```
-</details>
-
-<details>
-<summary>Agent String example</summary>
-
-```javascript
-`{
-  bounce_fees: { base: 10000 },
-  messages: [
-    {
-      app: 'state',
-      state: "{
-        var['constant_var'] = 'constant_var';
-        var['trigger_var'] = trigger.data.var;
-        var['sum_var'] = 123 + 456;
-      }"
-    }
-  ]
-}`
-```
-</details>
-
----------------------------------------
-
-### __`deployer.readAAStateVars(address)`__ *`: <Promise>`*
-
-Retrieve current network vars state of agent
-
-__Returns__ *Promise* that resolves to `{ vars }` where `vars` - state object of agent
-
-#### Parameters
-
-*`address : String`* - address of agent to retrieve state from
-
-<details>
-<summary>Agent Deployment example</summary>
-
-See [Agent deployment test example](#Test-Examples)
 </details>
 
 ---------------------------------------
@@ -900,7 +852,7 @@ ObyteExplorer node does not have any special methods except [common node methods
 const Testkit = require('aa-testkit')
 
 const { Network } = Testkit()
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 // to have something to display in explorer
@@ -934,7 +886,7 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 const alice = await network.newHeadlessWallet().ready()
@@ -979,8 +931,6 @@ await network.stop()
 const assert = require('assert')
 const Testkit = require('aa-testkit')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
-const ojson = require('ocore/formula/parse_ojson')
-const { promisify } = require('util')
 const path = require('path')
 
 const agentString = `{
@@ -1002,11 +952,11 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 // agent deployment
-const deployer = await network.newAgentDeployer().ready()
+const deployer = await network.newHeadlessWallet().ready()
 const deployerAddress = await deployer.getAddress()
 
 const wallet = await network.newHeadlessWallet().ready()
@@ -1016,8 +966,7 @@ await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
 await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 await network.witness()
 
-const agent = await promisify(ojson.parse)(agentString)
-const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agent)
+const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agentString)
 
 assert(isValidAddress(agentAddress))
 await network.witness(2)
@@ -1050,8 +999,6 @@ await network.stop()
 const assert = require('assert')
 const Testkit = require('aa-testkit')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
-const ojson = require('ocore/formula/parse_ojson')
-const { promisify } = require('util')
 const path = require('path')
 
 const agentString = `{
@@ -1092,11 +1039,11 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 // agent deployment
-const deployer = await network.newAgentDeployer().ready()
+const deployer = await network.newHeadlessWallet().ready()
 const deployerAddress = await deployer.getAddress()
 
 const wallet = await network.newHeadlessWallet().ready()
@@ -1106,8 +1053,7 @@ await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
 await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 await network.witness()
 
-const agent = await promisify(ojson.parse)(agentString)
-const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agent)
+const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agentString)
 
 assert(isValidAddress(agentAddress))
 await network.witness(2)
@@ -1123,7 +1069,7 @@ let state = await deployer.readAAStateVars(agentAddress)
 assert(state.vars.time === 'past')
 
 // Timetravel network
-await network.timetravelTo('2050-01-01')
+const { error } = await network.timetravel({ to: '2050-01-01' })
 
 const { unit: unitAfterTravel } = await wallet.sendBytes({
   toAddress: agentAddress,
@@ -1152,7 +1098,7 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.genesis()
+const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 
 const wallet = await network.newHeadlessWallet().ready()

@@ -5,10 +5,12 @@ const Joi = require('joi')
 
 const {
 	fromMessage,
+	CommandGetTime,
 	CommandChildStop,
 	CommandTimeTravel,
 	MessageChildError,
 	CommandGetUnitInfo,
+	CommandReadAAStateVars,
 } = require('../../messages')
 
 class AbstractNode extends EventEmitter {
@@ -80,12 +82,12 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
-	async timeTravel ({ to }) {
+	async timetravel ({ to, shift } = {}) {
 		return new Promise(resolve => {
-			this.once('time_travel_done', () => {
-				resolve(this)
+			this.once('time_travel_done', (m) => {
+				resolve({ error: m.error })
 			})
-			this.sendChild(new CommandTimeTravel({ to }))
+			this.sendChild(new CommandTimeTravel({ to, shift }))
 		})
 	}
 
@@ -94,12 +96,28 @@ class AbstractNode extends EventEmitter {
 		this.isReady = true
 	}
 
+	async readAAStateVars (address) {
+		this.sendChild(new CommandReadAAStateVars({ address }))
+		return new Promise((resolve) => {
+			this.once('aa_state_vars', m => resolve({ vars: m.vars }))
+		})
+	}
+
 	async getUnitInfo ({ unit }) {
 		return new Promise(resolve => {
 			this.once('unit_info', (m) => {
 				resolve({ unitObj: m.unitObj, error: m.error })
 			})
 			this.sendChild(new CommandGetUnitInfo({ unit }))
+		})
+	}
+
+	async getTime () {
+		return new Promise(resolve => {
+			this.once('current_time', (m) => {
+				resolve({ time: m.time })
+			})
+			this.sendChild(new CommandGetTime())
 		})
 	}
 

@@ -5,7 +5,7 @@ describe('Check payments', function () {
 	this.timeout(60000)
 
 	before(async () => {
-		this.network = await Network.genesis()
+		this.network = await Network.create()
 	})
 
 	it('Check sending bytes', async () => {
@@ -42,6 +42,14 @@ describe('Check payments', function () {
 
 		bobBalance = await bob.getBalance()
 		expect(bobBalance.base.stable).to.be.equal(50000)
+
+		await genesis.sendBytes({ toAddress: aliceAddress, amount: 1e9 })
+		aliceBalance = await alice.getBalance()
+		expect(aliceBalance.base.pending).to.be.equal(1000000000)
+		await network.witness(2)
+
+		aliceBalance = await alice.getBalance()
+		expect(aliceBalance.base.stable).to.be.equal(1000049756)
 	}).timeout(30000)
 
 	after(async () => {

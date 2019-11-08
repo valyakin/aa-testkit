@@ -6,6 +6,7 @@ const MessageMyAddress = require('./lib/MessageMyAddress')
 const MessageMyBalance = require('./lib/MessageMyBalance')
 const MessageChildError = require('./lib/MessageChildError')
 const MessageChildReady = require('./lib/MessageChildReady')
+const MessageCurrentTime = require('./lib/MessageCurrentTime')
 const MessageAAStateVars = require('./lib/MessageAAStateVars')
 const MessageChildStarted = require('./lib/MessageChildStarted')
 const MessageAgentDeployed = require('./lib/MessageAgentDeployed')
@@ -15,6 +16,7 @@ const MessageGenesisCreated = require('./lib/MessageGenesisCreated')
 const MessageMciBecameStable = require('./lib/MessageMciBecameStable')
 const MessagePasswordRequired = require('./lib/MessagePasswordRequired')
 
+const CommandGetTime = require('./lib/CommandGetTime')
 const CommandSendData = require('./lib/CommandSendData')
 const CommandSendMulti = require('./lib/CommandSendMulti')
 const CommandChildStop = require('./lib/CommandChildStop')
@@ -40,6 +42,7 @@ const fromMessage = (m) => {
 	case 'my_balance': return new MessageMyBalance(message)
 	case 'child_error': return new MessageChildError(message)
 	case 'child_ready': return new MessageChildReady(message)
+	case 'current_time': return new MessageCurrentTime(message)
 	case 'aa_state_vars': return new MessageAAStateVars(message)
 	case 'child_started': return new MessageChildStarted(message)
 	case 'agent_deployed': return new MessageAgentDeployed(message)
@@ -49,6 +52,7 @@ const fromMessage = (m) => {
 	case 'mci_became_stable': return new MessageMciBecameStable(message)
 	case 'password_required': return new MessagePasswordRequired(message)
 
+	case 'command_get_time': return new CommandGetTime(message)
 	case 'command_send_data': return new CommandSendData(message)
 	case 'command_send_multi': return new CommandSendMulti(message)
 	case 'command_child_stop': return new CommandChildStop(message)
@@ -77,6 +81,7 @@ module.exports = {
 	MessageMyBalance,
 	MessageChildError,
 	MessageChildReady,
+	MessageCurrentTime,
 	MessageAAStateVars,
 	MessageChildStarted,
 	MessageAgentDeployed,
@@ -86,6 +91,7 @@ module.exports = {
 	MessageMciBecameStable,
 	MessagePasswordRequired,
 
+	CommandGetTime,
 	CommandSendData,
 	CommandSendMulti,
 	CommandChildStop,

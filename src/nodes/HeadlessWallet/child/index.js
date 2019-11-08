@@ -7,6 +7,7 @@ const {
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageChildReady,
+	MessageAgentDeployed,
 	MessagePasswordRequired,
 } = require('../../../messages')
 
@@ -27,6 +28,7 @@ class HeadlessWalletChild extends AbstractChild {
 			.on('command_get_address', () => this.getAddress())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
 			.on('command_get_balance', (m) => this.getBalance(m))
+			.on('command_deploy_agent', (m) => this.deployAgent(m))
 	}
 
 	static unpackArgv (argv) {
@@ -55,6 +57,9 @@ class HeadlessWalletChild extends AbstractChild {
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
 
+		this.composer = require('ocore/composer')
+		this.network = require('ocore/network')
+
 		this.eventBus.once('headless_wallet_need_pass', () => {
 			this.sendParent(new MessagePasswordRequired())
 		})
@@ -75,7 +80,7 @@ class HeadlessWalletChild extends AbstractChild {
 			if (err) {
 				this.sendParent(new MessageSentBytes({ error: err }))
 			} else {
-				this.sendParent(new MessageSentBytes({ unit }))
+				this.sendParent(new MessageSentBytes({ unit, error: null }))
 			}
 		})
 	}
@@ -85,7 +90,7 @@ class HeadlessWalletChild extends AbstractChild {
 			if (err) {
 				this.sendParent(new MessageSentMulti({ error: err }))
 			}
-			this.sendParent(new MessageSentMulti({ unit }))
+			this.sendParent(new MessageSentMulti({ unit, error: null }))
 		})
 	}
 
@@ -113,7 +118,7 @@ class HeadlessWalletChild extends AbstractChild {
 				if (err) {
 					this.sendParent(new MessageSentData({ error: err }))
 				}
-				this.sendParent(new MessageSentData({ unit }))
+				this.sendParent(new MessageSentData({ unit, error: null }))
 			})
 		})
 	}
@@ -125,6 +130,53 @@ class HeadlessWalletChild extends AbstractChild {
 				console.log('assocBalances', assocBalances)
 				this.sendParent(new MessageMyBalance({ balance: assocBalances }))
 			})
+		})
+	}
+
+	async deployAgent ({ ojson }) {
+		try {
+			const objectHash = require('ocore/object_hash')
+			const aaAddress = objectHash.getChash160(ojson)
+
+			const myAddress = await new Promise((resolve, reject) => {
+				this.headlessWallet.readFirstAddress(address => resolve(address))
+			})
+
+			const payload = {
+				address: aaAddress,
+				definition: ojson,
+			}
+
+			const callbacks = this.composer.getSavingCallbacks({
+				ifNotEnoughFunds: (err) => this.sendParent(new MessageAgentDeployed({ error: err })),
+				ifError: (err) => this.sendParent(new MessageAgentDeployed({ error: err })),
+				ifOk: (objJoint) => {
+					this.network.broadcastJoint(objJoint)
+					this.sendParent(new MessageAgentDeployed({ unit: objJoint.unit.unit, address: aaAddress, error: null }))
+				},
+			})
+
+			this.composeContentJoint(myAddress, 'definition', payload, this.headlessWallet.signer, callbacks)
+		} catch (error) {
+			this.sendParent(new MessageAgentDeployed({ error: error.message }))
+		}
+	}
+
+	composeContentJoint (fromAddress, app, payload, signer, callbacks) {
+		const objectHash = require('ocore/object_hash')
+
+		const objMessage = {
+			app: app,
+			payload_location: 'inline',
+			payload_hash: objectHash.getBase64Hash(payload),
+			payload: payload,
+		}
+		this.composer.composeJoint({
+			paying_addresses: [fromAddress],
+			outputs: [{ address: fromAddress, amount: 0 }],
+			messages: [objMessage],
+			signer: signer,
+			callbacks: callbacks,
 		})
 	}
 }

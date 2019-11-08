@@ -1,10 +1,10 @@
 const AbstarctMessage = require('./AbstarctMessage')
 
 class CommandDeployAgent extends AbstarctMessage {
-	constructor ({ agent }) {
+	constructor ({ ojson }) {
 		super()
 		this.topic = 'command_deploy_agent'
-		this.agent = agent
+		this.ojson = ojson
 	}
 }
 

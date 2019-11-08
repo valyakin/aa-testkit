@@ -1,9 +1,10 @@
 const AbstarctMessage = require('./AbstarctMessage')
 
 class CommandTimeTravel extends AbstarctMessage {
-	constructor ({ to }) {
+	constructor ({ to, shift }) {
 		super()
 		this.topic = 'command_time_travel'
+		this.shift = shift
 		this.to = to
 	}
 }

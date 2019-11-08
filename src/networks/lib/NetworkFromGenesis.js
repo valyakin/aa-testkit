@@ -4,7 +4,7 @@ const path = require('path')
 const config = require('config')['aa-testkit']
 
 const { getIdForPrefix } = require('../../utils')
-const { HeadlessWallet, AgentDeployer, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
+const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
 
 const paramsSchema = () => ({
 	runid: Joi.string().required(),
@@ -21,7 +21,6 @@ class NetworkFromGenesis {
 		this.rundir = path.join(config.TESTDATA_DIR, this.runid)
 		this.nodes = {
 			headlessWallets: [],
-			agentDeployers: [],
 			obyteExplorers: [],
 		}
 	}
@@ -37,7 +36,6 @@ class NetworkFromGenesis {
 	get nodesList () {
 		return [
 			...this.nodes.headlessWallets,
-			...this.nodes.agentDeployers,
 			...this.nodes.obyteExplorers,
 			this.genesisNode,
 			this.hub,
@@ -48,8 +46,17 @@ class NetworkFromGenesis {
 		return Promise.all(this.nodesList.map(n => n.stop()))
 	}
 
-	async timetravelTo (to) {
-		return Promise.all(this.nodesList.map(n => n.timeTravel({ to })))
+	async timetravel ({ to, shift } = {}) {
+		return Promise.all(this.nodesList.map(n => n.timetravel({ to, shift }))).then(errors => {
+			return {
+				error:
+					errors
+						.filter(e => e.error)
+						.map(e => `${e.id}: ${e.error}`)
+						.join(',') ||
+					null,
+			}
+		})
 	}
 
 	async witness (n = 1) {
@@ -74,17 +81,6 @@ class NetworkFromGenesis {
 		})
 		this.nodes.headlessWallets.push(wallet)
 		return wallet
-	}
-
-	newAgentDeployer (params) {
-		const deployer = new AgentDeployer({
-			rundir: this.rundir,
-			genesisUnit: this.genesisUnit,
-			id: getIdForPrefix(this.rundir, 'agent-deployer-'),
-			...params,
-		})
-		this.nodes.agentDeployers.push(deployer)
-		return deployer
 	}
 
 	newObyteExplorer (params) {

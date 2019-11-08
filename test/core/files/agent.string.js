@@ -1,0 +1,14 @@
+module.exports = `{
+	bounce_fees: { base: 200000 },
+	messages: [
+		{
+			app: 'payment',
+			payload: {
+				asset: 'base',
+				outputs: [
+					{address: "{trigger.address}", amount: "{trigger.output[[asset=base]] - 1000}"}
+				]
+			}
+		}
+	]
+}`

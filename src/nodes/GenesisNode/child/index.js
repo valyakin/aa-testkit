@@ -88,7 +88,7 @@ class GenesisNodeChild extends AbstractChild {
 			if (err) {
 				this.sendParent(new MessageSentBytes({ error: err }))
 			} else {
-				this.sendParent(new MessageSentBytes({ unit }))
+				this.sendParent(new MessageSentBytes({ unit, error: null }))
 			}
 		})
 	}
