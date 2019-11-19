@@ -595,24 +595,37 @@ See [Agent AA response test example](#Test-Examples)
 
 ```javascript
 {
-  version: '2.0dev',
-  alt: '3',
-  timestamp: 1574092199,
-  messages: [ [Object], [Object] ],
-  authors: [ [Object] ],
-  last_ball_unit: 'JlYagmRSLxvtqOGLpAS7xRuWR/DjKIYqdxzzZILbaT0=',
-  last_ball: 'o8f6HIge9iAKLhi/su4YxkHP9yPGmRoD8DUlqozNpYA=',
-  witness_list_unit: 'ogM5EpG2oXp0Oyb/KZdDy65+8IzIRKvfYizg35atScw=',
-  parent_units: [ '6oawR6WlrKShEG2AfMrvHyq/+MH06vikV9XEfJFv/oY=' ],
-  headers_commission: 267,
-  payload_commission: 224,
-  unit: 'RNmwjyK88YgqYRORWLo8UEb9jIB5f9ndep9K7nB2xsM=' },
-  response: {
-    responseVars: {
-      dataFeedAaResponse: 'aa response!'
-    }
-  },
-  updatedStateVars: {}
+	mci: 13,
+	trigger_address: 'VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK',
+	trigger_initial_address: 'VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK',
+	trigger_unit: 'N9PI6hN+vmVMkmXMh58pFZErGt638Fwr6yhLQw3g3HA=',
+	aa_address: 'WWHEN5NDHBI2UF4CLJ7LQ7VAW2QELMD7',
+	bounced: false,
+	response_unit: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=',
+	objResponseUnit: {
+		version: '2.0dev',
+		alt: '3',
+		timestamp: 1574171283,
+		messages: [[Object], [Object]],
+		authors: [[Object]],
+		last_ball_unit: 'myDMlLHavXhVF+IMkXS6ir/GkXFASXplaNzDCpsV/kA=',
+		last_ball: 'jfh9QBcZVXsWE+Q5pstRQO1STO7gfngx9pLIVAxhsUM=',
+		witness_list_unit: 'rC7dZW1x3OCw8Bh+6urKN5OB0rnsmNeNy6Exz3n+rZI=',
+		parent_units: ['N9PI6hN+vmVMkmXMh58pFZErGt638Fwr6yhLQw3g3HA='],
+		headers_commission: 267,
+		payload_commission: 259,
+		unit: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=',
+	},
+	response: {
+		responseVars:
+			{ team_asset: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=' },
+	},
+	updatedStateVars: {
+		WWHEN5NDHBI2UF4CLJ7LQ7VAW2QELMD7: {
+			team_VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK_founder_tax: [Object],
+			team_VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK_asset: [Object],
+		},
+	},
 }
 ```
 </details>
