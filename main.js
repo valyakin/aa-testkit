@@ -8,9 +8,11 @@ function Testkit (configs = {}) {
 
 	const Nodes = require('./src/nodes')
 	const Network = require('./src/networks')
+	const Utils = require('./src/utils')
 	return {
 		Nodes,
 		Network,
+		Utils,
 	}
 }
 

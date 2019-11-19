@@ -108,7 +108,7 @@ describe('Check timetravel node feature', function () {
 		expect(timeAfter).to.be.approximately(timeBefore, 300)
 	}).timeout(30000)
 
-	it('node timetravel shift and to same time', async () => {
+	it('network timetravel both "shift" and "to" params are present', async () => {
 		const date = '2040-01-01 7:00'
 		const { error } = await this.wallet.timetravel({ to: date, shift: '10d' })
 		expect(error).to.be.null

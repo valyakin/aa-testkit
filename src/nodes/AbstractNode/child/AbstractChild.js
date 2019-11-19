@@ -7,6 +7,7 @@ const { isString } = require('lodash')
 const {
 	fromMessage,
 	MessageUnitInfo,
+	MessageAAResponse,
 	MessageCurrentTime,
 	MessageAAStateVars,
 	MessageChildStarted,
@@ -43,7 +44,9 @@ class AbstractChild extends EventEmitter {
 			.on('command_read_aa_state_vars', (m) => this.readAAStateVars(m))
 
 		const eventBus = require('ocore/event_bus')
-		eventBus.on('mci_became_stable', () => setTimeout(() => this.sendParent(new MessageMciBecameStable()), 100))
+		eventBus
+			.on('mci_became_stable', () => this.sendToParent(new MessageMciBecameStable()))
+			.on('aa_response', (objAAResponse) => this.sendToParent(new MessageAAResponse({ response: objAAResponse })))
 	}
 
 	static unpackArgv (argv) {
@@ -52,7 +55,7 @@ class AbstractChild extends EventEmitter {
 
 	start () {
 		this.replaceConsoleLog()
-		this.sendParent(new MessageChildStarted())
+		this.sendToParent(new MessageChildStarted())
 	}
 
 	stop () {
@@ -72,9 +75,9 @@ class AbstractChild extends EventEmitter {
 				throw new Error('Attempt to timetravel in past')
 			}
 			mockdate.set(newDate)
-			this.sendParent(new MessageTimeTravelDone({ error: null }))
+			this.sendToParent(new MessageTimeTravelDone({ error: null }))
 		} catch (error) {
-			this.sendParent(new MessageTimeTravelDone({ error: error.message }))
+			this.sendToParent(new MessageTimeTravelDone({ error: error.message }))
 		}
 	}
 
@@ -104,7 +107,7 @@ class AbstractChild extends EventEmitter {
 	}
 
 	getTime () {
-		this.sendParent(new MessageCurrentTime({ time: Date.now() }))
+		this.sendToParent(new MessageCurrentTime({ time: Date.now() }))
 	}
 
 	getUnitInfo ({ unit }) {
@@ -112,17 +115,17 @@ class AbstractChild extends EventEmitter {
 		const { readJoint } = require('ocore/storage')
 		readJoint(db, unit, {
 			ifNotFound: () => {
-				this.sendParent(new MessageUnitInfo({ unitObj: null, error: 'Unit not found' }))
+				this.sendToParent(new MessageUnitInfo({ unitObj: null, error: 'Unit not found' }))
 			},
 			ifFound: (objJoint) => {
-				this.sendParent(new MessageUnitInfo({ unitObj: objJoint, error: null }))
+				this.sendToParent(new MessageUnitInfo({ unitObj: objJoint, error: null }))
 			},
 		})
 	}
 
-	sendParent (message) {
-		console.log('sendParent', JSON.stringify(message.serialize(), null, 2))
-		setTimeout(() => process.send(message.serialize()), 100)
+	sendToParent (message) {
+		console.log('sendToParent', JSON.stringify(message.serialize(), null, 2))
+		setTimeout(() => process.send(message.serialize()), 200)
 	}
 
 	handleParentMessage (m) {
@@ -133,7 +136,7 @@ class AbstractChild extends EventEmitter {
 
 	async readAAStateVars ({ address }) {
 		const vars = await this.getAAStateVarsFromStorage(address)
-		this.sendParent(new MessageAAStateVars({ vars }))
+		this.sendToParent(new MessageAAStateVars({ vars }))
 	}
 
 	getAAStateVarsFromStorage (address) {

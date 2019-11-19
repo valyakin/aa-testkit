@@ -135,7 +135,7 @@ describe('Check timetravel network feature', function () {
 		await this.expectTimeInNodes(timeBefore)
 	}).timeout(30000)
 
-	it('network timetravel shift and to same time', async () => {
+	it('network timetravel both "shift" and "to" params are present', async () => {
 		const date = '2040-01-01 7:00'
 		const { error } = await this.network.timetravel({ to: date, shift: '10d' })
 		expect(error).to.be.null

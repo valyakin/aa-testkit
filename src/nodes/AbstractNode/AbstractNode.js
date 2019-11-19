@@ -18,6 +18,9 @@ class AbstractNode extends EventEmitter {
 		super()
 		this.setMaxListeners(20)
 		this.isReady = false
+		this.aaResponses = {
+			toUnit: {},
+		}
 
 		const { error, value } = Joi.validate(
 			params,
@@ -52,7 +55,9 @@ class AbstractNode extends EventEmitter {
 			.setMaxListeners(20)
 
 		this
-			.on('child_ready', () => this.childReady())
+			.on('child_ready', () => this.handleChildReady())
+			.on('aa_response', (m) => this.handleAaResponse(m))
+			.on('child_error', (m) => this.handleChildError(m.error))
 	}
 
 	async stop () {
@@ -60,7 +65,7 @@ class AbstractNode extends EventEmitter {
 			this.child.once('exit', () => {
 				resolve(this)
 			})
-			this.sendChild(new CommandChildStop())
+			this.sendToChild(new CommandChildStop())
 		})
 	}
 
@@ -87,20 +92,48 @@ class AbstractNode extends EventEmitter {
 			this.once('time_travel_done', (m) => {
 				resolve({ error: m.error })
 			})
-			this.sendChild(new CommandTimeTravel({ to, shift }))
+			this.sendToChild(new CommandTimeTravel({ to, shift }))
 		})
 	}
 
-	childReady () {
+	handleChildReady () {
 		console.log(`[INFO][${this.id}] Child started`)
 		this.isReady = true
 	}
 
+	handleAaResponse (m) {
+		// console.log(`[INFO][${this.id}] handleAaResponse`, JSON.stringify(m, null, 2))
+		this.aaResponses.toUnit[m.response.trigger_unit] = m.response
+		this.emit('aa_response_to_unit-' + m.response.trigger_unit, { response: m.response })
+		this.emit('aa_response_to_address-' + m.response.trigger_address, { response: m.response })
+		this.emit('aa_response_from_aa-' + m.response.aa_address, { response: m.response })
+	}
+
 	async readAAStateVars (address) {
-		this.sendChild(new CommandReadAAStateVars({ address }))
+		this.sendToChild(new CommandReadAAStateVars({ address }))
 		return new Promise((resolve) => {
 			this.once('aa_state_vars', m => resolve({ vars: m.vars }))
 		})
+	}
+
+	async getAaResponse ({ toUnit, toAddress, fromAa }) {
+		if (toUnit) {
+			if (this.aaResponses.toUnit[toUnit]) {
+				return { response: this.aaResponses.toUnit[toUnit] }
+			} else {
+				return new Promise((resolve) => {
+					this.once('aa_response_to_unit-' + toUnit, m => resolve(m))
+				})
+			}
+		} else if (toAddress) {
+			return new Promise((resolve) => {
+				this.once('aa_response_to_address-' + toAddress, m => resolve(m))
+			})
+		} else if (fromAa) {
+			return new Promise((resolve) => {
+				this.once('aa_response_from_aa-' + fromAa, m => resolve(m))
+			})
+		}
 	}
 
 	async getUnitInfo ({ unit }) {
@@ -108,7 +141,7 @@ class AbstractNode extends EventEmitter {
 			this.once('unit_info', (m) => {
 				resolve({ unitObj: m.unitObj, error: m.error })
 			})
-			this.sendChild(new CommandGetUnitInfo({ unit }))
+			this.sendToChild(new CommandGetUnitInfo({ unit }))
 		})
 	}
 
@@ -117,11 +150,11 @@ class AbstractNode extends EventEmitter {
 			this.once('current_time', (m) => {
 				resolve({ time: m.time })
 			})
-			this.sendChild(new CommandGetTime())
+			this.sendToChild(new CommandGetTime())
 		})
 	}
 
-	sendChild (message) {
+	sendToChild (message) {
 		this.child.send(message.serialize())
 	}
 

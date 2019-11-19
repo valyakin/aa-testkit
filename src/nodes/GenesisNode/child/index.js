@@ -54,7 +54,7 @@ class GenesisNodeChild extends AbstractChild {
 		this.network = require('ocore/network.js')
 
 		this.eventBus.once('headless_wallet_need_pass', () => {
-			this.sendParent(new MessagePasswordRequired())
+			this.sendToParent(new MessagePasswordRequired())
 		})
 
 		this.eventBus.once('headless_wallet_ready', () => this.genesis())
@@ -62,15 +62,15 @@ class GenesisNodeChild extends AbstractChild {
 
 	loginToHub () {
 		this.eventBus.once('connected', () => {
-			this.sendParent(new MessageConnectedToHub())
+			this.sendToParent(new MessageConnectedToHub())
 		})
 		this.device.loginToHub()
 	}
 
 	postWitness () {
 		const callbacks = this.composer.getSavingCallbacks({
-			ifNotEnoughFunds: (err) => this.sendParent(new MessageChildError(err)),
-			ifError: (err) => this.sendParent(new MessageChildError(err)),
+			ifNotEnoughFunds: (err) => this.sendToParent(new MessageChildError(err)),
+			ifError: (err) => this.sendToParent(new MessageChildError(err)),
 			ifOk: (objJoint) => {
 				this.network.broadcastJoint(objJoint)
 			},
@@ -86,9 +86,9 @@ class GenesisNodeChild extends AbstractChild {
 	sendBytes ({ toAddress, amount }) {
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
-				this.sendParent(new MessageSentBytes({ error: err }))
+				this.sendToParent(new MessageSentBytes({ error: err }))
 			} else {
-				this.sendParent(new MessageSentBytes({ unit, error: null }))
+				this.sendToParent(new MessageSentBytes({ unit, error: null }))
 			}
 		})
 	}
@@ -104,10 +104,15 @@ class GenesisNodeChild extends AbstractChild {
 			this.composer.setGenesis(false)
 			this.address = address
 
-			this.sendParent(new MessageGenesisCreated({ address, genesisUnit: genesisHash }))
-			this.sendParent(new MessageChildReady())
+			this.sendToParent(new MessageGenesisCreated({ address, genesisUnit: genesisHash }))
+
+			if (this.network.isCatchingUp()) {
+				this.eventBus.once('catching_up_done', () => this.sendToParent(new MessageChildReady()))
+			} else {
+				this.sendToParent(new MessageChildReady())
+			}
 		} catch (error) {
-			this.sendParent(new MessageChildError(error))
+			this.sendToParent(new MessageChildError(error))
 		}
 	}
 
@@ -155,7 +160,7 @@ class GenesisNodeChild extends AbstractChild {
 
 	getAddress () {
 		this.headlessWallet.readFirstAddress(address => {
-			this.sendParent(new MessageMyAddress({ address }))
+			this.sendToParent(new MessageMyAddress({ address }))
 		})
 	}
 }

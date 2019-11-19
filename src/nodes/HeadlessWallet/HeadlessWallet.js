@@ -45,7 +45,7 @@ class HeadlessWallet extends AbstractNode {
 	}
 
 	async getAddress () {
-		this.sendChild(new CommandGetAddress())
+		this.sendToChild(new CommandGetAddress())
 		return new Promise((resolve) => {
 			this.once('my_address', m => resolve(m.address))
 		})
@@ -54,28 +54,28 @@ class HeadlessWallet extends AbstractNode {
 	async sendMulti (opts) {
 		return new Promise(resolve => {
 			this.once('sent_multi', (m) => resolve({ unit: m.unit, error: m.error }))
-			this.sendChild(new CommandSendMulti(opts))
+			this.sendToChild(new CommandSendMulti(opts))
 		})
 	}
 
 	async sendData ({ toAddress, amount, payload }) {
 		return new Promise(resolve => {
 			this.once('sent_data', (m) => resolve({ unit: m.unit, error: m.error }))
-			this.sendChild(new CommandSendData({ toAddress, amount, payload }))
+			this.sendToChild(new CommandSendData({ toAddress, amount, payload }))
 		})
 	}
 
 	async sendBytes ({ toAddress, amount }) {
 		return new Promise(resolve => {
 			this.once('sent_bytes', (m) => resolve({ unit: m.unit, error: m.error }))
-			this.sendChild(new CommandSendBytes({ toAddress, amount }))
+			this.sendToChild(new CommandSendBytes({ toAddress, amount }))
 		})
 	}
 
 	getBalance () {
 		return new Promise((resolve) => {
 			this.once('my_balance', m => resolve(m.balance))
-			this.sendChild(new CommandGetBalance())
+			this.sendToChild(new CommandGetBalance())
 		})
 	}
 
@@ -97,7 +97,7 @@ class HeadlessWallet extends AbstractNode {
 				? await promisify(parseOjson)(agent)
 				: agent
 
-			this.sendChild(new CommandDeployAgent({
+			this.sendToChild(new CommandDeployAgent({
 				ojson: isArray(ojson)
 					? ojson
 					: ['autonomous agent', ojson],

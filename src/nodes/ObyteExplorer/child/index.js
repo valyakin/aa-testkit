@@ -51,8 +51,10 @@ class ObyteExplorerChild extends AbstractChild {
 		this.conf.hub = this.hub
 		this.conf.initial_peers = [`${this.conf.WS_PROTOCOL}${this.hub}`]
 
+		this.network = require('ocore/network.js')
+
 		this.explorer = require('obyte-explorer/explorer.js')
-		this.sendParent(new MessageChildReady())
+		this.sendToParent(new MessageChildReady())
 	}
 
 	logPrefix () {

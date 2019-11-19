@@ -38,7 +38,7 @@ class GenesisNode extends AbstractNode {
 	loginToHub () {
 		return new Promise(resolve => {
 			this.once('connected_to_hub', () => resolve(this))
-			this.sendChild(new CommandLoginToHub())
+			this.sendToChild(new CommandLoginToHub())
 		})
 	}
 
@@ -49,16 +49,16 @@ class GenesisNode extends AbstractNode {
 	sendBytes ({ toAddress, amount }) {
 		return new Promise(resolve => {
 			this.once('sent_bytes', (m) => resolve({ unit: m.unit, error: m.error }))
-			this.sendChild(new CommandSendBytes({ toAddress, amount }))
+			this.sendToChild(new CommandSendBytes({ toAddress, amount }))
 		})
 	}
 
 	postWitness () {
-		this.sendChild(new CommandPostWitness())
+		this.sendToChild(new CommandPostWitness())
 	}
 
 	getAddress () {
-		this.sendChild(new CommandGetAddress())
+		this.sendToChild(new CommandGetAddress())
 		return new Promise((resolve) => {
 			this.once('my_address', m => resolve(m.address))
 		})

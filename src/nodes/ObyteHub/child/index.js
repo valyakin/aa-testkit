@@ -44,8 +44,10 @@ class ObyteHubChild extends AbstractChild {
 		this.conf.initial_witnesses = this.initialWitnesses
 		this.conf.port = this.port
 
+		this.network = require('ocore/network.js')
+
 		this.hub = require('obyte-hub')
-		this.sendParent(new MessageChildReady())
+		this.sendToParent(new MessageChildReady())
 	}
 
 	logPrefix () {

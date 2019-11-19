@@ -4,6 +4,7 @@ const MessageSentMulti = require('./lib/MessageSentMulti')
 const MessageSentBytes = require('./lib/MessageSentBytes')
 const MessageMyAddress = require('./lib/MessageMyAddress')
 const MessageMyBalance = require('./lib/MessageMyBalance')
+const MessageAAResponse = require('./lib/MessageAAResponse')
 const MessageChildError = require('./lib/MessageChildError')
 const MessageChildReady = require('./lib/MessageChildReady')
 const MessageCurrentTime = require('./lib/MessageCurrentTime')
@@ -40,6 +41,7 @@ const fromMessage = (m) => {
 	case 'sent_bytes': return new MessageSentBytes(message)
 	case 'my_address': return new MessageMyAddress(message)
 	case 'my_balance': return new MessageMyBalance(message)
+	case 'aa_response': return new MessageAAResponse(message)
 	case 'child_error': return new MessageChildError(message)
 	case 'child_ready': return new MessageChildReady(message)
 	case 'current_time': return new MessageCurrentTime(message)
@@ -80,6 +82,7 @@ module.exports = {
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageChildError,
+	MessageAAResponse,
 	MessageChildReady,
 	MessageCurrentTime,
 	MessageAAStateVars,

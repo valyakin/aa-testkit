@@ -170,7 +170,7 @@ const hub = await network.getHub().ready()
 
 ---------------------------------------
 
-### __`network.witness(n)`__ *`: <Promise>`*
+### __`network.witness(n)`__ *`: Promise<>`*
 
 Send the command to `GenesisNode` to post and broadcast witness. Network will await then for every node to confirm `mci_became_stable`
 
@@ -199,7 +199,7 @@ await network.witness()
 
 ---------------------------------------
 
-### __`network.stop()`__ *`: <Promise>`*
+### __`network.stop()`__ *`: Promise<>`*
 
 Send the command to every node to stop the process.
 
@@ -370,19 +370,19 @@ await hub.stop()
 
 Methods described in this section are applicable for any node
 
-### __`node.ready()`__ *`: <Promise>`*
+### __`node.ready()`__ *`: Promise<>`*
 
 __Returns__ *Promise* that resolves when node child will be ready to operate
 
 ---------------------------------------
 
-### __`node.stop()`__ *`: <Promise>`*
+### __`node.stop()`__ *`: Promise<>`*
 
 __Returns__ *Promise* that resolves when node child exited its process
 
 ---------------------------------------
 
-### __`node.stabilize()`__ *`: <Promise>`*
+### __`node.stabilize()`__ *`: Promise<>`*
 
 __Returns__ *Promise* that resolves when node child receives `mci_became_stable` event
 
@@ -419,11 +419,11 @@ Receive details about unit from node. Uses `ocore/storage.readJoint` method
 
 *Promise* resolves as `{ time }` object and `time` is in milliseconds
 
-### __`node.getUnitInfo({ unit })`__ *`: Promise<unitObj>`*
+### __`node.getUnitInfo({ unit })`__ *`: Promise<{ unitObj, error }>`*
 
 Receive details about unit from node. Uses `ocore/storage.readJoint` method
 
-*Promise* resolves as *UnitObj* if unit found in the node or *null* otherwise
+*Promise* resolves as `{ unitObj, error }`. Error will be null if everything is ok
 
 #### Parameters
 
@@ -533,6 +533,57 @@ See [Agent deployment test example](#Test-Examples)
 
 ---------------------------------------
 
+### __`node.getAaResponse({ toUnit | toAddress | fromAa })`__ *`: Promise<{ response }>`*
+
+Retrieve autonomous agent execution response
+
+__Returns__ *Promise* that resolves to `{ response }` where `response` - object of agent response
+
+#### Parameters
+
+`getAaResponse` parameter can be one of `toUnit`, `toAddress` or `fromAa` depending on what is known
+
+*`toUnit : String`* - unit of aa execution to retrieve response from
+
+*`toAddress : String`* - address of wallet that triggered AA execution
+
+*`fromAa : String`* - address of Autonomous Agent
+
+<details>
+<summary>Example</summary>
+
+See [Agent AA response test example](#Test-Examples)
+</details>
+
+<details>
+<summary>Response Object example</summary>
+
+```javascript
+{
+  version: '2.0dev',
+  alt: '3',
+  timestamp: 1574092199,
+  messages: [ [Object], [Object] ],
+  authors: [ [Object] ],
+  last_ball_unit: 'JlYagmRSLxvtqOGLpAS7xRuWR/DjKIYqdxzzZILbaT0=',
+  last_ball: 'o8f6HIge9iAKLhi/su4YxkHP9yPGmRoD8DUlqozNpYA=',
+  witness_list_unit: 'ogM5EpG2oXp0Oyb/KZdDy65+8IzIRKvfYizg35atScw=',
+  parent_units: [ '6oawR6WlrKShEG2AfMrvHyq/+MH06vikV9XEfJFv/oY=' ],
+  headers_commission: 267,
+  payload_commission: 224,
+  unit: 'RNmwjyK88YgqYRORWLo8UEb9jIB5f9ndep9K7nB2xsM=' },
+  response: {
+    responseVars: {
+      dataFeedAaResponse: 'aa response!'
+    }
+  },
+  updatedStateVars: {}
+}
+```
+</details>
+
+---------------------------------------
+
 ## GenesisNode
 
 Genesis node main function is to start new network and create genesis unit. After this, genesis node serves as witness and source of Bytes. At the moment of network genesis, this node puts on its account `10e15` Bytes
@@ -548,11 +599,11 @@ Genesis node main function is to start new network and create genesis unit. Afte
 
 ### GenesisNode methods
 
-### __`genesis.createGenesis()`__ *`: <Promise>`*
+### __`genesis.createGenesis()`__ *`: Promise<{ genesisUnit, genesisAddress }>`*
 
 Creates network with new genesis unit.
 
-__Returns__ *Promise* that resolves when genesis complete. *Promise* resolves to { genesisUnit, genesisAddress }
+__Returns__ *Promise* that resolves when genesis complete. *Promise* resolves to `{ genesisUnit, genesisAddress }`
 
 <details>
 <summary>Example</summary>
@@ -576,7 +627,7 @@ const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 
 ---------------------------------------
 
-### __`genesis.loginToHub()`__ *`: <Promise>`*
+### __`genesis.loginToHub()`__ *`: Promise<>`*
 
 Send the command to node child to connect to hub. Usefull at network genesis, because hub node starts after genesis node.
 
@@ -642,7 +693,7 @@ await wallet.stop()
 
 ---------------------------------------
 
-### __`genesis.getAddress()`__ *`: <Promise>`*
+### __`genesis.getAddress()`__ *`: Promise<address>`*
 
 Request node address from child.
 
@@ -650,7 +701,7 @@ __Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
-### __`genesis.sendBytes({ toAddress, amount })`__ *`: <Promise>`*
+### __`genesis.sendBytes({ toAddress, amount })`__ *`: Promise<{ unit, error }>`*
 
 Send Bytes to address
 
@@ -698,7 +749,7 @@ Headless wallet node provides common network node functionality. It can receive 
 
 ### HeadlessWallet methods
 
-### __`wallet.getAddress()`__ *`: <Promise>`*
+### __`wallet.getAddress()`__ *`: Promise<address>`*
 
 Request node address from child.
 
@@ -706,7 +757,7 @@ __Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
-### __`wallet.getBalance()`__ *`: <Promise>`*
+### __`wallet.getBalance()`__ *`: Promise<balanceObject>`*
 
 Retrieve node balance from child.
 
@@ -728,7 +779,7 @@ __Returns__ *Promise* that resolves to node balance object
 
 ---------------------------------------
 
-### __`wallet.sendBytes({ toAddress, amount })`__ *`: <Promise>`*
+### __`wallet.sendBytes({ toAddress, amount })`__ *`: Promise<{ unit, error }>`*
 
 Send Bytes to address
 
@@ -742,7 +793,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after Bytes are sent. `
 
 ---------------------------------------
 
-### __`wallet.sendData({ toAddress, amount, payload })`__ *`: <Promise>`*
+### __`wallet.sendData({ toAddress, amount, payload })`__ *`: Promise<{ unit, error }>`*
 
 Broadcast data message to network. Usefull to trigger AA execution with some data. For this, set `toAddress` to address of deployed AA
 
@@ -758,7 +809,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after data is sent. `er
 
 ---------------------------------------
 
-### __`wallet.sendMulti(opts)`__ *`: <Promise>`*
+### __`wallet.sendMulti(opts)`__ *`: Promise<{ unit, error }>`*
 
 Allows to broadcast arbitrary message to network. Opts object forwards directly to [`issueChangeAddressAndSendMultiPayment`](https://developer.obyte.org/payments/data#data-with-any-structure) method of `headless-wallet`
 
@@ -1193,6 +1244,77 @@ await network.stop()
 ```
 </details>
 
+</details>
+
+<details>
+<summary>Get AA execution response</summary>
+
+```javascript
+const agentString = `{
+	bounce_fees: { base: 10000 },
+	messages: [
+		{
+			init: '{
+				$datafeed = trigger.data.dataFeedPayload;
+				response['dataFeedAaResponse'] = 'aa response!';
+			}',
+			app: 'data_feed',
+			payload: {
+				dataFeedPayload: '{
+					if ($datafeed)
+						return $datafeed;
+					'no datafeed provided'
+				}'
+			}
+		}
+	]
+}`
+
+const assert = require('assert')
+const Testkit = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+const explorer = await network.newObyteExplorer().ready()
+
+const deployer = await network.newHeadlessWallet().ready()
+const deployerAddress = await deployer.getAddress()
+
+const wallet = await network.newHeadlessWallet().ready()
+const walletAddress = await wallet.getAddress()
+
+await genesis.sendBytes({ toAddress: walletAddress, amount: 1e9 })
+await network.witness(2)
+
+await genesis.sendBytes({ toAddress: deployerAddress, amount: 1e9 })
+await network.witness(2)
+
+const { address: agentAddress, unit: agentDeploymentUnit, error: agentDeploymentError } = await deployer.deployAgent(agentString)
+
+await network.witness(2)
+
+const { unit, error } = await wallet.sendData({
+	toAddress: agentAddress,
+	amount: 10000,
+	payload: {
+		dataFeedPayload: 'this will be a datafeed',
+	},
+})
+
+await network.witness(4)
+const { response } = await wallet.getAaResponse({ toUnit: unit })
+
+assert(response.response.responseVars.dataFeedAaResponse === 'aa response!')
+
+const aaResponseUnit = response.response_unit
+const { unitObj, error: aaResponseUnitError } = await wallet.getUnitInfo({ unit: aaResponseUnit })
+
+const dataFeedMessage = unitObj.unit.messages.find(e => e.app === 'data_feed')
+assert(dataFeedMessage.payload.dataFeedPayload === 'this will be a datafeed')
+
+await network.stop()
+```
 </details>
 
 ## Writing Tests With Mocha

@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const { isString } = require('lodash')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const {
 	MessageSentData,
@@ -59,28 +60,29 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this.composer = require('ocore/composer')
 		this.network = require('ocore/network')
+		this.storage = require('ocore/storage')
 
 		this.eventBus.once('headless_wallet_need_pass', () => {
-			this.sendParent(new MessagePasswordRequired())
+			this.sendToParent(new MessagePasswordRequired())
 		})
 
 		this.eventBus.once('headless_wallet_ready', () => {
-			this.sendParent(new MessageChildReady())
+			this.sendToParent(new MessageChildReady())
 		})
 	}
 
 	getAddress () {
 		this.headlessWallet.readFirstAddress(address => {
-			this.sendParent(new MessageMyAddress({ address }))
+			this.sendToParent(new MessageMyAddress({ address }))
 		})
 	}
 
 	sendBytes ({ toAddress, amount }) {
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
-				this.sendParent(new MessageSentBytes({ error: err }))
+				this.sendToParent(new MessageSentBytes({ error: err }))
 			} else {
-				this.sendParent(new MessageSentBytes({ unit, error: null }))
+				this.sendToParent(new MessageSentBytes({ unit, error: null }))
 			}
 		})
 	}
@@ -88,38 +90,40 @@ class HeadlessWalletChild extends AbstractChild {
 	sendMulti ({ opts }) {
 		this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
 			if (err) {
-				this.sendParent(new MessageSentMulti({ error: err }))
+				this.sendToParent(new MessageSentMulti({
+					unit: null,
+					...(isString(err) ? { error: err } : err),
+				}))
 			}
-			this.sendParent(new MessageSentMulti({ unit, error: null }))
+			this.sendToParent(new MessageSentMulti({ unit, error: null }))
 		})
 	}
 
-	sendData (message) {
-		const { payload, toAddress, amount } = message
-		this.headlessWallet.readFirstAddress(firstAddress => {
-			const objectHash = require('ocore/object_hash.js')
+	sendData ({ payload, toAddress, amount }) {
+		const objectHash = require('ocore/object_hash.js')
 
-			const messages = [
-				{
-					app: 'data',
-					payload_location: 'inline',
-					payload_hash: objectHash.getBase64Hash(payload),
-					payload: payload,
-				},
-			]
-			const opts = {
-				paying_addresses: [firstAddress],
-				to_address: toAddress,
-				amount,
-				messages,
+		const messages = [
+			{
+				app: 'data',
+				payload_location: 'inline',
+				payload_hash: objectHash.getBase64Hash(payload),
+				payload: payload,
+			},
+		]
+		const opts = {
+			to_address: toAddress,
+			amount,
+			messages,
+		}
+
+		this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
+			if (err) {
+				this.sendToParent(new MessageSentData({
+					unit: null,
+					...(isString(err) ? { error: err } : err),
+				}))
 			}
-
-			this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
-				if (err) {
-					this.sendParent(new MessageSentData({ error: err }))
-				}
-				this.sendParent(new MessageSentData({ unit, error: null }))
-			})
+			this.sendToParent(new MessageSentData({ unit, error: null }))
 		})
 	}
 
@@ -127,8 +131,7 @@ class HeadlessWalletChild extends AbstractChild {
 		this.headlessWallet.readSingleWallet(walletId => {
 			const wallet = require('ocore/wallet')
 			wallet.readBalance(walletId, (assocBalances) => {
-				console.log('assocBalances', assocBalances)
-				this.sendParent(new MessageMyBalance({ balance: assocBalances }))
+				this.sendToParent(new MessageMyBalance({ balance: assocBalances }))
 			})
 		})
 	}
@@ -148,17 +151,17 @@ class HeadlessWalletChild extends AbstractChild {
 			}
 
 			const callbacks = this.composer.getSavingCallbacks({
-				ifNotEnoughFunds: (err) => this.sendParent(new MessageAgentDeployed({ error: err })),
-				ifError: (err) => this.sendParent(new MessageAgentDeployed({ error: err })),
+				ifNotEnoughFunds: (err) => this.sendToParent(new MessageAgentDeployed({ error: err })),
+				ifError: (err) => this.sendToParent(new MessageAgentDeployed({ error: err })),
 				ifOk: (objJoint) => {
 					this.network.broadcastJoint(objJoint)
-					this.sendParent(new MessageAgentDeployed({ unit: objJoint.unit.unit, address: aaAddress, error: null }))
+					this.sendToParent(new MessageAgentDeployed({ unit: objJoint.unit.unit, address: aaAddress, error: null }))
 				},
 			})
 
 			this.composeContentJoint(myAddress, 'definition', payload, this.headlessWallet.signer, callbacks)
 		} catch (error) {
-			this.sendParent(new MessageAgentDeployed({ error: error.message }))
+			this.sendToParent(new MessageAgentDeployed({ error: error.message }))
 		}
 	}
 
