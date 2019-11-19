@@ -9,7 +9,7 @@ describe('Check timetravel network feature', function () {
 		this.expectTimeInNodes = async (expectedTime) => {
 			for (const node of this.nodes) {
 				const { time } = await node.getTime()
-				expect(time, `${node.id} time should be ${time}`).to.be.approximately(expectedTime, 300)
+				expect(time, `${node.id} time should be ${time}`).to.be.approximately(expectedTime, 500)
 			}
 		}
 

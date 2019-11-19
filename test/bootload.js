@@ -4,13 +4,13 @@ const chai = require('chai')
 const expect = chai.expect
 global.expect = expect
 
-const isValidAddress = require('ocore/validation_utils').isValidAddress
-const isValidBase64 = require('ocore/validation_utils').isValidBase64
+const Testkit = require('../main')
+const { Utils } = Testkit()
 
 chai.Assertion.addChainableMethod('validAddress', (address) => {
-	new chai.Assertion(isValidAddress(address)).to.be.true
+	new chai.Assertion(Utils.isValidAddress(address)).to.be.true
 })
 
 chai.Assertion.addChainableMethod('validUnit', (unit) => {
-	new chai.Assertion(isValidBase64(unit)).to.be.true
+	new chai.Assertion(Utils.isValidBase64(unit)).to.be.true
 })

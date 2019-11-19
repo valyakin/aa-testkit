@@ -7,7 +7,6 @@ describe('Check receiving AA response feature', function () {
 
 	before(async () => {
 		this.network = await Network.create()
-		this.explorer = await this.network.newObyteExplorer()
 		this.genesis = await this.network.getGenesisNode().ready()
 		this.deployer = await this.network.newHeadlessWallet().ready()
 		this.wallet = await this.network.newHeadlessWallet().ready()

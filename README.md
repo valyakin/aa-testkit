@@ -811,7 +811,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after data is sent. `er
 
 ### __`wallet.sendMulti(opts)`__ *`: Promise<{ unit, error }>`*
 
-Allows to broadcast arbitrary message to network. Opts object forwards directly to [`issueChangeAddressAndSendMultiPayment`](https://developer.obyte.org/payments/data#data-with-any-structure) method of `headless-wallet`
+Allows to broadcast arbitrary message to network. Opts object is passed directly to [`issueChangeAddressAndSendMultiPayment`](https://developer.obyte.org/payments/data#data-with-any-structure) method of `headless-wallet`
 
 __Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. `error` will be null if sending was successfull
 

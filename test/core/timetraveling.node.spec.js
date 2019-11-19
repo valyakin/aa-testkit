@@ -25,7 +25,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time } = await this.wallet.getTime()
-		expect(time).to.be.approximately(Date.now(), 300)
+		expect(time).to.be.approximately(Date.now(), 500)
 	}).timeout(30000)
 
 	it('node timetravel to', async () => {
@@ -35,7 +35,7 @@ describe('Check timetravel node feature', function () {
 
 		const { time } = await this.wallet.getTime()
 
-		expect(time).to.be.approximately(new Date(date).getTime(), 300)
+		expect(time).to.be.approximately(new Date(date).getTime(), 500)
 	}).timeout(30000)
 
 	it('node timetravel shift milliseconds', async () => {
@@ -45,7 +45,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000, 300)
+		expect(timeAfter).to.be.approximately(timeBefore + 1000, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift seconds', async () => {
@@ -55,7 +55,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 30, 300)
+		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 30, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift minutes', async () => {
@@ -65,7 +65,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 10, 300)
+		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 10, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift hours', async () => {
@@ -75,7 +75,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 60 * 8, 300)
+		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 60 * 8, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift days', async () => {
@@ -85,7 +85,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 60 * 24 * 3, 300)
+		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 60 * 24 * 3, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift in past', async () => {
@@ -95,7 +95,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.string('Attempt to timetravel in past')
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore, 300)
+		expect(timeAfter).to.be.approximately(timeBefore, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift incorrect format', async () => {
@@ -105,7 +105,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.string("Unsupported 'shift' format '10f'")
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore, 300)
+		expect(timeAfter).to.be.approximately(timeBefore, 500)
 	}).timeout(30000)
 
 	it('network timetravel both "shift" and "to" params are present', async () => {
@@ -114,7 +114,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(new Date(date).getTime(), 300)
+		expect(timeAfter).to.be.approximately(new Date(date).getTime(), 500)
 	}).timeout(30000)
 
 	it('node timetravel to past', async () => {
@@ -123,7 +123,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.string('Attempt to timetravel in past')
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore, 300)
+		expect(timeAfter).to.be.approximately(timeBefore, 500)
 	}).timeout(30000)
 
 	after(async () => {
