@@ -1,4 +1,4 @@
-const Testkit = require('../../main')
+const { Testkit } = require('../../main')
 const { Network } = Testkit()
 
 describe('Check timetravel network feature', function () {

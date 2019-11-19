@@ -4,8 +4,7 @@ const chai = require('chai')
 const expect = chai.expect
 global.expect = expect
 
-const Testkit = require('../main')
-const { Utils } = Testkit()
+const { Utils } = require('../main')
 
 chai.Assertion.addChainableMethod('validAddress', (address) => {
 	new chai.Assertion(Utils.isValidAddress(address)).to.be.true

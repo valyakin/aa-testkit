@@ -1,5 +1,5 @@
 const path = require('path')
-const Testkit = require('../../main')
+const { Testkit } = require('../../main')
 const { Network } = Testkit()
 
 describe('Check agent deployment feature', function () {

@@ -1,4 +1,4 @@
-const Testkit = require('../../main')
+const { Testkit } = require('../../main')
 const { Network } = Testkit()
 const { timeDependentAA } = require('./agents')
 

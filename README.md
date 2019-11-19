@@ -5,6 +5,7 @@ Instant Obyte devnet network set up and testing
 ## Table of contents
 * [Usage](#Usage)
 * [Testkit API](#Testkit-API)
+* [Utils](#Utils)
 * [Network API](#Network-API)
 * [Nodes API](#Nodes-API)
   * [Common node methods](#Common-node-methods)
@@ -26,7 +27,7 @@ Instant Obyte devnet network set up and testing
 ## Usage
 ```javascript
 // import test framework
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 // spin up new devnet
@@ -69,7 +70,7 @@ Testkit constructor function. Helps to configure network defaults
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const path = require('path')
 
 const { Network } = Testkit({
@@ -100,10 +101,44 @@ module.exports = {
 }
 
 // then you can import `aa-testkit` and `config` variables will be used
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 ```
 </details>
+
+## Utils
+
+Utils and helpers from `aa-testkit`. Can be imported from the package
+
+```javascript
+const { Utils } = require('aa-testkit')
+// sleep 5 seconds
+await Utils.sleep(5000)
+```
+
+### __`Utils.sleep(ms)`__ *`: Promise<>`*
+
+Pause test execution for `ms` number of milliseconds. Returns `Promise`
+
+---------------------------------------
+
+### __`Utils.isValidAddress(address)`__ *`: Boolean`*
+
+Helper for address validation. Return `true` if passed argument is valid network address, `false` otherwise.
+
+---------------------------------------
+
+### __`Utils.isValidBase64(b64, len)`__ *`: Boolean`*
+
+Helper for base64 strings validation. Return `true` if passed argument is valid network address, `false` otherwise.
+
+#### Parameters
+
+*`b64`* - string to validate
+
+*`len`* - optional. Length of the string. Function also validates length if second parameter is present
+
+---------------------------------------
 
 ## Network API
 
@@ -123,7 +158,7 @@ Creates new devnet network from the scratch. Starts `GenesisNode` and `ObyteHub`
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -140,7 +175,7 @@ __Returns__ `GenesisNode` of this network
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -159,7 +194,7 @@ __Returns__ `ObyteHub` of this network
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -182,7 +217,7 @@ Send the command to `GenesisNode` to post and broadcast witness. Network will aw
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -207,7 +242,7 @@ Send the command to every node to stop the process.
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -247,7 +282,7 @@ If both of `to` and `shift` are present, `to` will be used
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -273,7 +308,7 @@ Creates and starts new `HeadlessWallet` node in network.
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -296,7 +331,7 @@ Creates and starts new `ObyteExplorer` node in network.
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -322,7 +357,7 @@ Every node runs inside its own child process. Main process sends commands to nod
 <summary>Creating nodes manually</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
@@ -433,7 +468,7 @@ Receive details about unit from node. Uses `ocore/storage.readJoint` method
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 
 const { Network } = Testkit()
 const network = await Network.create()
@@ -609,7 +644,7 @@ __Returns__ *Promise* that resolves when genesis complete. *Promise* resolves to
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
@@ -646,7 +681,7 @@ __Returns__ nothing
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
@@ -840,7 +875,7 @@ __Returns__ *Promise* that resolves to `{ address, unit, error }`, where `adress
 <summary>Example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()
@@ -900,7 +935,7 @@ ObyteExplorer node does not have any special methods except [common node methods
 <summary>ObyteExplorer creation example</summary>
 
 ```javascript
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 
 const { Network } = Testkit()
 const network = await Network.create()
@@ -929,7 +964,7 @@ const explorer = await network.newObyteExplorer().ready()
 
 ```javascript
 const assert = require('assert')
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
@@ -980,7 +1015,7 @@ await network.stop()
 
 ```javascript
 const assert = require('assert')
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
 const path = require('path')
 
@@ -1048,7 +1083,7 @@ await network.stop()
 
 ```javascript
 const assert = require('assert')
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const isValidAddress = require('ocore/validation_utils').isValidAddress
 const path = require('path')
 
@@ -1141,7 +1176,7 @@ await network.stop()
 
 ```javascript
 const assert = require('assert')
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const path = require('path')
 
 const testdata = path.join(__dirname, '../testdata')
@@ -1271,7 +1306,7 @@ const agentString = `{
 }`
 
 const assert = require('assert')
-const Testkit = require('aa-testkit')
+const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 const network = await Network.create()

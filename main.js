@@ -1,3 +1,5 @@
+const Utils = require('./src/utils')
+
 process.env.SUPPRESS_NO_CONFIG_WARNING = 'y'
 const config = require('config')
 
@@ -8,7 +10,6 @@ function Testkit (configs = {}) {
 
 	const Nodes = require('./src/nodes')
 	const Network = require('./src/networks')
-	const Utils = require('./src/utils')
 	return {
 		Nodes,
 		Network,
@@ -16,4 +17,4 @@ function Testkit (configs = {}) {
 	}
 }
 
-module.exports = Testkit
+module.exports = { Testkit, Utils }
