@@ -1432,3 +1432,5 @@ Some examples of mocha tests set up can be found inside `test` data of `aa-testk
 
 [Timetravel feature](./test/aa/timetravel_check.spec.js)
 
+[Retrieving AA response](./test/aa/aa_response.feature.spec.js)
+
