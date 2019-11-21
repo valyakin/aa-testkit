@@ -5,7 +5,6 @@ Instant Obyte devnet network set up and testing
 ## Table of contents
 * [Usage](#Usage)
 * [Testkit API](#Testkit-API)
-* [Utils](#Utils)
 * [Network API](#Network-API)
 * [Nodes API](#Nodes-API)
   * [Common node methods](#Common-node-methods)
@@ -21,6 +20,7 @@ Instant Obyte devnet network set up and testing
   * [ObyteExplorer](#ObyteExplorer)
     * [Constructor](#ObyteExplorer-constructor-params)
     * [Methods](#ObyteExplorer-methods)
+* [Utils](#Utils)
 * [Test Examples](#Test-Examples)
 * [Writing Tests With Mocha](#Writing-Tests-With-Mocha)
 
@@ -105,93 +105,6 @@ const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 ```
 </details>
-
-## Utils
-
-Utils and helpers from `aa-testkit`. Can be imported from the package
-
-```javascript
-const { Utils } = require('aa-testkit')
-// sleep 5 seconds
-await Utils.sleep(5000)
-```
-
-#### __`Utils.sleep(ms)`__ *`: Promise<>`*
-
-Pause test execution for `ms` number of milliseconds. Returns `Promise`
-
----------------------------------------
-
-#### __`Utils.isValidAddress(address)`__ *`: Boolean`*
-
-Helper for address validation. Return `true` if passed argument is valid network address, `false` otherwise.
-
----------------------------------------
-
-#### __`Utils.isValidBase64(b64, len)`__ *`: Boolean`*
-
-Helper for base64 strings validation. Return `true` if passed argument is valid network address, `false` otherwise.
-
-#### Parameters
-
-*`b64`* - string to validate
-
-*`len`* - optional. Length of the string. Function also validates length if second parameter is present
-
----------------------------------------
-
-#### __`Utils.countCommissionInUnits(node, units)`__ *`: Promise(commissions)`*
-
-Helper to count headers and payload commissions in units.
-
-__Returns__ Returns `Promise` that resolves to object:
-
-```javascript
-{
-  error,
-  total_headers_commission,
-  total_payload_commission
-}
-```
-
-`total_headers_commission` is the sum of headers commissions from passed units.
-
-`total_payload_commission` is the sum of payload commissions from passed units.
-
-`error` will be `null` if no errors present.
-
-`error` will be the first faced error otherwise.
-
-`total_payload_commission` and `total_headers_commission` will be `null` if `error` is present
-
-#### Parameters
-
-*`node`* - any running node that supports `node.getUnitInfo`
-
-*`units`* - array of unit hashes to count the commissions on
-
-<details>
-<summary>Example</summary>
-
-```javascript
-const { Testkit, Utils } = require('aa-testkit')
-const { Network } = Testkit()
-
-const network = await Network.create()
-const genesis = await network.getGenesisNode().ready()
-
-const wallet = await network.newHeadlessWallet().ready()
-const { unit, error } = await genesis.sendBytes({
-  toAddress: await wallet.getAddress(),
-  amount: 1e9,
-})
-
-const commissions = await Utils.countCommissionInUnits(wallet, [unit])
-await network.stop()
-```
-</details>
-
----------------------------------------
 
 ## Network API
 
@@ -1018,6 +931,93 @@ await network.witness()
 
 // by default DAG explorer will be started on http://localhost:8080
 const explorer = await network.newObyteExplorer().ready()
+```
+</details>
+
+---------------------------------------
+
+## Utils
+
+Utils and helpers from `aa-testkit`. Can be imported from the package
+
+```javascript
+const { Utils } = require('aa-testkit')
+// sleep 5 seconds
+await Utils.sleep(5000)
+```
+
+#### __`Utils.sleep(ms)`__ *`: Promise<>`*
+
+Pause test execution for `ms` number of milliseconds. Returns `Promise`
+
+---------------------------------------
+
+#### __`Utils.isValidAddress(address)`__ *`: Boolean`*
+
+Helper for address validation. Return `true` if passed argument is valid network address, `false` otherwise.
+
+---------------------------------------
+
+#### __`Utils.isValidBase64(b64, len)`__ *`: Boolean`*
+
+Helper for base64 strings validation. Return `true` if passed argument is valid network address, `false` otherwise.
+
+#### Parameters
+
+*`b64`* - string to validate
+
+*`len`* - optional. Length of the string. Function also validates length if second parameter is present
+
+---------------------------------------
+
+#### __`Utils.countCommissionInUnits(node, units)`__ *`: Promise(commissions)`*
+
+Helper to count headers and payload commissions in units.
+
+__Returns__ Returns `Promise` that resolves to object:
+
+```javascript
+{
+  error,
+  total_headers_commission,
+  total_payload_commission
+}
+```
+
+`total_headers_commission` is the sum of headers commissions from passed units.
+
+`total_payload_commission` is the sum of payload commissions from passed units.
+
+`error` will be `null` if no errors present.
+
+`error` will be the first faced error otherwise.
+
+`total_payload_commission` and `total_headers_commission` will be `null` if `error` is present
+
+#### Parameters
+
+*`node`* - any running node that supports `node.getUnitInfo`
+
+*`units`* - array of unit hashes to count the commissions on
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit, Utils } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+
+const wallet = await network.newHeadlessWallet().ready()
+const { unit, error } = await genesis.sendBytes({
+  toAddress: await wallet.getAddress(),
+  amount: 1e9,
+})
+
+const commissions = await Utils.countCommissionInUnits(wallet, [unit])
+await network.stop()
 ```
 </details>
 
