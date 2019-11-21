@@ -140,6 +140,38 @@ Helper for base64 strings validation. Return `true` if passed argument is valid 
 
 ---------------------------------------
 
+### __`Utils.countCommissionInUnits(node, units: Array<String>)`__ *`: Promise({ error, total_headers_commission, total_payload_commission })`*
+
+Helper to count headers and payload commissions in units. Returns `Promise` that resolves to `{ error, total_headers_commission, total_payload_commission }`. Error will be `null` if no errors present and the first faced error otherwise. `total_headers_commission` is the sum of headers commissions from passed units. `total_payload_commission` is the sum of payload commissions from passed units. `total_payload_commission` and `total_headers_commission` will be `null` if `error` is present
+#### Parameters
+
+*`node`* - any running node that supports `node.getUnitInfo`
+
+*`units`* - array of unit hashes to count the commissions on
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit, Utils } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+
+const wallet = await network.newHeadlessWallet().ready()
+const { unit, error } = await genesis.sendBytes({
+  toAddress: await wallet.getAddress(),
+  amount: 1e9,
+})
+
+const commissions = await Utils.countCommissionInUnits(wallet, [unit])
+await network.stop()
+```
+</details>
+
+---------------------------------------
+
 ## Network API
 
 Primary way to operate with network. Contains common functions for network management

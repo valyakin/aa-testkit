@@ -54,7 +54,7 @@ class HeadlessWallet extends AbstractNode {
 	async sendMulti (opts) {
 		return new Promise(resolve => {
 			this.once('sent_multi', (m) => resolve({ unit: m.unit, error: m.error }))
-			this.sendToChild(new CommandSendMulti(opts))
+			this.sendToChild(new CommandSendMulti({ opts }))
 		})
 	}
 
