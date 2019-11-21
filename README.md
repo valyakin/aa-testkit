@@ -51,7 +51,7 @@ const walletBalance = await wallet.getBalance()
 
 Defines how to import and configure `aa-testkit` module
 
-### __`Testkit(config)`__ *`: { Network, Nodes }`*
+#### __`Testkit(config)`__ *`: { Network, Nodes }`*
 
 Testkit constructor function. Helps to configure network defaults
 
@@ -116,19 +116,19 @@ const { Utils } = require('aa-testkit')
 await Utils.sleep(5000)
 ```
 
-### __`Utils.sleep(ms)`__ *`: Promise<>`*
+#### __`Utils.sleep(ms)`__ *`: Promise<>`*
 
 Pause test execution for `ms` number of milliseconds. Returns `Promise`
 
 ---------------------------------------
 
-### __`Utils.isValidAddress(address)`__ *`: Boolean`*
+#### __`Utils.isValidAddress(address)`__ *`: Boolean`*
 
 Helper for address validation. Return `true` if passed argument is valid network address, `false` otherwise.
 
 ---------------------------------------
 
-### __`Utils.isValidBase64(b64, len)`__ *`: Boolean`*
+#### __`Utils.isValidBase64(b64, len)`__ *`: Boolean`*
 
 Helper for base64 strings validation. Return `true` if passed argument is valid network address, `false` otherwise.
 
@@ -140,9 +140,30 @@ Helper for base64 strings validation. Return `true` if passed argument is valid 
 
 ---------------------------------------
 
-### __`Utils.countCommissionInUnits(node, units: Array<String>)`__ *`: Promise({ error, total_headers_commission, total_payload_commission })`*
+#### __`Utils.countCommissionInUnits(node, units)`__ *`: Promise(commissions)`*
 
-Helper to count headers and payload commissions in units. Returns `Promise` that resolves to `{ error, total_headers_commission, total_payload_commission }`. Error will be `null` if no errors present and the first faced error otherwise. `total_headers_commission` is the sum of headers commissions from passed units. `total_payload_commission` is the sum of payload commissions from passed units. `total_payload_commission` and `total_headers_commission` will be `null` if `error` is present
+Helper to count headers and payload commissions in units.
+
+__Returns__ Returns `Promise` that resolves to object:
+
+```javascript
+{
+  error,
+  total_headers_commission,
+  total_payload_commission
+}
+```
+
+`total_headers_commission` is the sum of headers commissions from passed units.
+
+`total_payload_commission` is the sum of payload commissions from passed units.
+
+`error` will be `null` if no errors present.
+
+`error` will be the first faced error otherwise.
+
+`total_payload_commission` and `total_headers_commission` will be `null` if `error` is present
+
 #### Parameters
 
 *`node`* - any running node that supports `node.getUnitInfo`
@@ -176,7 +197,7 @@ await network.stop()
 
 Primary way to operate with network. Contains common functions for network management
 
-### __`Network.create(genesisParams, hubParams)`__ *`: <network>`*
+#### __`Network.create(genesisParams, hubParams)`__ *`: <network>`*
 
 Creates new devnet network from the scratch. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`10e15`) of Bytes on its account.
 
@@ -199,7 +220,7 @@ const network = await Network.create()
 
 ---------------------------------------
 
-### __`network.getGenesisNode()`__ *`: <GenesisNode>`*
+#### __`network.getGenesisNode()`__ *`: <GenesisNode>`*
 
 __Returns__ `GenesisNode` of this network
 
@@ -218,7 +239,7 @@ const genesis = await network.getGenesisNode().ready()
 
 ---------------------------------------
 
-### __`network.getHub()`__ *`: <ObyteHub>`*
+#### __`network.getHub()`__ *`: <ObyteHub>`*
 
 __Returns__ `ObyteHub` of this network
 
@@ -237,7 +258,7 @@ const hub = await network.getHub().ready()
 
 ---------------------------------------
 
-### __`network.witness(n)`__ *`: Promise<>`*
+#### __`network.witness(n)`__ *`: Promise<>`*
 
 Send the command to `GenesisNode` to post and broadcast witness. Network will await then for every node to confirm `mci_became_stable`
 
@@ -266,7 +287,7 @@ await network.witness()
 
 ---------------------------------------
 
-### __`network.stop()`__ *`: Promise<>`*
+#### __`network.stop()`__ *`: Promise<>`*
 
 Send the command to every node to stop the process.
 
@@ -288,7 +309,7 @@ await network.stop()
 
 ---------------------------------------
 
-### __`network.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
+#### __`network.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
 
 allows you to set the current network time in the future. This can be helpful for testing time-dependent AA.
 > **Note:** Timetravel should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
@@ -328,7 +349,7 @@ Also check in [Test Examples](#Test-Examples)
 
 ---------------------------------------
 
-### __`network.newHeadlessWallet(params)`__ *`: <HeadlessWallet>`*
+#### __`network.newHeadlessWallet(params)`__ *`: <HeadlessWallet>`*
 
 Creates and starts new `HeadlessWallet` node in network.
 
@@ -351,7 +372,7 @@ const wallet = await network.newHeadlessWallet().ready()
 
 ---------------------------------------
 
-### __`network.newObyteExplorer(params)`__ *`: <ObyteExplorer>`*
+#### __`network.newObyteExplorer(params)`__ *`: <ObyteExplorer>`*
 
 Creates and starts new `ObyteExplorer` node in network.
 
@@ -437,25 +458,25 @@ await hub.stop()
 
 Methods described in this section are applicable for any node
 
-### __`node.ready()`__ *`: Promise<>`*
+#### __`node.ready()`__ *`: Promise<>`*
 
 __Returns__ *Promise* that resolves when node child will be ready to operate
 
 ---------------------------------------
 
-### __`node.stop()`__ *`: Promise<>`*
+#### __`node.stop()`__ *`: Promise<>`*
 
 __Returns__ *Promise* that resolves when node child exited its process
 
 ---------------------------------------
 
-### __`node.stabilize()`__ *`: Promise<>`*
+#### __`node.stabilize()`__ *`: Promise<>`*
 
 __Returns__ *Promise* that resolves when node child receives `mci_became_stable` event
 
 ---------------------------------------
 
-### __`node.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
+#### __`node.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
 
 Send the command to node child to change its time. This can be helpful for testing time-dependent AA.
 
@@ -480,13 +501,13 @@ If both of `to` and `shift` are present, `to` will be used
 
 ---------------------------------------
 
-### __`node.getTime()`__ *`: Promise<{ time: number }>`*
+#### __`node.getTime()`__ *`: Promise<{ time: number }>`*
 
 Receive details about unit from node. Uses `ocore/storage.readJoint` method
 
 *Promise* resolves as `{ time }` object and `time` is in milliseconds
 
-### __`node.getUnitInfo({ unit })`__ *`: Promise<{ unitObj, error }>`*
+#### __`node.getUnitInfo({ unit })`__ *`: Promise<{ unitObj, error }>`*
 
 Receive details about unit from node. Uses `ocore/storage.readJoint` method
 
@@ -582,7 +603,7 @@ await network.stop()
 
 ---------------------------------------
 
-### __`node.readAAStateVars(address)`__ *`: Promise<{ vars }>`*
+#### __`node.readAAStateVars(address)`__ *`: Promise<{ vars }>`*
 
 Retrieve current network vars state of agent
 
@@ -600,11 +621,11 @@ See [Agent deployment test example](#Test-Examples)
 
 ---------------------------------------
 
-### __`node.getAaResponse({ toUnit | toAddress | fromAa })`__ *`: Promise<{ response }>`*
+#### __`node.getAaResponse({ toUnit | toAddress | fromAa })`__ *`: Promise<>`*
 
 Retrieve autonomous agent execution response
 
-__Returns__ *Promise* that resolves to `{ response }` where `response` - object of agent response
+__Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
 
 #### Parameters
 
@@ -679,7 +700,7 @@ Genesis node main function is to start new network and create genesis unit. Afte
 
 ### GenesisNode methods
 
-### __`genesis.createGenesis()`__ *`: Promise<{ genesisUnit, genesisAddress }>`*
+#### __`genesis.createGenesis()`__ *`: Promise<{ genesisUnit, genesisAddress }>`*
 
 Creates network with new genesis unit.
 
@@ -707,7 +728,7 @@ const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
 
 ---------------------------------------
 
-### __`genesis.loginToHub()`__ *`: Promise<>`*
+#### __`genesis.loginToHub()`__ *`: Promise<>`*
 
 Send the command to node child to connect to hub. Usefull at network genesis, because hub node starts after genesis node.
 
@@ -716,7 +737,7 @@ __Returns__ *Promise* that resolves when node connected to hub
 
 ---------------------------------------
 
-### __`genesis.postWitness()`__ *`: Nothing`*
+#### __`genesis.postWitness()`__ *`: Nothing`*
 
 Broadcast new witness to network. Returns nothing and does not wait for joint to be broadcasted to other nodes. To wait for stabilization use `stabilize` method from [Common node methods](#Common-node-methods)
 
@@ -773,7 +794,7 @@ await wallet.stop()
 
 ---------------------------------------
 
-### __`genesis.getAddress()`__ *`: Promise<address>`*
+#### __`genesis.getAddress()`__ *`: Promise<address>`*
 
 Request node address from child.
 
@@ -781,7 +802,7 @@ __Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
-### __`genesis.sendBytes({ toAddress, amount })`__ *`: Promise<{ unit, error }>`*
+#### __`genesis.sendBytes({ toAddress, amount })`__ *`: Promise<{ unit, error }>`*
 
 Send Bytes to address
 
@@ -829,7 +850,7 @@ Headless wallet node provides common network node functionality. It can receive 
 
 ### HeadlessWallet methods
 
-### __`wallet.getAddress()`__ *`: Promise<address>`*
+#### __`wallet.getAddress()`__ *`: Promise<address>`*
 
 Request node address from child.
 
@@ -837,7 +858,7 @@ __Returns__ *Promise* that resolves to node address
 
 ---------------------------------------
 
-### __`wallet.getBalance()`__ *`: Promise<balanceObject>`*
+#### __`wallet.getBalance()`__ *`: Promise<balanceObject>`*
 
 Retrieve node balance from child.
 
@@ -859,7 +880,7 @@ __Returns__ *Promise* that resolves to node balance object
 
 ---------------------------------------
 
-### __`wallet.sendBytes({ toAddress, amount })`__ *`: Promise<{ unit, error }>`*
+#### __`wallet.sendBytes({ toAddress, amount })`__ *`: Promise<{ unit, error }>`*
 
 Send Bytes to address
 
@@ -873,7 +894,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after Bytes are sent. `
 
 ---------------------------------------
 
-### __`wallet.sendData({ toAddress, amount, payload })`__ *`: Promise<{ unit, error }>`*
+#### __`wallet.sendData({ toAddress, amount, payload })`__ *`: Promise<{ unit, error }>`*
 
 Broadcast data message to network. Usefull to trigger AA execution with some data. For this, set `toAddress` to address of deployed AA
 
@@ -889,7 +910,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after data is sent. `er
 
 ---------------------------------------
 
-### __`wallet.sendMulti(opts)`__ *`: Promise<{ unit, error }>`*
+#### __`wallet.sendMulti(opts)`__ *`: Promise<{ unit, error }>`*
 
 Allows to broadcast arbitrary message to network. Opts object is passed directly to [`issueChangeAddressAndSendMultiPayment`](https://developer.obyte.org/payments/data#data-with-any-structure) method of `headless-wallet`
 
@@ -901,7 +922,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. 
 
 ---------------------------------------
 
-### __`wallet.deployAgent(source)`__ *`: Promise<{ address, unit, error }>`*
+#### __`wallet.deployAgent(source)`__ *`: Promise<{ address, unit, error }>`*
 
 Deploy an agent in the network.
 
