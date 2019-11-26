@@ -37,9 +37,9 @@ const genesis = await network.getGenesisNode().ready()
 // create new wallet and send some bytes from rich genesis node
 const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 // and wait for witnessing
-await network.witness()
+await network.witnessUntilStable(unit)
 
 // get wallet balance
 const walletBalance = await wallet.getBalance()
@@ -171,6 +171,53 @@ const hub = await network.getHub().ready()
 
 ---------------------------------------
 
+#### __`network.newHeadlessWallet(params)`__ *`: <HeadlessWallet>`*
+
+Creates and starts new `HeadlessWallet` node in network.
+
+#### Parameters
+
+*`params`* - object passed to `HeadlessWallet` constructor to override default values. See [HeadlessWallet](#HeadlessWallet-constructor-params) Nodes API section.
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+const wallet = await network.newHeadlessWallet().ready()
+```
+</details>
+
+---------------------------------------
+
+#### __`network.newObyteExplorer(params)`__ *`: <ObyteExplorer>`*
+
+Creates and starts new `ObyteExplorer` node in network.
+
+#### Parameters
+
+*`params`* - object passed to `ObyteExplorer` constructor to override default values. See [ObyteExplorer](#ObyteExplorer-constructor-params) Nodes API section.
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+
+const explorer = await network.newObyteExplorer().ready()
+```
+</details>
+
+---------------------------------------
+
 #### __`network.witness(n)`__ *`: Promise<>`*
 
 Send the command to `GenesisNode` to post and broadcast witness. Network will await then for every node to confirm `mci_became_stable`
@@ -200,9 +247,13 @@ await network.witness()
 
 ---------------------------------------
 
-#### __`network.stop()`__ *`: Promise<>`*
+#### __`network.witnessUntilStable(unit)`__ *`: Promise<>`*
 
-Send the command to every node to stop the process.
+Post witnesse until `unit` will stabilize. `Promise` will be resolved when `unit` become stable.
+
+#### Parameters
+
+*`unit: String`* - wait for stabilization of this unit
 
 <details>
 <summary>Example</summary>
@@ -213,10 +264,71 @@ const { Network } = Testkit()
 
 const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
-const wallet = await network.newHeadlessWallet().ready()
 
-// wait until every node exits
-await network.stop()
+// create wallet and send bytes to it
+const wallet = await network.newHeadlessWallet().ready()
+const walletAddress = await wallet.getAddress()
+const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+// witness last transaction
+await network.witnessUntilStable(unit)
+```
+</details>
+
+---------------------------------------
+
+#### __`network.getAaResponseToUnit(unit)`__ *`: Promise<{ response }>`*
+
+Retrieve autonomous agent execution response from `unit`. Method will make network to post witnesses until response is being received.
+
+__Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
+
+#### Parameters
+
+*`unit : String`* - unit of aa execution to retrieve response from
+
+<details>
+<summary>Example</summary>
+
+See [Agent AA response test example](#Test-Examples)
+</details>
+
+<details>
+<summary>Response Object example</summary>
+
+```javascript
+{
+  mci: 13,
+  trigger_address: 'VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK',
+  trigger_initial_address: 'VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK',
+  trigger_unit: 'N9PI6hN+vmVMkmXMh58pFZErGt638Fwr6yhLQw3g3HA=',
+  aa_address: 'WWHEN5NDHBI2UF4CLJ7LQ7VAW2QELMD7',
+  bounced: false,
+  response_unit: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=',
+  objResponseUnit: {
+    version: '2.0dev',
+    alt: '3',
+    timestamp: 1574171283,
+    messages: [[Object], [Object]],
+    authors: [[Object]],
+    last_ball_unit: 'myDMlLHavXhVF+IMkXS6ir/GkXFASXplaNzDCpsV/kA=',
+    last_ball: 'jfh9QBcZVXsWE+Q5pstRQO1STO7gfngx9pLIVAxhsUM=',
+    witness_list_unit: 'rC7dZW1x3OCw8Bh+6urKN5OB0rnsmNeNy6Exz3n+rZI=',
+    parent_units: ['N9PI6hN+vmVMkmXMh58pFZErGt638Fwr6yhLQw3g3HA='],
+    headers_commission: 267,
+    payload_commission: 259,
+    unit: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=',
+  },
+  response: {
+    responseVars:
+      { team_asset: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=' },
+  },
+  updatedStateVars: {
+    WWHEN5NDHBI2UF4CLJ7LQ7VAW2QELMD7: {
+      team_VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK_founder_tax: [Object],
+      team_VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK_asset: [Object],
+    },
+  },
+}
 ```
 </details>
 
@@ -262,13 +374,9 @@ Also check in [Test Examples](#Test-Examples)
 
 ---------------------------------------
 
-#### __`network.newHeadlessWallet(params)`__ *`: <HeadlessWallet>`*
+#### __`network.stop()`__ *`: Promise<>`*
 
-Creates and starts new `HeadlessWallet` node in network.
-
-#### Parameters
-
-*`params`* - object passed to `HeadlessWallet` constructor to override default values. See [HeadlessWallet](#HeadlessWallet-constructor-params) Nodes API section.
+Send the command to every node to stop the process.
 
 <details>
 <summary>Example</summary>
@@ -280,30 +388,9 @@ const { Network } = Testkit()
 const network = await Network.create()
 const genesis = await network.getGenesisNode().ready()
 const wallet = await network.newHeadlessWallet().ready()
-```
-</details>
 
----------------------------------------
-
-#### __`network.newObyteExplorer(params)`__ *`: <ObyteExplorer>`*
-
-Creates and starts new `ObyteExplorer` node in network.
-
-#### Parameters
-
-*`params`* - object passed to `ObyteExplorer` constructor to override default values. See [ObyteExplorer](#ObyteExplorer-constructor-params) Nodes API section.
-
-<details>
-<summary>Example</summary>
-
-```javascript
-const { Testkit } = require('aa-testkit')
-const { Network } = Testkit()
-
-const network = await Network.create()
-const genesis = await network.getGenesisNode().ready()
-
-const explorer = await network.newObyteExplorer().ready()
+// wait until every node exits
+await network.stop()
 ```
 </details>
 
@@ -447,7 +534,7 @@ const walletAddress = await wallet.getAddress()
 const { unit, error } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 await network.witness()
 
-const unitObj = await wallet.getUnitInfo({ unit: unit })
+const { unitObj, error } = await wallet.getUnitInfo({ unit: unit })
 await network.stop()
 ```
 </details>
@@ -516,6 +603,64 @@ await network.stop()
 
 ---------------------------------------
 
+#### __`node.getUnitProps({ unit })`__ *`: Promise<{ unitProps }>`*
+
+Receive unit props.
+
+*Promise* resolves as `{ unitProps }`
+
+#### Parameters
+
+*`unit : String`* - unit to get info about
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit } = require('aa-testkit')
+
+const { Network } = Testkit()
+const network = await Network.create()
+
+const genesis = await network.getGenesisNode().ready()
+
+const wallet = await network.newHeadlessWallet().ready()
+const walletAddress = await wallet.getAddress()
+
+const { unit, error } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+await network.witness()
+
+const { unitProps } = await wallet.getUnitProps({ unit: unit })
+await network.stop()
+```
+</details>
+
+<details>
+<summary>UnitProps example</summary>
+
+```javascript
+{
+  unit: 'WhTBfbZK9k1/SxiINGarg455SdpiQNloBdrzbcO29Lo=',
+  timestamp: 1574685652,
+  level: 1,
+  latest_included_mc_index: 0,
+  main_chain_index: 1,
+  is_on_main_chain: 1,
+  is_free: 0,
+  is_stable: 1,
+  witnessed_level: 0,
+  headers_commission: 355,
+  payload_commission: 197,
+  sequence: 'good',
+  author_addresses: ['ZWDAO5YRB3SQZWAOGVNS4NADGIR3RB7Z'],
+  witness_list_unit: 'PdiMP8/V2dks18gIP5foxy4WWFYwyURkKyCXQfkZjPU=',
+  parent_units: ['PdiMP8/V2dks18gIP5foxy4WWFYwyURkKyCXQfkZjPU='],
+}
+```
+</details>
+
+---------------------------------------
+
 #### __`node.readAAStateVars(address)`__ *`: Promise<{ vars }>`*
 
 Retrieve current network vars state of agent
@@ -530,70 +675,6 @@ __Returns__ *Promise* that resolves to `{ vars }` where `vars` - state object of
 <summary>Agent Deployment example</summary>
 
 See [Agent deployment test example](#Test-Examples)
-</details>
-
----------------------------------------
-
-#### __`node.getAaResponse({ toUnit | toAddress | fromAa })`__ *`: Promise<>`*
-
-Retrieve autonomous agent execution response
-
-__Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
-
-#### Parameters
-
-`getAaResponse` parameter can be one of `toUnit`, `toAddress` or `fromAa` depending on what is known
-
-*`toUnit : String`* - unit of aa execution to retrieve response from
-
-*`toAddress : String`* - address of wallet that triggered AA execution
-
-*`fromAa : String`* - address of Autonomous Agent
-
-<details>
-<summary>Example</summary>
-
-See [Agent AA response test example](#Test-Examples)
-</details>
-
-<details>
-<summary>Response Object example</summary>
-
-```javascript
-{
-  mci: 13,
-  trigger_address: 'VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK',
-  trigger_initial_address: 'VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK',
-  trigger_unit: 'N9PI6hN+vmVMkmXMh58pFZErGt638Fwr6yhLQw3g3HA=',
-  aa_address: 'WWHEN5NDHBI2UF4CLJ7LQ7VAW2QELMD7',
-  bounced: false,
-  response_unit: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=',
-  objResponseUnit: {
-    version: '2.0dev',
-    alt: '3',
-    timestamp: 1574171283,
-    messages: [[Object], [Object]],
-    authors: [[Object]],
-    last_ball_unit: 'myDMlLHavXhVF+IMkXS6ir/GkXFASXplaNzDCpsV/kA=',
-    last_ball: 'jfh9QBcZVXsWE+Q5pstRQO1STO7gfngx9pLIVAxhsUM=',
-    witness_list_unit: 'rC7dZW1x3OCw8Bh+6urKN5OB0rnsmNeNy6Exz3n+rZI=',
-    parent_units: ['N9PI6hN+vmVMkmXMh58pFZErGt638Fwr6yhLQw3g3HA='],
-    headers_commission: 267,
-    payload_commission: 259,
-    unit: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=',
-  },
-  response: {
-    responseVars:
-      { team_asset: 'm2vasHgREngt/7f0y4g2d42A8Ih+A9iu5dBWGU5pnWg=' },
-  },
-  updatedStateVars: {
-    WWHEN5NDHBI2UF4CLJ7LQ7VAW2QELMD7: {
-      team_VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK_founder_tax: [Object],
-      team_VL53Z3AQWQ7AX4QKFBA42B3YPY3UYIGK_asset: [Object],
-    },
-  },
-}
-```
 </details>
 
 ---------------------------------------
@@ -807,19 +888,19 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after Bytes are sent. `
 
 ---------------------------------------
 
-#### __`wallet.sendData({ toAddress, amount, payload })`__ *`: Promise<{ unit, error }>`*
+#### __`wallet.triggerAaWithData({ toAddress, amount, data })`__ *`: Promise<{ unit, error }>`*
 
-Broadcast data message to network. Usefull to trigger AA execution with some data. For this, set `toAddress` to address of deployed AA
+Trigger AA execution with some data
 
 __Returns__ *Promise* that resolves to `{ unit, error }` after data is sent. `error` will be null if sending was successfull
 
 #### Parameters
 
-*`toAddress : String`* - address of node that will receive Bytes
+*`toAddress : String`* - address of AA to trigger
 
-*`amount : Number`* - amount of Bytes to send
+*`amount : Number`* - amount of Bytes to send to AA
 
-*`payload : Object`* - key:value pairs object of data that will be posted to network
+*`data : Object`* - key:value pairs object of data that will be passed to the AA
 
 ---------------------------------------
 
@@ -839,7 +920,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. 
 
 Deploy an agent in the network.
 
-__Returns__ *Promise* that resolves to `{ address, unit, error }`, where `adress` is the address of deployed agent and `unit` determines unit where agent was deployed. `error` will be null on success
+__Returns__ *Promise* that resolves to `{ address, unit, error }`, where `address` is the address of deployed agent and `unit` determines unit where agent was deployed. `error` will be null on success
 
 #### Parameters
 
@@ -888,6 +969,14 @@ await network.witness(2)
 await network.stop()
 ```
 </details>
+
+---------------------------------------
+
+#### __`wallet.getOwnedAddresses()`__ *`: Promise<Array[String]>`*
+
+Retreive the array of addresses, owned by this wallet
+
+__Returns__ *Promise* that resolves to array of string associated with `wallet` after message is sent.
 
 ---------------------------------------
 
@@ -1124,10 +1213,10 @@ assert(isValidAddress(agentAddress))
 await network.witness(2)
 
 // reading state vars
-const { unit } = await wallet.sendData({
+const { unit } = await wallet.triggerAaWithData({
   toAddress: agentAddress,
   amount: 10000,
-  payload: {
+  data: {
     var: 'trigger_var',
   },
 })
@@ -1395,16 +1484,16 @@ const { address: agentAddress, unit: agentDeploymentUnit, error: agentDeployment
 
 await network.witness(2)
 
-const { unit, error } = await wallet.sendData({
+const { unit, error } = await wallet.triggerAaWithData({
   toAddress: agentAddress,
   amount: 10000,
-  payload: {
+  data: {
     dataFeedPayload: 'this will be a datafeed',
   },
 })
 
 await network.witness(4)
-const { response } = await wallet.getAaResponse({ toUnit: unit })
+const { response } = await network.getAaResponseToUnit(unit)
 
 assert(response.response.responseVars.dataFeedAaResponse === 'aa response!')
 

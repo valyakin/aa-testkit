@@ -72,6 +72,23 @@ class NetworkFromGenesis {
 		return stabilization
 	}
 
+	async witnessUntilStable (unit) {
+		if (!unit) return
+		await this.witness()
+		const { unitProps } = await this.genesisNode.getUnitProps({ unit })
+		if (!unitProps.is_stable) return this.witnessUntilStable(unit)
+	}
+
+	async getAaResponseToUnit (unit) {
+		await this.witness()
+		const response = this.genesisNode.getAaResponseToUnit(unit)
+		if (response) {
+			return { response }
+		} else {
+			return this.getAaResponseToUnit(unit)
+		}
+	}
+
 	newHeadlessWallet (params) {
 		const wallet = new HeadlessWallet({
 			rundir: this.rundir,

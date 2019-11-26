@@ -2,12 +2,13 @@ const Joi = require('joi')
 const { isString } = require('lodash')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const {
-	MessageSentData,
 	MessageSentMulti,
 	MessageSentBytes,
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageChildReady,
+	MessageMyAddresses,
+	MessageAaTriggered,
 	MessageAgentDeployed,
 	MessagePasswordRequired,
 } = require('../../../messages')
@@ -24,12 +25,13 @@ class HeadlessWalletChild extends AbstractChild {
 		super(params, paramsSchema)
 
 		this
-			.on('command_send_data', (m) => this.sendData(m))
+			.on('command_trigger_aa', (m) => this.triggerAa(m))
 			.on('command_send_multi', (m) => this.sendMulti(m))
 			.on('command_get_address', () => this.getAddress())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
 			.on('command_get_balance', (m) => this.getBalance(m))
 			.on('command_deploy_agent', (m) => this.deployAgent(m))
+			.on('command_get_my_addresses', (m) => this.getMyAddresses(m))
 	}
 
 	static unpackArgv (argv) {
@@ -77,6 +79,13 @@ class HeadlessWalletChild extends AbstractChild {
 		})
 	}
 
+	getMyAddresses () {
+		const { readMyAddresses } = require('ocore/wallet_general')
+		readMyAddresses((addresses) => {
+			this.sendToParent(new MessageMyAddresses({ addresses }))
+		})
+	}
+
 	sendBytes ({ toAddress, amount }) {
 		this.headlessWallet.issueChangeAddressAndSendPayment(null, amount, toAddress, null, (err, unit) => {
 			if (err) {
@@ -99,15 +108,15 @@ class HeadlessWalletChild extends AbstractChild {
 		})
 	}
 
-	sendData ({ payload, toAddress, amount }) {
+	triggerAa ({ data, toAddress, amount }) {
 		const objectHash = require('ocore/object_hash.js')
 
 		const messages = [
 			{
 				app: 'data',
 				payload_location: 'inline',
-				payload_hash: objectHash.getBase64Hash(payload),
-				payload: payload,
+				payload_hash: objectHash.getBase64Hash(data),
+				payload: data,
 			},
 		]
 		const opts = {
@@ -118,12 +127,12 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
 			if (err) {
-				this.sendToParent(new MessageSentData({
+				this.sendToParent(new MessageAaTriggered({
 					unit: null,
 					...(isString(err) ? { error: err } : err),
 				}))
 			}
-			this.sendToParent(new MessageSentData({ unit, error: null }))
+			this.sendToParent(new MessageAaTriggered({ unit, error: null }))
 		})
 	}
 

@@ -7,12 +7,13 @@ const parseOjson = require('ocore/formula/parse_ojson').parse
 const config = require('config')['aa-testkit']
 const AbstractNode = require('../AbstractNode/AbstractNode')
 const {
-	CommandSendData,
+	CommandTriggerAa,
 	CommandSendBytes,
 	CommandSendMulti,
 	CommandGetAddress,
 	CommandGetBalance,
 	CommandDeployAgent,
+	CommandGetMyAddresses,
 } = require('../../messages')
 
 const schemaFactory = () => ({
@@ -51,6 +52,13 @@ class HeadlessWallet extends AbstractNode {
 		})
 	}
 
+	async getOwnedAddresses () {
+		this.sendToChild(new CommandGetMyAddresses())
+		return new Promise((resolve) => {
+			this.once('my_addresses', m => resolve(m.addresses))
+		})
+	}
+
 	async sendMulti (opts) {
 		return new Promise(resolve => {
 			this.once('sent_multi', (m) => resolve({ unit: m.unit, error: m.error }))
@@ -58,10 +66,10 @@ class HeadlessWallet extends AbstractNode {
 		})
 	}
 
-	async sendData ({ toAddress, amount, payload }) {
+	async triggerAaWithData ({ toAddress, amount, data }) {
 		return new Promise(resolve => {
-			this.once('sent_data', (m) => resolve({ unit: m.unit, error: m.error }))
-			this.sendToChild(new CommandSendData({ toAddress, amount, payload }))
+			this.once('aa_triggered', (m) => resolve({ unit: m.unit, error: m.error }))
+			this.sendToChild(new CommandTriggerAa({ toAddress, amount, data }))
 		})
 	}
 

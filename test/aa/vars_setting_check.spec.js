@@ -37,10 +37,10 @@ describe('AA state vars', function () {
 	it('Check agent state vars read', async () => {
 		const { agentAddress, wallet, network, deployer } = this
 
-		const { unit } = await wallet.sendData({
+		const { unit } = await wallet.triggerAaWithData({
 			toAddress: agentAddress,
 			amount: 10000,
-			payload: {
+			data: {
 				var: 'trigger_var',
 			},
 		})

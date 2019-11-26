@@ -7,6 +7,7 @@ const { isString } = require('lodash')
 const {
 	fromMessage,
 	MessageUnitInfo,
+	MessageUnitProps,
 	MessageAAResponse,
 	MessageCurrentTime,
 	MessageAAStateVars,
@@ -41,6 +42,7 @@ class AbstractChild extends EventEmitter {
 			.on('command_get_time', (m) => this.getTime(m))
 			.on('command_time_travel', (m) => this.timetravel(m))
 			.on('command_get_unit_info', (m) => this.getUnitInfo(m))
+			.on('command_get_unit_props', (m) => this.getUnitProps(m))
 			.on('command_read_aa_state_vars', (m) => this.readAAStateVars(m))
 
 		const eventBus = require('ocore/event_bus')
@@ -120,6 +122,14 @@ class AbstractChild extends EventEmitter {
 			ifFound: (objJoint) => {
 				this.sendToParent(new MessageUnitInfo({ unitObj: objJoint, error: null }))
 			},
+		})
+	}
+
+	getUnitProps ({ unit }) {
+		const db = require('ocore/db')
+		const { readUnitProps } = require('ocore/storage')
+		readUnitProps(db, unit, (props) => {
+			this.sendToParent(new MessageUnitProps({ unitProps: props }))
 		})
 	}
 

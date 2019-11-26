@@ -10,6 +10,7 @@ const {
 	CommandTimeTravel,
 	MessageChildError,
 	CommandGetUnitInfo,
+	CommandGetUnitProps,
 	CommandReadAAStateVars,
 } = require('../../messages')
 
@@ -116,24 +117,8 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
-	async getAaResponse ({ toUnit, toAddress, fromAa }) {
-		if (toUnit) {
-			if (this.aaResponses.toUnit[toUnit]) {
-				return { response: this.aaResponses.toUnit[toUnit] }
-			} else {
-				return new Promise((resolve) => {
-					this.once('aa_response_to_unit-' + toUnit, m => resolve(m))
-				})
-			}
-		} else if (toAddress) {
-			return new Promise((resolve) => {
-				this.once('aa_response_to_address-' + toAddress, m => resolve(m))
-			})
-		} else if (fromAa) {
-			return new Promise((resolve) => {
-				this.once('aa_response_from_aa-' + fromAa, m => resolve(m))
-			})
-		}
+	getAaResponseToUnit (unit) {
+		return this.aaResponses.toUnit[unit]
 	}
 
 	async getUnitInfo ({ unit }) {
@@ -142,6 +127,15 @@ class AbstractNode extends EventEmitter {
 				resolve({ unitObj: m.unitObj, error: m.error })
 			})
 			this.sendToChild(new CommandGetUnitInfo({ unit }))
+		})
+	}
+
+	async getUnitProps ({ unit }) {
+		return new Promise(resolve => {
+			this.once('unit_props', (m) => {
+				resolve({ unitProps: m.unitProps })
+			})
+			this.sendToChild(new CommandGetUnitProps({ unit }))
 		})
 	}
 

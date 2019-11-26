@@ -47,10 +47,10 @@ describe('Check receiving AA response feature', function () {
 	}).timeout(10000)
 
 	it('Trigger bouncing AA not enough fees', async () => {
-		const { unit, error } = await this.wallet.sendData({
+		const { unit, error } = await this.wallet.triggerAaWithData({
 			toAddress: this.bouncingAgentAddress,
 			amount: 100,
-			payload: {
+			data: {
 				bounceMessage: 'BOUNCED!',
 			},
 		})
@@ -62,10 +62,10 @@ describe('Check receiving AA response feature', function () {
 	}).timeout(10000)
 
 	it('Trigger bouncing AA', async () => {
-		const { unit, error } = await this.wallet.sendData({
+		const { unit, error } = await this.wallet.triggerAaWithData({
 			toAddress: this.bouncingAgentAddress,
 			amount: 10000,
-			payload: {
+			data: {
 				bounceMessage: 'BOUNCED!',
 			},
 		})
@@ -75,15 +75,15 @@ describe('Check receiving AA response feature', function () {
 
 		await this.network.witness(2)
 
-		const { response } = await this.wallet.getAaResponse({ toUnit: unit })
+		const { response } = await this.network.getAaResponseToUnit(unit)
 		expect(response.response.error).to.be.string('Bounce with message BOUNCED!')
 	}).timeout(10000)
 
 	it('Trigger data feed AA without data', async () => {
-		const { unit, error } = await this.wallet.sendData({
+		const { unit, error } = await this.wallet.triggerAaWithData({
 			toAddress: this.dataFeedAgentAddress,
 			amount: 10000,
-			payload: {
+			data: {
 				notDataFeedPayload: '123',
 			},
 		})
@@ -93,7 +93,7 @@ describe('Check receiving AA response feature', function () {
 
 		await this.network.witness(4)
 
-		const { response: triggerResponse } = await this.wallet.getAaResponse({ toUnit: unit })
+		const { response: triggerResponse } = await this.network.getAaResponseToUnit(unit)
 		expect(triggerResponse.bounced).to.be.false
 		expect(triggerResponse.response.responseVars.dataFeedAaResponse).to.be.string('aa response!')
 
@@ -106,10 +106,10 @@ describe('Check receiving AA response feature', function () {
 	}).timeout(20000)
 
 	it('Trigger data feed AA with data', async () => {
-		const { unit, error } = await this.wallet.sendData({
+		const { unit, error } = await this.wallet.triggerAaWithData({
 			toAddress: this.dataFeedAgentAddress,
 			amount: 10000,
-			payload: {
+			data: {
 				dataFeedPayload: 'this will be a datafeed',
 			},
 		})
@@ -119,7 +119,7 @@ describe('Check receiving AA response feature', function () {
 
 		await this.network.witness(4)
 
-		const { response: triggerResponse } = await this.wallet.getAaResponse({ toUnit: unit })
+		const { response: triggerResponse } = await this.network.getAaResponseToUnit(unit)
 		expect(triggerResponse.bounced).to.be.false
 		expect(triggerResponse.response.responseVars.dataFeedAaResponse).to.be.string('aa response!')
 
