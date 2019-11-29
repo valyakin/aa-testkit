@@ -3,6 +3,8 @@ const EventEmitter = require('events')
 const Joi = require('joi')
 const util = require('util')
 const fs = require('fs')
+const mkdirp = require('mkdirp')
+
 const { isString } = require('lodash')
 const {
 	fromMessage,
@@ -29,7 +31,7 @@ class AbstractChild extends EventEmitter {
 		if (error) throw new Error(`[${this.constructor.name}][${params.id}] ${error}`)
 		Object.assign(this, value)
 
-		fs.mkdirSync(process.env.HOME, { recursive: true })
+		mkdirp.sync(process.env.HOME)
 		const conf = require('ocore/conf.js')
 		conf.deviceName = this.id
 
@@ -162,7 +164,7 @@ class AbstractChild extends EventEmitter {
 		const desktopApp = require('ocore/desktop_app.js')
 		const conf = require('ocore/conf.js')
 		const appDataDir = desktopApp.getAppDataDir()
-		fs.mkdirSync(appDataDir, { recursive: true })
+		mkdirp.sync(appDataDir)
 
 		const logFilename = conf.LOG_FILENAME || (appDataDir + '/log.txt')
 		const writeStream = fs.createWriteStream(logFilename, { flags: 'a' })

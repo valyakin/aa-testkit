@@ -1,6 +1,6 @@
-const fs = require('fs')
 const Joi = require('joi')
 const path = require('path')
+const mkdirp = require('mkdirp')
 const config = require('config')['aa-testkit']
 
 const { getIdForPrefix } = require('../../utils')
@@ -114,7 +114,7 @@ class NetworkFromGenesis {
 }
 
 const genesis = async (genesisParams, hubParams) => {
-	fs.mkdirSync(config.TESTDATA_DIR, { recursive: true })
+	mkdirp.sync(config.TESTDATA_DIR)
 	const runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
 	const rundir = path.join(config.TESTDATA_DIR, runid)
 	console.log('rundir', rundir)
