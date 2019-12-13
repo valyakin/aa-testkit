@@ -59,11 +59,12 @@ Testkit constructor function. Helps to configure network defaults
 
 *`config`* - network defaults configuration object
 
-| Property           |  Type  | Required |               Default              | Description                              |
-|--------------------|:------:|:--------:|:----------------------------------:|------------------------------------------|
-| TESTDATA_DIR       | String |   false  | `node_modules/aa-testkit/testdata` | Absolute path to `testdata` directory    |
-| DEFAULT_PASSPHRASE | String |   false  |               `0000`               | Wallet passphrase                        |
-| NETWORK_PORT       | Number |   false  |                6611                | Defines port, the network will be run on |
+| Property                   |   Type  | Required |               Default              | Description                                                   |
+|----------------------------|:-------:|:--------:|:----------------------------------:|---------------------------------------------------------------|
+| TESTDATA_DIR               |  String |   false  | `node_modules/aa-testkit/testdata` | Absolute path to `testdata` directory                         |
+| DEFAULT_PASSPHRASE         |  String |   false  |               `0000`               | Wallet passphrase                                             |
+| NETWORK_PORT               |  Number |   false  |                6611                | Defines port, the network will be run on                      |
+| WALLETS_ARE_SINGLE_ADDRESS | Boolean |   false  |                true                | Defines if HeadlessWallet nodes are single address by default |
 
 <br>
 <details>
@@ -834,13 +835,14 @@ Headless wallet node provides common network node functionality. It can receive 
 
 ### HeadlessWallet constructor params
 
-|   Property  |   Type  | Required |       Default      | Description                                                                 |
-|:-----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
-|      id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
-|    rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|  passphrase |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
-| genesisUnit |  String |   true   |                    | The very first unit of the network                                          |
-|     hub     |  String |   false  | `'localhost:6611'` | Address of the hub to connect                                               |
+|     Property    |   Type  | Required |       Default      | Description                                                                 |
+|:---------------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
+|        id       |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
+|      rundir     |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
+|    passphrase   |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
+|   genesisUnit   |  String |   true   |                    | The very first unit of the network                                          |
+|       hub       |  String |   false  | `'localhost:6611'` | Address of the hub to connect                                               |
+| isSingleAddress | Boolean |   false  |        true        | Defines if node will operate in single address mode                         |
 
 ### HeadlessWallet methods
 

@@ -22,6 +22,7 @@ const schemaFactory = () => ({
 	genesisUnit: Joi.string().required(),
 	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
 	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
+	isSingleAddress: Joi.string().default(config.WALLETS_ARE_SINGLE_ADDRESS),
 })
 
 class HeadlessWallet extends AbstractNode {
@@ -38,6 +39,7 @@ class HeadlessWallet extends AbstractNode {
 			this.id,
 			this.hub,
 			this.genesisUnit,
+			this.isSingleAddress,
 		]
 	}
 

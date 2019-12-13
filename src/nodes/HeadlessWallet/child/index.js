@@ -17,6 +17,7 @@ const paramsSchema = () => ({
 	id: Joi.string().required(),
 	hub: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
+	isSingleAddress: Joi.boolean().required(),
 })
 
 class HeadlessWalletChild extends AbstractChild {
@@ -39,12 +40,14 @@ class HeadlessWalletChild extends AbstractChild {
 			id,
 			hub,
 			genesisUnit,
+			isSingleAddress,
 		] = argv
 
 		return {
 			id,
 			hub,
 			genesisUnit,
+			isSingleAddress,
 		}
 	}
 
@@ -56,6 +59,7 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this.conf = require('ocore/conf.js')
 		this.conf.hub = this.hub
+		this.conf.bSingleAddress = this.isSingleAddress
 
 		this.headlessWallet = require('headless-obyte')
 		this.eventBus = require('ocore/event_bus.js')
