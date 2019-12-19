@@ -12,16 +12,17 @@
   },
   "dependencies": {
     "config": "^3.2.2",
-    "headless-obyte": "git+https://github.com/byteball/headless-obyte#aa",
     "joi": "^14.3.1",
     "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
     "mockdate": "^2.0.5",
-    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",
-    "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
-    "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",
     "uniqid": "^5.0.3",
-    "yargs": "^14.0.0"
+    "yargs": "^14.0.0",
+    "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
+    "ocore": "git+https://github.com/byteball/ocore#rocks-and-formulas",
+    "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte#aa",
+    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa"
   },
   "devDependencies": {
     "chai": "^4.2.0",

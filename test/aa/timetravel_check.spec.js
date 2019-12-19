@@ -20,26 +20,25 @@ describe('Check agent dependent on time', function () {
 		const walletAddress = await wallet.getAddress()
 
 		await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
-		await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-		await network.witness()
+		const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+		await network.witnessUntilStable(unit)
 
 		const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(timeDependentAA)
 
 		expect(agentAddress).to.be.validAddress
 		expect(agentUnit).to.be.validUnit
 
-		await network.witness(2)
+		await network.witnessUntilStable(agentUnit)
 
 		const { unit: unitBeforeTravel } = await wallet.sendBytes({
 			toAddress: agentAddress,
 			amount: 10000,
 		})
 		expect(unitBeforeTravel).to.be.validUnit
-		await network.witness(2)
+		await this.network.witnessUntilStable(unitBeforeTravel)
 
 		let state = await deployer.readAAStateVars(agentAddress)
 		expect(state.vars.time).to.be.equal('past')
-
 		const { error } = await network.timetravel({ to: '2050-01-01' })
 		expect(error).to.be.null
 
@@ -48,7 +47,7 @@ describe('Check agent dependent on time', function () {
 			amount: 10000,
 		})
 		expect(unitAfterTravel).to.be.validUnit
-		await network.witness(2)
+		await network.witnessUntilStable(unitAfterTravel)
 
 		state = await deployer.readAAStateVars(agentAddress)
 

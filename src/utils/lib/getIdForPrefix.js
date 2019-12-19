@@ -1,17 +1,26 @@
 const fs = require('fs')
 
+const prefixes = {}
+
 function getIdForPrefix (dir, prefix) {
-	const names = fs.readdirSync(dir)
-
+	const path = `${dir}/${prefix}`
 	let maxId = 0
-	names.forEach(name => {
-		const match = name.match(new RegExp(`${prefix}(\\d+)`))
-		if (match) {
-			maxId = Math.max(maxId, Number(match[1]))
-		}
-	})
+	if (prefixes[path]) {
+		maxId = prefixes[path]
+	} else {
+		const names = fs.readdirSync(dir)
+		names.forEach(name => {
+			const match = name.match(new RegExp(`${prefix}(\\d+)`))
+			if (match) {
+				maxId = Math.max(maxId, Number(match[1]))
+			}
+		})
+	}
 
-	return `${prefix}` + String(maxId + 1).padStart(4, '0')
+	const newId = maxId + 1
+	prefixes[path] = newId
+
+	return `${prefix}` + String(newId).padStart(4, '0')
 }
 
 module.exports = getIdForPrefix

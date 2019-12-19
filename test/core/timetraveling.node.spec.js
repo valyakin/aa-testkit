@@ -17,7 +17,7 @@ describe('Check timetravel node feature', function () {
 		const { unit, error } = await this.genesis.sendBytes({ toAddress: walletAddress, amount: 100000 })
 		expect(unit).to.be.string
 		expect(error).to.be.null
-		await this.network.witness()
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('node timetravel without params', async () => {

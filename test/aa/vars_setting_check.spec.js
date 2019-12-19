@@ -20,14 +20,14 @@ describe('AA state vars', function () {
 		const walletAddress = await wallet.getAddress()
 
 		await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
-		await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-		await network.witness()
+		const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+		await network.witnessUntilStable(unit)
 
 		const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(varsSettingCheck)
 
 		expect(agentAddress).to.be.validAddress
 		expect(agentUnit).to.be.validUnit
-		await network.witness(2)
+		await network.witnessUntilStable(agentUnit)
 
 		this.agentAddress = agentAddress
 		this.deployer = deployer
@@ -46,7 +46,7 @@ describe('AA state vars', function () {
 		})
 
 		expect(unit).to.be.validUnit
-		await network.witness(2)
+		await network.witnessUntilStable(unit)
 
 		const { vars } = await deployer.readAAStateVars(agentAddress)
 

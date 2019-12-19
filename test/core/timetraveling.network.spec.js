@@ -23,11 +23,12 @@ describe('Check timetravel network feature', function () {
 			const { unit, error } = await this.wallet1.sendBytes({ toAddress: address, amount: 100000 })
 			expect(unit).to.be.string
 			expect(error).to.be.null
+			await this.network.sync()
 
 			balance = await this.wallet2.getBalance()
 			expect(balance.base.pending).to.be.equal(100000)
 
-			await this.network.witness(2)
+			await this.network.witnessUntilStable(unit)
 			balance = await this.wallet2.getBalance()
 			expect(balance.base.pending).to.be.equal(0)
 			expect(balance.base.stable).to.be.equal(stableBalance + 100000)
@@ -54,7 +55,7 @@ describe('Check timetravel network feature', function () {
 		const { unit, error } = await this.genesis.sendBytes({ toAddress: await this.wallet1.getAddress(), amount: 10000000 })
 		expect(unit).to.be.string
 		expect(error).to.be.null
-		await this.network.witness()
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('network timetravel without params', async () => {

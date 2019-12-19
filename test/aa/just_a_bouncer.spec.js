@@ -20,8 +20,8 @@ describe('Check `just a bouncer` AA', function () {
 		const walletAddress = await wallet.getAddress()
 
 		await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
-		await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-		await network.witness()
+		const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+		await network.witnessUntilStable(unit)
 
 		const { address: agentAddress, unit: agentUnit, error: deploymentError } = await deployer.deployAgent(justABouncer)
 		expect(deploymentError).to.be.null
@@ -32,7 +32,7 @@ describe('Check `just a bouncer` AA', function () {
 		expect(agentUnit).to.be.validUnit
 		expect(walletBalance.base.stable).to.be.equal(1000000)
 
-		await network.witness(2)
+		await network.witnessUntilStable(agentUnit)
 
 		const { unit: newUnit } = await wallet.sendBytes({
 			toAddress: agentAddress,
@@ -40,7 +40,7 @@ describe('Check `just a bouncer` AA', function () {
 		})
 
 		expect(newUnit).to.be.validUnit
-		await network.witness(2)
+		await network.witnessUntilStable(newUnit)
 
 		walletBalance = await wallet.getBalance()
 		expect(walletBalance.base.pending).to.be.equal(9000)

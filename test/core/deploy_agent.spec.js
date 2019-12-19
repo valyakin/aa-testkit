@@ -15,7 +15,7 @@ describe('Check agent deployment feature', function () {
 
 		expect(unit).to.be.string
 		expect(error).to.be.null
-		await this.network.witness()
+		await this.network.witnessUntilStable(unit)
 	})
 
 	it('deploy agent no params', async () => {
@@ -49,7 +49,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from path with plaintext array', async () => {
@@ -58,7 +58,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from string in javascript file', async () => {
@@ -67,7 +67,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from string in javascript file array', async () => {
@@ -76,7 +76,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from object in javascript file', async () => {
@@ -85,7 +85,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from object in javascript file array', async () => {
@@ -94,7 +94,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from ojson object', async () => {
@@ -118,7 +118,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	it('deploy agent from ojson array', async () => {
@@ -145,7 +145,7 @@ describe('Check agent deployment feature', function () {
 		expect(address).to.be.validAddress
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(30000)
 
 	after(async () => {

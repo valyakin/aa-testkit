@@ -9,6 +9,7 @@ const {
 	CommandChildStop,
 	CommandTimeTravel,
 	MessageChildError,
+	CommandGetLastMCI,
 	CommandGetUnitInfo,
 	CommandGetUnitProps,
 	CommandReadAAStateVars,
@@ -26,7 +27,7 @@ class AbstractNode extends EventEmitter {
 		const { error, value } = Joi.validate(
 			params,
 			(schema instanceof Function) ? schema() : schema,
-			options
+			options,
 		)
 		if (error) throw new Error(`[${this.constructor.name}][${params.id}] ${error}`)
 		Object.assign(this, value)
@@ -80,10 +81,18 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
-	async stabilize () {
+	waitForNewJoint () {
 		return new Promise(resolve => {
-			this.once('mci_became_stable', () => {
-				resolve(this)
+			this.once('new_joint', ({ joint }) => {
+				resolve(joint)
+			})
+		})
+	}
+
+	stabilize () {
+		return new Promise(resolve => {
+			this.once('mci_became_stable', ({ mci }) => {
+				resolve(mci)
 			})
 		})
 	}
@@ -148,12 +157,21 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
+	async getLastMCI () {
+		return new Promise(resolve => {
+			this.once('last_mci', (m) => {
+				resolve(m.mci)
+			})
+			this.sendToChild(new CommandGetLastMCI())
+		})
+	}
+
 	sendToChild (message) {
 		this.child.send(message.serialize())
 	}
 
 	handleChildError (e) {
-		console.log(`[Error][${this.id}]`, e)
+		console.log(`[ERROR][${this.id}]`, e)
 	}
 
 	handleChildExit () {

@@ -15,7 +15,7 @@ describe('Check receiving AA response feature', function () {
 		const { unit, error } = await this.genesis.sendBytes({ toAddress: deployerAddress, amount: 1e9 })
 		expect(error).to.be.null
 		expect(unit).to.be.validUnit
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	})
 
 	it('Deploy bouncing Agent', async () => {
@@ -25,7 +25,7 @@ describe('Check receiving AA response feature', function () {
 		expect(deploymentError).to.be.null
 
 		this.bouncingAgentAddress = agentAddress
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(agentUnit)
 	}).timeout(15000)
 
 	it('Deploy data feed Agent', async () => {
@@ -35,7 +35,7 @@ describe('Check receiving AA response feature', function () {
 		expect(deploymentError).to.be.null
 
 		this.dataFeedAgentAddress = agentAddress
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(agentUnit)
 	}).timeout(15000)
 
 	it('Send money to wallet', async () => {
@@ -43,7 +43,7 @@ describe('Check receiving AA response feature', function () {
 		const { unit, error } = await this.genesis.sendBytes({ toAddress: walletAddress, amount: 1e9 })
 		expect(error).to.be.null
 		expect(unit).to.be.validUnit
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(10000)
 
 	it('Trigger bouncing AA not enough fees', async () => {
@@ -58,7 +58,7 @@ describe('Check receiving AA response feature', function () {
 		expect(error).to.be.string('The amounts are less than bounce fees')
 		expect(unit).to.be.null
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 	}).timeout(10000)
 
 	it('Trigger bouncing AA', async () => {
@@ -73,7 +73,7 @@ describe('Check receiving AA response feature', function () {
 		expect(error).to.be.null
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(2)
+		await this.network.witnessUntilStable(unit)
 
 		const { response } = await this.network.getAaResponseToUnit(unit)
 		expect(response.response.error).to.be.string('Bounce with message BOUNCED!')
@@ -91,7 +91,7 @@ describe('Check receiving AA response feature', function () {
 		expect(error).to.be.null
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(4)
+		await this.network.witnessUntilStable(unit)
 
 		const { response: triggerResponse } = await this.network.getAaResponseToUnit(unit)
 		expect(triggerResponse.bounced).to.be.false
@@ -117,7 +117,7 @@ describe('Check receiving AA response feature', function () {
 		expect(error).to.be.null
 		expect(unit).to.be.validUnit
 
-		await this.network.witness(4)
+		await this.network.witnessUntilStable(unit)
 
 		const { response: triggerResponse } = await this.network.getAaResponseToUnit(unit)
 		expect(triggerResponse.bounced).to.be.false

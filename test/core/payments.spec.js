@@ -18,16 +18,19 @@ describe('Check payments', function () {
 		const aliceAddress = await alice.getAddress()
 		const bobAddress = await bob.getAddress()
 
-		await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
+		const { unit: unit1 } = await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
+		await network.sync()
+
 		let aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.pending).to.be.equal(100000)
 
-		await network.witness()
+		await network.witnessUntilStable(unit1)
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.stable).to.be.equal(100000)
 
-		await alice.sendBytes({ toAddress: bobAddress, amount: 50000 })
+		const { unit: unit2 } = await alice.sendBytes({ toAddress: bobAddress, amount: 50000 })
+		await network.sync()
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.pending).to.be.equal(49401)
@@ -35,7 +38,7 @@ describe('Check payments', function () {
 		let bobBalance = await bob.getBalance()
 		expect(bobBalance.base.pending).to.be.equal(50000)
 
-		await network.witness(2)
+		await network.witnessUntilStable(unit2)
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.stable).to.be.equal(49756)
@@ -43,10 +46,12 @@ describe('Check payments', function () {
 		bobBalance = await bob.getBalance()
 		expect(bobBalance.base.stable).to.be.equal(50000)
 
-		await genesis.sendBytes({ toAddress: aliceAddress, amount: 1e9 })
+		const { unit: unit3 } = await genesis.sendBytes({ toAddress: aliceAddress, amount: 1e9 })
+		await network.sync()
+
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.pending).to.be.equal(1000000000)
-		await network.witness(2)
+		await network.witnessUntilStable(unit3)
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.stable).to.be.equal(1000049756)

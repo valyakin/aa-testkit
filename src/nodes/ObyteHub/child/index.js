@@ -47,7 +47,9 @@ class ObyteHubChild extends AbstractChild {
 		this.network = require('ocore/network.js')
 
 		this.hub = require('obyte-hub')
-		this.sendToParent(new MessageChildReady())
+		setTimeout(() => {
+			this.sendToParent(new MessageChildReady())
+		})
 	}
 
 	logPrefix () {

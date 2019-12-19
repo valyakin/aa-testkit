@@ -219,32 +219,9 @@ const explorer = await network.newObyteExplorer().ready()
 
 ---------------------------------------
 
-#### __`network.witness(n)`__ *`: Promise<>`*
+#### __`network.sync()`__ *`: Promise<>`*
 
-Send the command to `GenesisNode` to post and broadcast witness. Network will await then for every node to confirm `mci_became_stable`
-
-#### Parameters
-
-*`n`* - number of consequential witnesses to post. Defaults to 1.
-
-<details>
-<summary>Example</summary>
-
-```javascript
-const { Testkit } = require('aa-testkit')
-const { Network } = Testkit()
-
-const network = await Network.create()
-const genesis = await network.getGenesisNode().ready()
-
-// create wallet and send bytes to it
-const wallet = await network.newHeadlessWallet().ready()
-const walletAddress = await wallet.getAddress()
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-// witness last transaction
-await network.witness()
-```
-</details>
+Wait for MCI on every node to be synchronized. Returns `Promise` that will be resolved when MCI on every node become identical.
 
 ---------------------------------------
 
@@ -471,9 +448,40 @@ __Returns__ *Promise* that resolves when node child exited its process
 
 ---------------------------------------
 
-#### __`node.stabilize()`__ *`: Promise<>`*
+#### __`node.stabilize()`__ *`: Promise<mci: number>`*
 
-__Returns__ *Promise* that resolves when node child receives `mci_became_stable` event
+__Returns__ *Promise* that resolves to Main Chain Index when node child receives `mci_became_stable` event
+
+---------------------------------------
+
+#### __`node.waitForNewJoint()`__ *`: Promise<joint>`*
+
+__Returns__ *Promise* that resolves to `joint` object when node child receives and validates new joint
+
+<details>
+<summary>Joint object example</summary>
+
+```javascript
+{
+  unit:
+  {
+    version: '2.0dev',
+    alt: '3',
+    messages: [ [Object] ],
+    authors: [ [Object] ],
+    timestamp: 1576682858,
+    parent_units: [ 'A7QwnTCN2kKspj8Mfs5MQGkM9oMoaMvZmIQzq3VWZEM=' ],
+    last_ball: '0hlnU+5lXnT5s8j22DJQ6OYPdRI3ymqJ1JG0zvcJ9OE=',
+    last_ball_unit: 'jrEkfzJMZ6mSituUJBN/YOjO56rkopZPT04JGfs6BSo=',
+    witness_list_unit: 'kTGo2ttgTUkj8bjF6lWKL+afeJm3OIjO+wUJBe0a0fc=',
+    headers_commission: 402,
+    payload_commission: 197,
+    unit: 'ZvGvEjo7/nZ5P70XAGzafqcjqeeww/1mT6zi/fVTfUk='
+  }
+}
+```
+
+</details>
 
 ---------------------------------------
 
@@ -508,6 +516,16 @@ Receive details about unit from node. Uses `ocore/storage.readJoint` method
 
 *Promise* resolves as `{ time }` object and `time` is in milliseconds
 
+---------------------------------------
+
+#### __`node.getLastMCI()`__ *`: Promise<mci: number>`*
+
+Get node last Main Chain Index
+
+*Promise* resolves as `mci`
+
+---------------------------------------
+
 #### __`node.getUnitInfo({ unit })`__ *`: Promise<{ unitObj, error }>`*
 
 Receive details about unit from node. Uses `ocore/storage.readJoint` method
@@ -533,7 +551,7 @@ const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
 const { unit, error } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-await network.witness()
+await network.witnessUntilStable(unit)
 
 const { unitObj, error } = await wallet.getUnitInfo({ unit: unit })
 await network.stop()
@@ -629,7 +647,7 @@ const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
 const { unit, error } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-await network.witness()
+await network.witnessUntilStable(unit)
 
 const { unitProps } = await wallet.getUnitProps({ unit: unit })
 await network.stop()
@@ -947,8 +965,8 @@ const deployer = await network.newHeadlessWallet().ready()
 const deployerAddress = await deployer.getAddress()
 
 // send some bytes to AgentDeployer so it will be able to broadcast message with agent to the network
-await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
-await network.witness()
+const { unit, error } = await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
+await network.witnessUntilStable(unit)
 
 // agent in OJSON fromat
 const agent = {
@@ -967,7 +985,7 @@ const agent = {
 
 // deploy agent and confirm it on the network
 const { address, unit, error } = await deployer.deployAgent(agent)
-await network.witness(2)
+await network.witnessUntilStable(unit)
 await network.stop()
 ```
 </details>
@@ -1015,10 +1033,10 @@ const genesis = await network.getGenesisNode().ready()
 const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-await network.witness()
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-await network.witness()
+const { unit: unit1 } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+await network.witnessUntilStable(unit1)
+const { unit: unit2 } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+await network.witnessUntilStable(unit2)
 
 // by default DAG explorer will be started on http://localhost:8080
 const explorer = await network.newObyteExplorer().ready()
@@ -1058,6 +1076,58 @@ Helper for base64 strings validation. Return `true` if passed argument is valid 
 *`b64`* - string to validate
 
 *`len`* - optional. Length of the string. Function also validates length if second parameter is present
+
+---------------------------------------
+
+#### __`Utils.asyncStartHeadlessWallets(network, n)`__ *`: Primise<Array>`*
+
+Util that starts `n` of `HeadlessWallet` nodes asynchronously. Helps to speed up test execution when starting a lot of `HeadlessWallet` nodes.
+
+__Returns__ Returns `Promise` that resolves to Array of `HeadlessWallets`:
+
+#### Parameters
+
+*`network`* - network to start nodes on
+
+*`n`* - number of nodes to start
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit, Utils } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+
+const [wallet1, wallet2, wallet3] = await Utils.asyncStartHeadlessWallets(network, 3)
+await network.stop()
+```
+</details>
+
+<details>
+<summary>Mocha Example</summary>
+
+This could be helpfull if you want to assign created wallets to `this` in `mocha` tests
+
+```javascript
+this.network = await Network.create()
+this.genesis = await this.network.getGenesisNode().ready()
+
+this.teamRed = {}
+this.teamBlue = {}; // mind the semicolon. Otherwise use of destructuring assignment on the next line will lead to incorrect syntax.
+[
+  this.deployer,
+  this.teamRed.founder,
+  this.teamRed.alice,
+  this.teamRed.bob,
+  this.teamBlue.founder,
+  this.teamBlue.mark,
+  this.teamBlue.eva,
+] = await Utils.asyncStartHeadlessWallets(this.network, 7)
+```
+</details>
 
 ---------------------------------------
 
@@ -1138,16 +1208,18 @@ const bob = await network.newHeadlessWallet().ready()
 const aliceAddress = await alice.getAddress()
 const bobAddress = await bob.getAddress()
 
-await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
+const { unit: unit1 } = await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
+await network.sync()
 
 let aliceBalance = await alice.getBalance()
 assert(aliceBalance.base.pending === 100000)
-await network.witness()
+await network.witnessUntilStable(unit1)
 
 aliceBalance = await alice.getBalance()
 assert(aliceBalance.base.stable === 100000)
 
-await alice.sendBytes({ toAddress: bobAddress, amount: 50000 })
+const { unit: unit2 } = await alice.sendBytes({ toAddress: bobAddress, amount: 50000 })
+await network.sync()
 
 aliceBalance = await alice.getBalance()
 assert(aliceBalance.base.pending === 49401)
@@ -1155,7 +1227,7 @@ assert(aliceBalance.base.pending === 49401)
 let bobBalance = await bob.getBalance()
 assert(bobBalance.base.pending === 50000)
 
-await network.witness(2)
+await network.witnessUntilStable(unit2)
 
 aliceBalance = await alice.getBalance()
 assert(aliceBalance.base.stable === 49756)
@@ -1206,13 +1278,13 @@ const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
 await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-await network.witness()
+const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+await network.witnessUntilStable(unit)
 
 const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agentString)
 
 assert(isValidAddress(agentAddress))
-await network.witness(2)
+await network.witnessUntilStable(agentUnit)
 
 // reading state vars
 const { unit } = await wallet.triggerAaWithData({
@@ -1223,7 +1295,7 @@ const { unit } = await wallet.triggerAaWithData({
   },
 })
 
-await network.witness(2)
+await network.witnessUntilStable(unit)
 
 const { vars } = await deployer.readAAStateVars(agentAddress)
 
@@ -1293,19 +1365,19 @@ const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
 await genesis.sendBytes({ toAddress: deployerAddress, amount: 1000000 })
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
-await network.witness()
+const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1000000 })
+await network.witnessUntilStable(unit)
 
 const { address: agentAddress, unit: agentUnit } = await deployer.deployAgent(agentString)
 
 assert(isValidAddress(agentAddress))
-await network.witness(2)
+await network.witnessUntilStable(agentUnit)
 
 const { unit: unitBeforeTravel } = await wallet.sendBytes({
   toAddress: agentAddress,
   amount: 10000,
 })
-await network.witness(2)
+await network.witnessUntilStable(unitBeforeTravel)
 
 // check state vars before timetravel
 let state = await deployer.readAAStateVars(agentAddress)
@@ -1318,7 +1390,7 @@ const { unit: unitAfterTravel } = await wallet.sendBytes({
   toAddress: agentAddress,
   amount: 10000,
 })
-await network.witness(2)
+await network.witnessUntilStable(unitAfterTravel)
 
 state = await deployer.readAAStateVars(agentAddress)
 
@@ -1349,7 +1421,7 @@ const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
 const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 100000 })
-await network.witness()
+await network.witnessUntilStable(unit)
 
 const { unitObj, error } = await wallet.getUnitInfo({ unit })
 assert(error === null)
@@ -1476,15 +1548,15 @@ const deployerAddress = await deployer.getAddress()
 const wallet = await network.newHeadlessWallet().ready()
 const walletAddress = await wallet.getAddress()
 
-await genesis.sendBytes({ toAddress: walletAddress, amount: 1e9 })
-await network.witness(2)
+const { unit: unit1 } = await genesis.sendBytes({ toAddress: walletAddress, amount: 1e9 })
+await network.witnessUntilStable(unit1)
 
-await genesis.sendBytes({ toAddress: deployerAddress, amount: 1e9 })
-await network.witness(2)
+const { unit: unit2 } = await genesis.sendBytes({ toAddress: deployerAddress, amount: 1e9 })
+await network.witnessUntilStable(unit2)
 
 const { address: agentAddress, unit: agentDeploymentUnit, error: agentDeploymentError } = await deployer.deployAgent(agentString)
 
-await network.witness(2)
+await network.witnessUntilStable(agentDeploymentUnit)
 
 const { unit, error } = await wallet.triggerAaWithData({
   toAddress: agentAddress,
@@ -1494,7 +1566,7 @@ const { unit, error } = await wallet.triggerAaWithData({
   },
 })
 
-await network.witness(4)
+await network.witnessUntilStable(unit)
 const { response } = await network.getAaResponseToUnit(unit)
 
 assert(response.response.responseVars.dataFeedAaResponse === 'aa response!')

@@ -59,13 +59,23 @@ class NetworkFromGenesis {
 		})
 	}
 
-	async witness (n = 1) {
-		for (let i = 0; i < n; i++) {
-			await this.witnessAndStabilize()
+	async sync () {
+		const arrayMci = await Promise.all(this.nodesList.map(n => n.getLastMCI()))
+		const maxMci = Math.max(...arrayMci)
+
+		const laggedNodes = arrayMci
+			.map((mci, index) => mci < maxMci ? index : -1)
+			.filter(e => e > -1)
+			.map(i => this.nodesList[i])
+
+		if (laggedNodes.length) {
+			await Promise.all(laggedNodes.map(n => n.waitForNewJoint()))
+			return this.sync()
 		}
 	}
 
 	async witnessAndStabilize () {
+		await this.sync()
 		const stabilization = Promise.all(this.nodesList.map(n => n.stabilize()))
 
 		await this.genesisNode.postWitness()
@@ -74,30 +84,24 @@ class NetworkFromGenesis {
 
 	async witnessUntilStable (unit) {
 		if (!unit) return
-		await this.witness()
-		const { unitProps } = await this.genesisNode.getUnitProps({ unit })
-		if (!unitProps.is_stable) return this.witnessUntilStable(unit)
+		await this.sync()
+
+		const props = await Promise.all(this.nodesList.map(n => n.getUnitProps({ unit })))
+		const unstableNode = props.find(p => !p.unitProps.is_stable)
+		if (unstableNode) {
+			await this.witnessAndStabilize()
+			return this.witnessUntilStable(unit)
+		}
 	}
 
 	async getAaResponseToUnit (unit) {
-		await this.witness()
+		await this.witnessAndStabilize()
 		const response = this.genesisNode.getAaResponseToUnit(unit)
 		if (response) {
 			return { response }
 		} else {
 			return this.getAaResponseToUnit(unit)
 		}
-	}
-
-	newHeadlessWallet (params) {
-		const wallet = new HeadlessWallet({
-			rundir: this.rundir,
-			genesisUnit: this.genesisUnit,
-			id: getIdForPrefix(this.rundir, 'headless-wallet-'),
-			...params,
-		})
-		this.nodes.headlessWallets.push(wallet)
-		return wallet
 	}
 
 	newObyteExplorer (params) {
@@ -110,6 +114,17 @@ class NetworkFromGenesis {
 		})
 		this.nodes.obyteExplorers.push(explorer)
 		return explorer
+	}
+
+	newHeadlessWallet (params) {
+		const wallet = new HeadlessWallet({
+			rundir: this.rundir,
+			genesisUnit: this.genesisUnit,
+			id: getIdForPrefix(this.rundir, 'headless-wallet-'),
+			...params,
+		})
+		this.nodes.headlessWallets.push(wallet)
+		return wallet
 	}
 }
 

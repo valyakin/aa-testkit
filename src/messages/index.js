@@ -1,3 +1,5 @@
+const MessageLastMCI = require('./lib/MessageLastMCI')
+const MessageNewJoint = require('./lib/MessageNewJoint')
 const MessageUnitInfo = require('./lib/MessageUnitInfo')
 const MessageUnitProps = require('./lib/MessageUnitProps')
 const MessageSentMulti = require('./lib/MessageSentMulti')
@@ -24,6 +26,7 @@ const CommandTriggerAa = require('./lib/CommandTriggerAa')
 const CommandSendMulti = require('./lib/CommandSendMulti')
 const CommandChildStop = require('./lib/CommandChildStop')
 const CommandSendBytes = require('./lib/CommandSendBytes')
+const CommandGetLastMCI = require('./lib/CommandGetLastMCI')
 const CommandGetAddress = require('./lib/CommandGetAddress')
 const CommandLoginToHub = require('./lib/CommandLoginToHub')
 const CommandGetBalance = require('./lib/CommandGetBalance')
@@ -39,6 +42,8 @@ const fromMessage = (m) => {
 	const message = JSON.parse(m)
 
 	switch (message.topic) {
+	case 'last_mci': return new MessageLastMCI(message)
+	case 'new_joint': return new MessageNewJoint(message)
 	case 'unit_info': return new MessageUnitInfo(message)
 	case 'unit_props': return new MessageUnitProps(message)
 	case 'sent_multi': return new MessageSentMulti(message)
@@ -68,6 +73,7 @@ const fromMessage = (m) => {
 	case 'command_get_address': return new CommandGetAddress(message)
 	case 'command_get_balance': return new CommandGetBalance(message)
 	case 'command_time_travel': return new CommandTimeTravel(message)
+	case 'command_get_last_mci': return new CommandGetLastMCI(message)
 	case 'command_login_to_hub': return new CommandLoginToHub(message)
 	case 'command_deploy_agent': return new CommandDeployAgent(message)
 	case 'command_post_witness': return new CommandPostWitness(message)
@@ -83,6 +89,8 @@ const fromMessage = (m) => {
 module.exports = {
 	fromMessage,
 
+	MessageLastMCI,
+	MessageNewJoint,
 	MessageUnitInfo,
 	MessageUnitProps,
 	MessageSentMulti,
@@ -109,6 +117,7 @@ module.exports = {
 	CommandSendMulti,
 	CommandChildStop,
 	CommandSendBytes,
+	CommandGetLastMCI,
 	CommandGetAddress,
 	CommandLoginToHub,
 	CommandTimeTravel,

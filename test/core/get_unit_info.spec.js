@@ -17,7 +17,7 @@ describe('Get unit info feature', function () {
 		const walletAddress = await wallet.getAddress()
 
 		const { unit } = await genesis.sendBytes({ toAddress: walletAddress, amount: 100000 })
-		await network.witness()
+		await network.witnessUntilStable(unit)
 
 		const { unitObj, error } = await wallet.getUnitInfo({ unit })
 

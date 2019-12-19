@@ -3,6 +3,7 @@ const isValidBase64 = require('./lib/isValidBase64')
 const isValidAddress = require('./lib/isValidAddress')
 const getIdForPrefix = require('./lib/getIdForPrefix')
 const countCommissionInUnits = require('./lib/countCommissionInUnits')
+const asyncStartHeadlessWallets = require('./lib/asyncStartHeadlessWallets')
 
 module.exports = {
 	sleep,
@@ -10,4 +11,5 @@ module.exports = {
 	isValidAddress,
 	getIdForPrefix,
 	countCommissionInUnits,
+	asyncStartHeadlessWallets,
 }
