@@ -989,7 +989,51 @@ await network.witnessUntilStable(unit)
 await network.stop()
 ```
 </details>
+---------------------------------------
 
+#### __`wallet.createAsset(asset_definition)`__ *`: Promise<{ unit, error }>`*
+
+Create an asset in the network.
+
+__Returns__ *Promise* that resolves to `{ unit, error }`, where `unit` determines the asset that was created. `error` will be null on success
+
+#### Parameters
+
+*`source : Object`* - asset definition
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+
+const creator = await network.newHeadlessWallet().ready()
+const creatorAddress = await deployer.getAddress()
+
+// send some bytes to AgentDeployer so it will be able to broadcast message
+const { unit, error } = await genesis.sendBytes({ toAddress: creatorAddress, amount: 1000000 })
+await network.witnessUntilStable(unit)
+
+const asset_definition = {
+  is_private: false,
+  is_transferrable: true,
+  auto_destroy: false,
+  issued_by_definer_only: true,
+  cosigned_by_definer: false,
+  spender_attested: false,
+  fixed_denominations: false
+}
+
+// create asset and confirm it on the network
+const { unit, error } = await creator.createAsset(asset_definition)
+await network.witnessUntilStable(unit)
+await network.stop()
+```
+</details>
 ---------------------------------------
 
 #### __`wallet.getOwnedAddresses()`__ *`: Promise<Array[String]>`*

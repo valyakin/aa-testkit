@@ -8,6 +8,7 @@
   "scripts": {
     "test": "mocha",
 		"test:aa": "mocha test/aa/**spec.js",
+		"test:core": "mocha test/core/**spec.js",
 		"test:utils": "mocha test/utils/**spec.js",
     "test:all": "mocha test/**/**spec.js"
   },

@@ -123,6 +123,9 @@ class HeadlessWallet extends AbstractNode {
 	}
 
 	async createAsset (asset_definition) {
+		if (typeof asset_definition != 'object')
+			return { error: "asset definition should be an object"}
+
 		try {
 			this.sendToChild(new CommandCreateAsset({
 				asset_definition
