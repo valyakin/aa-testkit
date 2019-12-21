@@ -1,6 +1,6 @@
 function hasResponseUnitOnlyThesePayments (objUnit, arrExpectedOutputs) {
 		const aa_address = objUnit.unit.authors[0].address
-		
+
 		// we sort expected payments by unit
 		const assocExpectedOutputsByAsset = {}
 		arrExpectedOutputs.forEach(expectedOutput => {
@@ -18,12 +18,12 @@ function hasResponseUnitOnlyThesePayments (objUnit, arrExpectedOutputs) {
 		//we check that for each asset, expected outputs and actual outputs match
 		for (var asset in assocExpectedOutputsByAsset){
 			if (asset === 'base')
-				var payloadForThisAsset = paymentMessages.find(m => m.asset === undefined)
+				var paymentMessageForThisAsset = paymentMessages.find(m => m.payload.asset === undefined)
 			else
-				var payloadForThisAsset = paymentMessages.find(m => m.asset === asset)
-			if (!payloadForThisAsset)
+				var paymentMessageForThisAsset = paymentMessages.find(m => m.payload.asset === asset)
+			if (!paymentMessageForThisAsset)
 				return false
-			const outputsForThisAsset = payloadForThisAsset.payload.outputs.filter(o => o.address != aa_address) // we exclude change outputs
+			const outputsForThisAsset = paymentMessageForThisAsset.payload.outputs.filter(o => o.address != aa_address) // we exclude change outputs
 			const expectedOutputsForThisAsset = assocExpectedOutputsByAsset[asset]
 
 			if (outputsForThisAsset.length != expectedOutputsForThisAsset.length)
@@ -38,7 +38,7 @@ function hasResponseUnitOnlyThesePayments (objUnit, arrExpectedOutputs) {
 			if (expectedOutputsForThisAsset.length > 0) // if expected output is missing
 				return false
 		}
-			return true
+		return true
 }
 
 module.exports = hasResponseUnitOnlyThesePayments
