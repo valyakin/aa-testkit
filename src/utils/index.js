@@ -4,7 +4,7 @@ const isValidAddress = require('./lib/isValidAddress')
 const getIdForPrefix = require('./lib/getIdForPrefix')
 const countCommissionInUnits = require('./lib/countCommissionInUnits')
 const asyncStartHeadlessWallets = require('./lib/asyncStartHeadlessWallets')
-const hasResponseUnitOnlyThesePayments = require('./lib/hasResponseUnitOnlyThesePayments')
+const hasOnlyTheseExternalPayments = require('./lib/hasOnlyTheseExternalPayments')
 
 module.exports = {
 	sleep,
@@ -13,5 +13,5 @@ module.exports = {
 	getIdForPrefix,
 	countCommissionInUnits,
 	asyncStartHeadlessWallets,
-	hasResponseUnitOnlyThesePayments,
+	hasOnlyTheseExternalPayments,
 }

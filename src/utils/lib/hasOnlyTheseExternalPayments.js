@@ -1,4 +1,4 @@
-function hasResponseUnitOnlyThesePayments (objUnit, arrExpectedOutputs) {
+function hasOnlyTheseExternalPayments (objUnit, arrExpectedOutputs) {
 		const aa_address = objUnit.unit.authors[0].address
 
 		// we sort expected payments by unit
@@ -41,4 +41,4 @@ function hasResponseUnitOnlyThesePayments (objUnit, arrExpectedOutputs) {
 		return true
 }
 
-module.exports = hasResponseUnitOnlyThesePayments
+module.exports = hasOnlyTheseExternalPayments

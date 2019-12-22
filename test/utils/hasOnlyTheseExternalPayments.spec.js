@@ -31,7 +31,7 @@ describe('Response unit has only these payments', function () {
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
 
-		expect(	Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(	Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		}])).to.be.true
@@ -49,7 +49,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(	Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(	Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 80006,
 			asset: this.asset_1
@@ -78,7 +78,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 80006,
 			asset: this.asset_1
@@ -109,7 +109,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		}])).to.be.false
@@ -129,7 +129,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		}])).to.be.false
@@ -157,7 +157,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 80006,
 			asset: this.asset_1
@@ -184,7 +184,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		},{
@@ -207,7 +207,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		},{
@@ -230,7 +230,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513,
 			asset: 'base'
@@ -251,7 +251,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(	Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(	Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		},{
@@ -272,7 +272,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasResponseUnitOnlyThesePayments(unitObj, [{
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
 			address: "WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI",
 			amount: 185513
 		},{
