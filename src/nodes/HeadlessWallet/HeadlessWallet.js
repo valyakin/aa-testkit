@@ -108,31 +108,30 @@ class HeadlessWallet extends AbstractNode {
 				? await promisify(parseOjson)(agent)
 				: agent
 
-			this.sendToChild(new CommandDeployAgent({
+			const agentMessage = new CommandDeployAgent({
 				ojson: isArray(ojson)
 					? ojson
 					: ['autonomous agent', ojson],
-			}))
+			})
 
 			return new Promise((resolve) => {
 				this.once('agent_deployed', m => resolve({ address: m.address, unit: m.unit, error: m.error }))
+				this.sendToChild(agentMessage)
 			})
 		} catch (error) {
 			return { error: error.message || error }
 		}
 	}
 
-	async createAsset (asset_definition) {
-		if (typeof asset_definition != 'object')
-			return { error: "asset definition should be an object"}
+	async createAsset (assetDefinition) {
+		if (typeof assetDefinition !== 'object') {
+			return { error: 'asset definition should be an object' }
+		}
 
 		try {
-			this.sendToChild(new CommandCreateAsset({
-				asset_definition
-			}))
-
 			return new Promise((resolve) => {
-				this.once('asset_created', m => resolve({unit: m.unit, error: m.error }))
+				this.once('asset_created', m => resolve({ unit: m.unit, error: m.error }))
+				this.sendToChild(new CommandCreateAsset({ assetDefinition }))
 			})
 		} catch (error) {
 			return { error: error.message || error }

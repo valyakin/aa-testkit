@@ -991,7 +991,7 @@ await network.stop()
 </details>
 ---------------------------------------
 
-#### __`wallet.createAsset(asset_definition)`__ *`: Promise<{ unit, error }>`*
+#### __`wallet.createAsset(assetDefinition)`__ *`: Promise<{ unit, error }>`*
 
 Create an asset in the network.
 
@@ -1018,7 +1018,7 @@ const creatorAddress = await deployer.getAddress()
 const { unit, error } = await genesis.sendBytes({ toAddress: creatorAddress, amount: 1000000 })
 await network.witnessUntilStable(unit)
 
-const asset_definition = {
+const assetDefinition = {
   is_private: false,
   is_transferrable: true,
   auto_destroy: false,
@@ -1029,7 +1029,7 @@ const asset_definition = {
 }
 
 // create asset and confirm it on the network
-const { unit, error } = await creator.createAsset(asset_definition)
+const { unit, error } = await creator.createAsset(assetDefinition)
 await network.witnessUntilStable(unit)
 await network.stop()
 ```

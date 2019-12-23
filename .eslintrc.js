@@ -15,6 +15,7 @@ module.exports = {
   ],
   rules: {
     "indent": [2, "tab"],
+    "no-var": "error",
     "no-tabs": ["error", { allowIndentationTabs: true }],
     "comma-dangle": ["error", "always-multiline"],
     "mocha/no-exclusive-tests": "error",

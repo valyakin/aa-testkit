@@ -1,4 +1,3 @@
-
 const fs = require('fs')
 
 const [,,
@@ -22,5 +21,5 @@ require('obyte-witness')
 process.send({ topic: 'password_required' })
 
 // eventBus.once('headless_wallet_ready', function () {
-//	process.send({ topic: 'started' })
+//  process.send({ topic: 'started' })
 // })

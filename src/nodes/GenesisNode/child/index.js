@@ -124,7 +124,7 @@ class GenesisNodeChild extends AbstractChild {
 
 	createGenesisUnit (witness) {
 		return new Promise((resolve, reject) => {
-			var savingCallbacks = this.composer.getSavingCallbacks({
+			const savingCallbacks = this.composer.getSavingCallbacks({
 				ifNotEnoughFunds: reject,
 				ifError: reject,
 				ifOk: (objJoint) => {

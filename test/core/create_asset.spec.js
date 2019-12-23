@@ -29,7 +29,7 @@ describe('Check asset creation feature', function () {
 			issued_by_definer_only: true,
 			cosigned_by_definer: false,
 			spender_attested: false,
-			fixed_denominations: false
+			fixed_denominations: false,
 		})
 		expect(error).to.be.string('some required fields in asset definition are missing')
 	}).timeout(30000)
@@ -43,7 +43,7 @@ describe('Check asset creation feature', function () {
 			issued_by_definer_only: true,
 			cosigned_by_definer: false,
 			spender_attested: false,
-			fixed_denominations: false
+			fixed_denominations: false,
 		})
 		expect(error).to.be.string('unknown fields in asset definition')
 	}).timeout(30000)
@@ -56,11 +56,10 @@ describe('Check asset creation feature', function () {
 			issued_by_definer_only: true,
 			cosigned_by_definer: false,
 			spender_attested: false,
-			fixed_denominations: false
+			fixed_denominations: false,
 		})
 		expect(error).to.be.null
 		expect(unit).to.be.validUnit
-		
 	}).timeout(30000)
 
 	after(async () => {

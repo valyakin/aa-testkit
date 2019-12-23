@@ -1,11 +1,11 @@
 const AbstarctMessage = require('./AbstarctMessage')
 
-class CommandCreateAgent extends AbstarctMessage {
-	constructor ({ asset_definition }) {
+class CommandCreateAsset extends AbstarctMessage {
+	constructor ({ assetDefinition }) {
 		super()
 		this.topic = 'command_create_asset'
-		this.asset_definition = asset_definition
+		this.assetDefinition = assetDefinition
 	}
 }
 
-module.exports = CommandCreateAgent
+module.exports = CommandCreateAsset

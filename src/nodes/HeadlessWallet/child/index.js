@@ -180,14 +180,14 @@ class HeadlessWalletChild extends AbstractChild {
 		}
 	}
 
-	async createAsset ({ asset_definition }) {
+	async createAsset ({ assetDefinition }) {
 		try {
 			const myAddress = await new Promise((resolve, reject) => {
 				this.headlessWallet.readFirstAddress(address => resolve(address))
 			})
 
 			const callbacks = this.composer.getSavingCallbacks({
-				ifNotEnoughFunds: (err) => this.sendToParent(new MessageAssetCreated({  error: err })),
+				ifNotEnoughFunds: (err) => this.sendToParent(new MessageAssetCreated({ error: err })),
 				ifError: (err) => this.sendToParent(new MessageAssetCreated({ error: err })),
 				ifOk: (objJoint) => {
 					this.network.broadcastJoint(objJoint)
@@ -195,7 +195,7 @@ class HeadlessWalletChild extends AbstractChild {
 				},
 			})
 
-			this.composeContentJoint(myAddress, 'asset', asset_definition, this.headlessWallet.signer, callbacks)
+			this.composeContentJoint(myAddress, 'asset', assetDefinition, this.headlessWallet.signer, callbacks)
 		} catch (error) {
 			this.sendToParent(new MessageAssetCreated({ error: error.message }))
 		}
