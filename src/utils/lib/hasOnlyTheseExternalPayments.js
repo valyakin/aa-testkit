@@ -1,4 +1,4 @@
-function hasOnlyTheseExternalPayments (objUnit, arrExpectedOutputs) {
+const hasOnlyTheseExternalPayments = (objUnit, arrExpectedOutputs) => {
 	const aaAddress = objUnit.unit.authors[0].address
 
 	// we sort expected payments by unit
@@ -26,7 +26,9 @@ function hasOnlyTheseExternalPayments (objUnit, arrExpectedOutputs) {
 
 		for (let i = 0; i < outputsForThisAsset.length; i++) {
 			expectedOutputsForThisAsset.forEach((expectedOutput, index) => {
-				if (expectedOutput.address === outputsForThisAsset[i].address && expectedOutput.amount === outputsForThisAsset[i].amount) { return expectedOutputsForThisAsset.splice(index, 1) }
+				if (expectedOutput.address === outputsForThisAsset[i].address && expectedOutput.amount === outputsForThisAsset[i].amount) {
+					return expectedOutputsForThisAsset.splice(index, 1)
+				}
 			})
 		}
 		// if expected output is missing
