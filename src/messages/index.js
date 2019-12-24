@@ -14,6 +14,7 @@ const MessageCurrentTime = require('./lib/MessageCurrentTime')
 const MessageMyAddresses = require('./lib/MessageMyAddresses')
 const MessageAAStateVars = require('./lib/MessageAAStateVars')
 const MessageChildStarted = require('./lib/MessageChildStarted')
+const MessageAssetCreated = require('./lib/MessageAssetCreated')
 const MessageAgentDeployed = require('./lib/MessageAgentDeployed')
 const MessageTimeTravelDone = require('./lib/MessageTimeTravelDone')
 const MessageConnectedToHub = require('./lib/MessageConnectedToHub')
@@ -32,6 +33,7 @@ const CommandLoginToHub = require('./lib/CommandLoginToHub')
 const CommandGetBalance = require('./lib/CommandGetBalance')
 const CommandTimeTravel = require('./lib/CommandTimeTravel')
 const CommandDeployAgent = require('./lib/CommandDeployAgent')
+const CommandCreateAsset = require('./lib/CommandCreateAsset')
 const CommandPostWitness = require('./lib/CommandPostWitness')
 const CommandGetUnitInfo = require('./lib/CommandGetUnitInfo')
 const CommandGetUnitProps = require('./lib/CommandGetUnitProps')
@@ -58,6 +60,7 @@ const fromMessage = (m) => {
 	case 'my_addresses': return new MessageMyAddresses(message)
 	case 'aa_state_vars': return new MessageAAStateVars(message)
 	case 'child_started': return new MessageChildStarted(message)
+	case 'asset_created': return new MessageAssetCreated(message)
 	case 'agent_deployed': return new MessageAgentDeployed(message)
 	case 'genesis_created': return new MessageGenesisCreated(message)
 	case 'time_travel_done': return new MessageTimeTravelDone(message)
@@ -76,6 +79,7 @@ const fromMessage = (m) => {
 	case 'command_get_last_mci': return new CommandGetLastMCI(message)
 	case 'command_login_to_hub': return new CommandLoginToHub(message)
 	case 'command_deploy_agent': return new CommandDeployAgent(message)
+	case 'command_create_asset': return new CommandCreateAsset(message)
 	case 'command_post_witness': return new CommandPostWitness(message)
 	case 'command_get_unit_info': return new CommandGetUnitInfo(message)
 	case 'command_get_unit_props': return new CommandGetUnitProps(message)
@@ -105,6 +109,7 @@ module.exports = {
 	MessageMyAddresses,
 	MessageAAStateVars,
 	MessageChildStarted,
+	MessageAssetCreated,
 	MessageAgentDeployed,
 	MessageConnectedToHub,
 	MessageTimeTravelDone,
@@ -123,6 +128,7 @@ module.exports = {
 	CommandTimeTravel,
 	CommandGetBalance,
 	CommandDeployAgent,
+	CommandCreateAsset,
 	CommandPostWitness,
 	CommandGetUnitInfo,
 	CommandGetUnitProps,

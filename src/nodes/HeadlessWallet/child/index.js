@@ -10,6 +10,7 @@ const {
 	MessageMyAddresses,
 	MessageAaTriggered,
 	MessageAgentDeployed,
+	MessageAssetCreated,
 	MessagePasswordRequired,
 } = require('../../../messages')
 
@@ -32,6 +33,7 @@ class HeadlessWalletChild extends AbstractChild {
 			.on('command_send_bytes', (m) => this.sendBytes(m))
 			.on('command_get_balance', (m) => this.getBalance(m))
 			.on('command_deploy_agent', (m) => this.deployAgent(m))
+			.on('command_create_asset', (m) => this.createAsset(m))
 			.on('command_get_my_addresses', (m) => this.getMyAddresses(m))
 	}
 
@@ -175,6 +177,27 @@ class HeadlessWalletChild extends AbstractChild {
 			this.composeContentJoint(myAddress, 'definition', payload, this.headlessWallet.signer, callbacks)
 		} catch (error) {
 			this.sendToParent(new MessageAgentDeployed({ error: error.message }))
+		}
+	}
+
+	async createAsset ({ assetDefinition }) {
+		try {
+			const myAddress = await new Promise((resolve, reject) => {
+				this.headlessWallet.readFirstAddress(address => resolve(address))
+			})
+
+			const callbacks = this.composer.getSavingCallbacks({
+				ifNotEnoughFunds: (err) => this.sendToParent(new MessageAssetCreated({ error: err })),
+				ifError: (err) => this.sendToParent(new MessageAssetCreated({ error: err })),
+				ifOk: (objJoint) => {
+					this.network.broadcastJoint(objJoint)
+					this.sendToParent(new MessageAssetCreated({ unit: objJoint.unit.unit, error: null }))
+				},
+			})
+
+			this.composeContentJoint(myAddress, 'asset', assetDefinition, this.headlessWallet.signer, callbacks)
+		} catch (error) {
+			this.sendToParent(new MessageAssetCreated({ error: error.message }))
 		}
 	}
 

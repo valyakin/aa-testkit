@@ -8,21 +8,24 @@
   "scripts": {
     "test": "mocha",
     "test:aa": "mocha test/aa/**spec.js",
-    "test:all": "mocha test/**/**spec.js"
+    "test:core": "mocha test/core/**spec.js",
+    "test:utils": "mocha test/utils/**spec.js",
+    "test:all": "mocha test/**/**spec.js",
+    "lint": "node ./node_modules/.bin/eslint --ext .js --max-warnings=0 --fix src test"
   },
   "dependencies": {
     "config": "^3.2.2",
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte#aa",
     "joi": "^14.3.1",
     "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
     "mockdate": "^2.0.5",
-    "uniqid": "^5.0.3",
-    "yargs": "^14.0.0",
+    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa",
     "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
-    "ocore": "git+https://github.com/byteball/ocore#rocks-and-formulas",
     "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",
-    "headless-obyte": "git+https://github.com/byteball/headless-obyte#aa",
-    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer#aa"
+    "ocore": "git+https://github.com/byteball/ocore#rocks-and-formulas",
+    "uniqid": "^5.0.3",
+    "yargs": "^14.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -34,6 +37,10 @@
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "mocha": "^6.2.0"
-  }
+    "mocha": "^6.2.0",
+    "pre-commit": "^1.2.2"
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }

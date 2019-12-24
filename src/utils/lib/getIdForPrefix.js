@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const prefixes = {}
 
-function getIdForPrefix (dir, prefix) {
+const getIdForPrefix = (dir, prefix) => {
 	const path = `${dir}/${prefix}`
 	let maxId = 0
 	if (prefixes[path]) {
