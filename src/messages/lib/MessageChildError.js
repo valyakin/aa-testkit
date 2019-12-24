@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageChildError extends AbstarctMessage {
+class MessageChildError extends AbstractMessage {
 	constructor ({ error }) {
 		super()
 		this.topic = 'child_error'

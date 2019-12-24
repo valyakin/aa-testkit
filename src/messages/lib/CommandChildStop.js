@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandChildStop extends AbstarctMessage {
+class CommandChildStop extends AbstractMessage {
 	constructor () {
 		super()
 		this.topic = 'command_child_stop'

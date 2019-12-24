@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageAAResponse extends AbstarctMessage {
+class MessageAAResponse extends AbstractMessage {
 	constructor ({ response }) {
 		super()
 		this.topic = 'aa_response'

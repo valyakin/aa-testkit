@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageUnitProps extends AbstarctMessage {
+class MessageUnitProps extends AbstractMessage {
 	constructor ({ unitProps }) {
 		super()
 		this.topic = 'unit_props'

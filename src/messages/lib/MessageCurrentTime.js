@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageCurrentTime extends AbstarctMessage {
+class MessageCurrentTime extends AbstractMessage {
 	constructor ({ time }) {
 		super()
 		this.topic = 'current_time'

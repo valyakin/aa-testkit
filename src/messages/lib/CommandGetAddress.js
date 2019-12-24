@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandGetAddress extends AbstarctMessage {
+class CommandGetAddress extends AbstractMessage {
 	constructor () {
 		super()
 		this.topic = 'command_get_address'

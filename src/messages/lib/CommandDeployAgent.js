@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandDeployAgent extends AbstarctMessage {
+class CommandDeployAgent extends AbstractMessage {
 	constructor ({ ojson }) {
 		super()
 		this.topic = 'command_deploy_agent'

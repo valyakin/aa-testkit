@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageGenesisCreated extends AbstarctMessage {
+class MessageGenesisCreated extends AbstractMessage {
 	constructor ({ address, genesisUnit }) {
 		super()
 		this.address = address

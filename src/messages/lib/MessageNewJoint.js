@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageNewJoint extends AbstarctMessage {
+class MessageNewJoint extends AbstractMessage {
 	constructor ({ joint }) {
 		super()
 		this.topic = 'new_joint'

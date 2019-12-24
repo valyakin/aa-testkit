@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessagePasswordRequired extends AbstarctMessage {
+class MessagePasswordRequired extends AbstractMessage {
 	constructor () {
 		super()
 		this.topic = 'password_required'

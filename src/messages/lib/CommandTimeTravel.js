@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandTimeTravel extends AbstarctMessage {
+class CommandTimeTravel extends AbstractMessage {
 	constructor ({ to, shift }) {
 		super()
 		this.topic = 'command_time_travel'

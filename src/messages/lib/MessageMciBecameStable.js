@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageMciBecameStable extends AbstarctMessage {
+class MessageMciBecameStable extends AbstractMessage {
 	constructor ({ mci }) {
 		super()
 		this.topic = 'mci_became_stable'

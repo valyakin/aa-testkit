@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageSentMulti extends AbstarctMessage {
+class MessageSentMulti extends AbstractMessage {
 	constructor ({ unit, error }) {
 		super()
 		this.topic = 'sent_multi'

@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageConnectedToHub extends AbstarctMessage {
+class MessageConnectedToHub extends AbstractMessage {
 	constructor () {
 		super()
 		this.topic = 'connected_to_hub'

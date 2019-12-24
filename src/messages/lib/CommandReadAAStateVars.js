@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandReadAAStateVars extends AbstarctMessage {
+class CommandReadAAStateVars extends AbstractMessage {
 	constructor ({ address }) {
 		super()
 		this.topic = 'command_read_aa_state_vars'

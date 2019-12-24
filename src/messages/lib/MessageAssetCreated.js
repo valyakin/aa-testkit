@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class MessageAssetCreated extends AbstarctMessage {
+class MessageAssetCreated extends AbstractMessage {
 	constructor ({ unit, error }) {
 		super()
 		this.topic = 'asset_created'

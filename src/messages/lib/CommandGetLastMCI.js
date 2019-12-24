@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandGetLastMCI extends AbstarctMessage {
+class CommandGetLastMCI extends AbstractMessage {
 	constructor () {
 		super()
 		this.topic = 'command_get_last_mci'

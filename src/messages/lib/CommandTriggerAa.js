@@ -1,6 +1,6 @@
-const AbstarctMessage = require('./AbstarctMessage')
+const AbstractMessage = require('./AbstractMessage')
 
-class CommandTriggerAa extends AbstarctMessage {
+class CommandTriggerAa extends AbstractMessage {
 	constructor ({ data, toAddress, amount }) {
 		super()
 		this.topic = 'command_trigger_aa'
