@@ -1228,6 +1228,88 @@ await network.stop()
 
 ---------------------------------------
 
+#### __`Utils.hasOnlyTheseExternalPayments(unit, arrExpectedPayments)`__ *`: Promise(Boolean)`*
+
+Helper to check the outputs of a response unit. Returns `true` if the unit contains exclusively the payment described in arrExpectedPayments.
+
+
+#### Parameters
+
+*`unit`* - unit object
+
+*`arrExpectedPayments`* - array of payment objects having each this structure
+
+```javascript
+{
+  address,
+  amount,
+  asset
+}
+```
+where `address` is the recipient address, `amount` the amount sent, `asset` is the asset hash (`null` for payment in bytes)
+
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit, Utils } = require('aa-testkit')
+const { Network, Utils } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+const sender = await network.newHeadlessWallet().ready()
+
+const { unit } = await genesis.sendBytes({ toAddress: await sender.getAddress(), amount: 1e9 })
+await network.witnessUntilStable(unit)
+
+const asset_1 = (await sender.createAsset({
+	is_private: false,
+	is_transferrable: true,
+	auto_destroy: false,
+	issued_by_definer_only: true,
+	cosigned_by_definer: false,
+	spender_attested: false,
+	fixed_denominations: false,
+})).unit
+
+await network.witnessUntilStable(asset_1)
+
+const { unit } = await sender.sendMulti({
+	asset_outputs: [{
+		address: 'WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI',
+		amount: 80006,
+	}, {
+		address: '3W43U3SHKBVDUP7T7YOJOY5NM353HA5C',
+		amount: 3806,
+	}],
+	base_outputs: [{
+		address: '3W43U3SHKBVDUP7T7YOJOY5NM353HA5C',
+		amount: 1875513,
+	}],
+	change_address: await sender.getAddress(),
+	asset: asset_1,
+})
+
+const { unitObj } = await sender.getUnitInfo({ unit })
+
+const isValid = Utils.hasOnlyTheseExternalPayments(unitObj, [{
+	address: 'WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI',
+	amount: 80006,
+	asset: asset_1,
+}, {
+	address: '3W43U3SHKBVDUP7T7YOJOY5NM353HA5C',
+	amount: 3806,
+	asset: asset_1,
+}, {
+	address: '3W43U3SHKBVDUP7T7YOJOY5NM353HA5C',
+	amount: 1875513,
+}])
+```
+</details>
+
+---------------------------------------
+
 ## Test Examples
 
 <details>
