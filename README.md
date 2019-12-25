@@ -66,6 +66,8 @@ Testkit constructor function. Helps to configure network defaults
 | NETWORK_PORT               |  Number |   false  |                6611                | Defines port, the network will be run on                      |
 | WALLETS_ARE_SINGLE_ADDRESS | Boolean |   false  |                true                | Defines if HeadlessWallet nodes are single address by default |
 
+If provided NETWORK_PORT is already in use, `aa-testkit` will try to find next free port
+
 <br>
 <details>
 <summary>Example</summary>

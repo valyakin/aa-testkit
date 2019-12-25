@@ -20,6 +20,7 @@ class AbstractNode extends EventEmitter {
 		super()
 		this.setMaxListeners(20)
 		this.isReady = false
+		this.isStopped = false
 		this.aaResponses = {
 			toUnit: {},
 		}
@@ -63,6 +64,7 @@ class AbstractNode extends EventEmitter {
 	}
 
 	async stop () {
+		if (this.isStopped) return this
 		return new Promise((resolve) => {
 			this.child.once('exit', () => {
 				resolve(this)
@@ -104,11 +106,6 @@ class AbstractNode extends EventEmitter {
 			})
 			this.sendToChild(new CommandTimeTravel({ to, shift }))
 		})
-	}
-
-	handleChildReady () {
-		console.log(`[INFO][${this.id}] Child started`)
-		this.isReady = true
 	}
 
 	handleAaResponse (m) {
@@ -170,12 +167,18 @@ class AbstractNode extends EventEmitter {
 		this.child.send(message.serialize())
 	}
 
+	handleChildReady () {
+		// console.log(`[INFO][${this.id}] Child started`)
+		this.isReady = true
+	}
+
 	handleChildError (e) {
 		console.log(`[ERROR][${this.id}]`, e)
 	}
 
 	handleChildExit () {
-		console.log(`[INFO][${this.id}] Child exited`)
+		this.isStopped = true
+		// console.log(`[INFO][${this.id}] Child exited`)
 	}
 
 	handleChildMessage (m) {

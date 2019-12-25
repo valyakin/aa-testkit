@@ -7,6 +7,7 @@
   "private": true,
   "scripts": {
     "test": "mocha",
+    "test:parallel": "mocha-parallel-tests test/**/**spec.js",
     "test:aa": "mocha test/aa/**spec.js",
     "test:core": "mocha test/core/**spec.js",
     "test:utils": "mocha test/utils/**spec.js",
@@ -17,6 +18,7 @@
     "config": "^3.2.2",
     "headless-obyte": "git+https://github.com/byteball/headless-obyte#aa",
     "joi": "^14.3.1",
+    "lockfile": "^1.0.4",
     "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
     "mockdate": "^2.0.5",
@@ -24,12 +26,14 @@
     "obyte-hub": "git+https://github.com/byteball/obyte-hub#aa",
     "obyte-witness": "git+https://github.com/byteball/obyte-witness#aa",
     "ocore": "git+https://github.com/byteball/ocore#rocks-and-formulas",
+    "portfinder": "^1.0.25",
     "uniqid": "^5.0.3",
     "yargs": "^14.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.3.0",
+    "mocha-parallel-tests": "^2.2.2",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-chai-friendly": "^0.4.1",
     "eslint-plugin-import": "^2.18.2",
