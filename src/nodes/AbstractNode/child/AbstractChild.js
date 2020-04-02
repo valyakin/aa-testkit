@@ -126,7 +126,7 @@ class AbstractChild extends EventEmitter {
 				this.sendToParent(new MessageUnitInfo({ unitObj: null, error: 'Unit not found' }))
 			},
 			ifFound: (objJoint) => {
-				this.sendToParent(new MessageUnitInfo({ unitObj: objJoint, error: null }))
+				this.sendToParent(new MessageUnitInfo({ unitObj: objJoint.unit, error: null }))
 			},
 		})
 	}
