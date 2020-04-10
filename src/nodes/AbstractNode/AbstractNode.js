@@ -45,6 +45,7 @@ class AbstractNode extends EventEmitter {
 			cwd: path.join(dirname, '/child'),
 			env: {
 				devnet: 1,
+				LOCALAPPDATA: path.join(this.rundir, this.id),
 				HOME: path.join(this.rundir, this.id),
 				...env,
 			},
