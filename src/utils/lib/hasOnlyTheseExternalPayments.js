@@ -1,5 +1,5 @@
 const hasOnlyTheseExternalPayments = (objUnit, arrExpectedOutputs) => {
-	const aaAddress = objUnit.unit.authors[0].address
+	const aaAddress = objUnit.authors[0].address
 
 	// we sort expected payments by unit
 	const assocExpectedOutputsByAsset = {}
@@ -11,7 +11,7 @@ const hasOnlyTheseExternalPayments = (objUnit, arrExpectedOutputs) => {
 		assocExpectedOutputsByAsset[asset].push(expectedOutput)
 	})
 	// we filter payment messages
-	const paymentMessages = objUnit.unit.messages.filter(m => m.app === 'payment')
+	const paymentMessages = objUnit.messages.filter(m => m.app === 'payment')
 
 	// we check that for each asset, expected outputs and actual outputs match
 	for (const asset in assocExpectedOutputsByAsset) {

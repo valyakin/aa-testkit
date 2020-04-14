@@ -11,10 +11,10 @@ const countCommissionInUnits = async (node, units) => {
 		return {
 			error: null,
 			total_headers_commission: infos.reduce((acc, cur) => {
-				return acc + cur.unitObj.unit.headers_commission
+				return acc + cur.unitObj.headers_commission
 			}, 0),
 			total_payload_commission: infos.reduce((acc, cur) => {
-				return acc + cur.unitObj.unit.payload_commission
+				return acc + cur.unitObj.payload_commission
 			}, 0),
 		}
 	}

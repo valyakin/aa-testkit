@@ -101,7 +101,7 @@ describe('Check receiving AA response feature', function () {
 		const { unitObj, error: aaResponseUnitError } = await this.wallet.getUnitInfo({ unit: aaResponseUnit })
 
 		expect(aaResponseUnitError).to.be.null
-		const dataFeedMessage = unitObj.unit.messages.find(e => e.app === 'data_feed')
+		const dataFeedMessage = unitObj.messages.find(e => e.app === 'data_feed')
 		expect(dataFeedMessage.payload.dataFeedPayload).to.be.string('no datafeed provided')
 	}).timeout(20000)
 
@@ -127,7 +127,7 @@ describe('Check receiving AA response feature', function () {
 		const { unitObj, error: aaResponseUnitError } = await this.wallet.getUnitInfo({ unit: aaResponseUnit })
 
 		expect(aaResponseUnitError).to.be.null
-		const dataFeedMessage = unitObj.unit.messages.find(e => e.app === 'data_feed')
+		const dataFeedMessage = unitObj.messages.find(e => e.app === 'data_feed')
 		expect(dataFeedMessage.payload.dataFeedPayload).to.be.string('this will be a datafeed')
 	}).timeout(20000)
 

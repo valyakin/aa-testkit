@@ -18,7 +18,7 @@ const {
 class AbstractNode extends EventEmitter {
 	constructor (params, schema, options = {}) {
 		super()
-		this.setMaxListeners(20)
+		this.setMaxListeners(100)
 		this.isReady = false
 		this.aaResponses = {
 			toUnit: {},

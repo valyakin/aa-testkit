@@ -22,12 +22,11 @@ describe('Get unit info feature', function () {
 		const { unitObj, error } = await wallet.getUnitInfo({ unit })
 
 		expect(error).to.be.null
-		expect(unitObj).to.have.keys(['unit', 'ball'])
 
-		expect(unitObj.unit).to.have.property('unit', unit)
-		expect(unitObj.unit).to.have.property('main_chain_index', 1)
+		expect(unitObj).to.have.property('unit', unit)
+		expect(unitObj).to.have.property('main_chain_index', 1)
 
-		expect(unitObj.unit).to.have.keys([
+		expect(unitObj).to.have.keys([
 			'alt',
 			'unit',
 			'version',

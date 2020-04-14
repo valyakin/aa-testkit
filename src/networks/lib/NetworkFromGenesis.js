@@ -3,7 +3,7 @@ const path = require('path')
 const mkdirp = require('mkdirp')
 const config = require('config')['aa-testkit']
 
-const { getIdForPrefix } = require('../../utils')
+const { getIdForPrefix, sleep } = require('../../utils')
 const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
 
 const paramsSchema = () => ({
@@ -69,7 +69,10 @@ class NetworkFromGenesis {
 			.map(i => this.nodesList[i])
 
 		if (laggedNodes.length) {
-			await Promise.all(laggedNodes.map(n => n.waitForNewJoint()))
+			await Promise.race([
+				Promise.all(laggedNodes.map(n => n.waitForNewJoint())),
+				sleep(100),
+			])
 			return this.sync()
 		}
 	}
@@ -87,10 +90,23 @@ class NetworkFromGenesis {
 		await this.sync()
 
 		const props = await Promise.all(this.nodesList.map(n => n.getUnitProps({ unit })))
+
 		const unstableNode = props.find(p => !p.unitProps.is_stable)
 		if (unstableNode) {
 			await this.witnessAndStabilize()
 			return this.witnessUntilStable(unit)
+		}
+	}
+
+	async witnessUntilStableOnNode (node, unit) {
+		if (!unit || !node) return
+
+		const { unitProps } = await node.getUnitProps({ unit })
+		if (!unitProps.is_stable) {
+			const stabilization = node.stabilize()
+			await this.genesisNode.postWitness()
+			await stabilization
+			return this.witnessUntilStableOnNode(node, unit)
 		}
 	}
 

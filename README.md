@@ -254,6 +254,35 @@ await network.witnessUntilStable(unit)
 
 ---------------------------------------
 
+#### __`network.witnessUntilStableOnNode(node, unit)`__ *`: Promise<>`*
+
+Post witnesse until `unit` become stable on node `node`.
+
+#### Parameters
+
+*`node: Node`* - wait for stabilization on this node
+*`unit: String`* - wait for stabilization of this unit
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+const genesis = await network.getGenesisNode().ready()
+
+const wallet = await network.newHeadlessWallet().ready()
+const address = await wallet.getAddress()
+
+const { unit } = await genesis.sendBytes({ toAddress: address, amount: 100000 })
+await network.witnessUntilStableOnNode(wallet, unit)
+```
+</details>
+
+---------------------------------------
+
 #### __`network.getAaResponseToUnit(unit)`__ *`: Promise<{ response }>`*
 
 Retrieve autonomous agent execution response from `unit`. Method will make network to post witnesses until response is being received.
@@ -1555,23 +1584,23 @@ assert(error === null)
 assert(unitObj.hasOwnProperty('unit'))
 assert(unitObj.hasOwnProperty('ball'))
 
-assert(unitObj.unit.hasOwnProperty('version'))
-assert(unitObj.unit.hasOwnProperty('alt'))
-assert(unitObj.unit.hasOwnProperty('messages'))
-assert(unitObj.unit.hasOwnProperty('authors'))
-assert(unitObj.unit.hasOwnProperty('timestamp'))
-assert(unitObj.unit.hasOwnProperty('parent_units'))
-assert(unitObj.unit.hasOwnProperty('last_ball'))
-assert(unitObj.unit.hasOwnProperty('last_ball_unit'))
-assert(unitObj.unit.hasOwnProperty('witness_list_unit'))
-assert(unitObj.unit.hasOwnProperty('headers_commission'))
-assert(unitObj.unit.hasOwnProperty('payload_commission'))
+assert(unitObj.hasOwnProperty('version'))
+assert(unitObj.hasOwnProperty('alt'))
+assert(unitObj.hasOwnProperty('messages'))
+assert(unitObj.hasOwnProperty('authors'))
+assert(unitObj.hasOwnProperty('timestamp'))
+assert(unitObj.hasOwnProperty('parent_units'))
+assert(unitObj.hasOwnProperty('last_ball'))
+assert(unitObj.hasOwnProperty('last_ball_unit'))
+assert(unitObj.hasOwnProperty('witness_list_unit'))
+assert(unitObj.hasOwnProperty('headers_commission'))
+assert(unitObj.hasOwnProperty('payload_commission'))
 
-assert(unitObj.unit.hasOwnProperty('unit'))
-assert(unitObj.unit.unit === unit)
+assert(unitObj.hasOwnProperty('unit'))
+assert(unitObj.unit === unit)
 
-assert(unitObj.unit.hasOwnProperty('main_chain_index'))
-assert(unitObj.unit.main_chain_index === 1)
+assert(unitObj.hasOwnProperty('main_chain_index'))
+assert(unitObj.main_chain_index === 1)
 
 await network.stop()
 ```
@@ -1700,7 +1729,7 @@ assert(response.response.responseVars.dataFeedAaResponse === 'aa response!')
 const aaResponseUnit = response.response_unit
 const { unitObj, error: aaResponseUnitError } = await wallet.getUnitInfo({ unit: aaResponseUnit })
 
-const dataFeedMessage = unitObj.unit.messages.find(e => e.app === 'data_feed')
+const dataFeedMessage = unitObj.messages.find(e => e.app === 'data_feed')
 assert(dataFeedMessage.payload.dataFeedPayload === 'this will be a datafeed')
 
 await network.stop()
