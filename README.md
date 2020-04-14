@@ -256,7 +256,7 @@ await network.witnessUntilStable(unit)
 
 #### __`network.witnessUntilStableOnNode(node, unit)`__ *`: Promise<>`*
 
-Post witnesse until `unit` become stable on node `node`.
+Post witness transactions until `unit` becomes stable on node `node`.
 
 #### Parameters
 
