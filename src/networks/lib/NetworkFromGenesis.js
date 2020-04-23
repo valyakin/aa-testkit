@@ -5,6 +5,7 @@ const config = require('config')['aa-testkit']
 
 const { getIdForPrefix, sleep } = require('../../utils')
 const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
+const NetworkInitializer = require('./NetworkInitializer')
 
 const paramsSchema = () => ({
 	runid: Joi.string().required(),
@@ -18,11 +19,14 @@ class NetworkFromGenesis {
 		if (error) throw new Error(`${error}`)
 		Object.assign(this, value)
 
+		this.hub = null
+		this.genesisNode = null
 		this.rundir = path.join(config.TESTDATA_DIR, this.runid)
 		this.nodes = {
 			headlessWallets: [],
 			obyteExplorers: [],
 		}
+		this.initializer = null
 	}
 
 	getGenesisNode () {
@@ -79,9 +83,8 @@ class NetworkFromGenesis {
 
 	async witnessAndStabilize () {
 		await this.sync()
-		const stabilization = Promise.all(this.nodesList.map(n => n.stabilize()))
-
-		await this.genesisNode.postWitness()
+		const unit = await this.genesisNode.postWitness()
+		const stabilization = Promise.all([this.hub, ...this.nodes.headlessWallets, ...this.nodes.obyteExplorers].map(n => n.waitForUnit(unit)))
 		return stabilization
 	}
 
@@ -103,9 +106,8 @@ class NetworkFromGenesis {
 
 		const { unitProps } = await node.getUnitProps({ unit })
 		if (!unitProps.is_stable) {
-			const stabilization = node.stabilize()
-			await this.genesisNode.postWitness()
-			await stabilization
+			const witnessUnit = await this.genesisNode.postWitness()
+			await node.waitForUnit(witnessUnit)
 			return this.witnessUntilStableOnNode(node, unit)
 		}
 	}
@@ -141,6 +143,35 @@ class NetworkFromGenesis {
 		})
 		this.nodes.headlessWallets.push(wallet)
 		return wallet
+	}
+
+	get with () {
+		this.initializer = this.initializer
+			? this.initializer
+			: new NetworkInitializer({ network: this })
+		return this.initializer
+	}
+
+	get readiedInitializer () {
+		if (!this.initializer) throw new Error("Network was not started with any of 'with' initializers")
+		if (!this.initializer.isInitialized) throw new Error("Network was not initialized yet. Did you forgot to call '.run()'?")
+		return this.initializer
+	}
+
+	get wallet () {
+		return this.readiedInitializer.wallets
+	}
+
+	get agent () {
+		return this.readiedInitializer.agents
+	}
+
+	get asset () {
+		return this.readiedInitializer.assets
+	}
+
+	get deployer () {
+		return this.readiedInitializer.deployer
 	}
 }
 

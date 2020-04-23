@@ -24,6 +24,8 @@ class AbstractNode extends EventEmitter {
 			toUnit: {},
 		}
 
+		this.receivedUnits = []
+
 		const { error, value } = Joi.validate(
 			params,
 			(schema instanceof Function) ? schema() : schema,
@@ -61,6 +63,7 @@ class AbstractNode extends EventEmitter {
 			.on('child_ready', () => this.handleChildReady())
 			.on('aa_response', (m) => this.handleAaResponse(m))
 			.on('child_error', (m) => this.handleChildError(m.error))
+			.on('new_joint', ({ joint }) => this.receivedUnits.push(joint.unit.unit))
 	}
 
 	async stop () {
@@ -79,6 +82,22 @@ class AbstractNode extends EventEmitter {
 				this.isReady = true
 				resolve(this)
 			})
+		})
+	}
+
+	waitForUnit (unit) {
+		return new Promise(resolve => {
+			if (this.receivedUnits.includes(unit)) {
+				resolve()
+			} else {
+				const cb = ({ joint }) => {
+					if (joint.unit.unit === unit) {
+						this.off('new_joint', cb)
+						resolve()
+					}
+				}
+				this.on('new_joint', cb)
+			}
 		})
 	}
 

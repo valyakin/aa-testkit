@@ -16,6 +16,7 @@ const MessageAAStateVars = require('./lib/MessageAAStateVars')
 const MessageChildStarted = require('./lib/MessageChildStarted')
 const MessageAssetCreated = require('./lib/MessageAssetCreated')
 const MessageAgentDeployed = require('./lib/MessageAgentDeployed')
+const MessageWitnessPosted = require('./lib/MessageWitnessPosted')
 const MessageTimeTravelDone = require('./lib/MessageTimeTravelDone')
 const MessageConnectedToHub = require('./lib/MessageConnectedToHub')
 const MessageGenesisCreated = require('./lib/MessageGenesisCreated')
@@ -61,6 +62,7 @@ const fromMessage = (m) => {
 	case 'aa_state_vars': return new MessageAAStateVars(message)
 	case 'child_started': return new MessageChildStarted(message)
 	case 'asset_created': return new MessageAssetCreated(message)
+	case 'witness_posted': return new MessageWitnessPosted(message)
 	case 'agent_deployed': return new MessageAgentDeployed(message)
 	case 'genesis_created': return new MessageGenesisCreated(message)
 	case 'time_travel_done': return new MessageTimeTravelDone(message)
@@ -110,6 +112,7 @@ module.exports = {
 	MessageAAStateVars,
 	MessageChildStarted,
 	MessageAssetCreated,
+	MessageWitnessPosted,
 	MessageAgentDeployed,
 	MessageConnectedToHub,
 	MessageTimeTravelDone,

@@ -779,11 +779,11 @@ __Returns__ *Promise* that resolves when node connected to hub
 
 ---------------------------------------
 
-#### __`genesis.postWitness()`__ *`: Nothing`*
+#### __`genesis.postWitness()`__ *`: Promise<unit>`*
 
-Broadcast new witness to network. Returns nothing and does not wait for joint to be broadcasted to other nodes. To wait for stabilization use `stabilize` method from [Common node methods](#Common-node-methods)
+Broadcast new witness to network. Returns Promise that resolves to witness unit hash after broadcasting(although it does not mean other nodes already received it) To wait for stabilization use `stabilize` method from [Common node methods](#Common-node-methods)
 
-__Returns__ nothing
+__Returns__ *Promise* that resolves to witness unit hash
 
 <details>
 <summary>Example</summary>
