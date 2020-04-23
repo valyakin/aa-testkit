@@ -8,7 +8,7 @@ describe('Response unit has only these payments', function () {
 	const mockAddress2 = '3W43U3SHKBVDUP7T7YOJOY5NM353HA5C'
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 		const genesis = await this.network.getGenesisNode().ready()
 		this.sender = await this.network.newHeadlessWallet().ready()
 

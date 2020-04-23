@@ -31,7 +31,7 @@ const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
 // spin up new devnet
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 // create new wallet and send some bytes from rich genesis node
@@ -113,7 +113,7 @@ Primary way to operate with network. Contains common functions for network manag
 
 #### __`Network.create(genesisParams, hubParams)`__ *`: <network>`*
 
-Creates new devnet network from the scratch. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`10e15`) of Bytes on its account.
+Creates new devnet network from the scratch. `.run()` should be called after `.create()` for network to start. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`10e15`) of Bytes on its account.
 
 #### Parameters
 
@@ -128,9 +128,100 @@ Creates new devnet network from the scratch. Starts `GenesisNode` and `ObyteHub`
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 ```
 </details>
+
+---------------------------------------
+
+#### __`Network.create.with`__
+
+A set of helpers for running network with some preconditions e.g. wallets running with balances, agents deployed and assets created.
+
+#### __`.with.wallet({ walletName: balances })`__
+
+Create a wallet with some bytes or assets balances on its account.
+
+`walletName` - a name for the wallet, wallet node is avaliable in `network.wallet.walletName`
+
+`balances` - initial balances of this wallet. Could be a number for the Bytes balance or object
+
+```javascript
+{
+  base: 1e9,
+  someasset: 1000, // asset keys are defined in `.with.asset` call
+  asset2: 1e6
+}
+```
+
+`with.wallet` can be chained to create multiple wallets
+
+#### __`.with.agent({ agentName: source })`__
+
+Create an agent. Multiple agents creation is supported
+
+`agentName` - a name for the agent, agent address is avaliable in `network.agents.agentName`
+
+`source` - string with agent or absolute path to the file with agent or anything supported by `wallet.deployAgent(source)`
+
+#### __`.with.asset({ assetName: assetDefinition })`__
+
+Create an asset. Multiple assets creation is supported
+
+`assetName` - a name for the asset, asset unit hash is avaliable in `network.asset.assetName`
+
+`assetDefinition` - object containing asset definition. Refer to `wallet.createAsset(assetDefinition)` for example. Any required field of the definition can be omitted, omitted fields will be replaced with default values
+
+```javascript
+{
+  is_private: false,
+  is_transferrable: true,
+  auto_destroy: false,
+  issued_by_definer_only: true,
+  cosigned_by_definer: false,
+  spender_attested: false,
+  fixed_denominations: false,
+}
+```
+
+#### __`.network.deployer`__
+
+Asset or agents deployed with `with` helpers are deployed with extra node called `deployer`. Deployer node is avaliable in `network.deployer`
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { Testkit } = require('aa-testkit')
+const { Network } = Testkit()
+
+const network = await Network.create()
+  .with.agent({ bouncer: path.join(__dirname, './files/bouncer.oscript') })
+  .with.asset({ someasset: {} })
+  .with.wallet({ alice: 1e6 })
+  .with.wallet({ bob: { base: 1000 } })
+  .with.wallet({ eva: { base: 1e9, someasset: 1e9 } })
+  .with.wallet({ mark: { someasset: 1e10 } })
+  .run()
+
+// wallets are avaliable like this
+const balances = await network.wallet.alice.getBalance()
+const { unit, error } = await network.wallet.bob.sendBytes({ toAddress: await network.wallet.bob.getAddress(), amount: 100e9 })
+const { unitObj } = await network.wallet.eva.getUnitInfo({ unit: unit })
+const mark = network.wallet.mark
+
+// agent address
+const agentAddress = network.agent.bouncer
+
+// asset unit hash
+const asset = network.asset.someasset
+
+// deployer node
+const deployer = network.deployer
+```
+</details>
+
+Also refer to [withFeature](./test/core/withFeature.spec.js) test code example
 
 ---------------------------------------
 
@@ -145,7 +236,7 @@ __Returns__ `GenesisNode` of this network
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 // calling `.ready()` assures that node have started at this point
 const genesis = await network.getGenesisNode().ready()
 ```
@@ -164,7 +255,7 @@ __Returns__ `ObyteHub` of this network
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 // calling `.ready()` assures that node have started at this point
 const hub = await network.getHub().ready()
 ```
@@ -187,7 +278,7 @@ Creates and starts new `HeadlessWallet` node in network.
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 const wallet = await network.newHeadlessWallet().ready()
 ```
@@ -210,7 +301,7 @@ Creates and starts new `ObyteExplorer` node in network.
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const explorer = await network.newObyteExplorer().ready()
@@ -227,7 +318,7 @@ Wait for MCI on every node to be synchronized. Returns `Promise` that will be re
 
 #### __`network.witnessUntilStable(unit)`__ *`: Promise<>`*
 
-Post witnesse until `unit` will stabilize. `Promise` will be resolved when `unit` become stable.
+Post witnesse until `unit` become stable. `Promise` will be resolved when `unit` become stable.
 
 #### Parameters
 
@@ -240,7 +331,7 @@ Post witnesse until `unit` will stabilize. `Promise` will be resolved when `unit
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 // create wallet and send bytes to it
@@ -270,7 +361,7 @@ Post witness transactions until `unit` becomes stable on node `node`.
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const wallet = await network.newHeadlessWallet().ready()
@@ -370,7 +461,7 @@ If both of `to` and `shift` are present, `to` will be used
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const { error } = await network.timetravel({ to: '2050-01-01' })
@@ -392,7 +483,7 @@ Send the command to every node to stop the process.
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 const wallet = await network.newHeadlessWallet().ready()
 
@@ -477,12 +568,6 @@ __Returns__ *Promise* that resolves when node child exited its process
 
 ---------------------------------------
 
-#### __`node.stabilize()`__ *`: Promise<mci: number>`*
-
-__Returns__ *Promise* that resolves to Main Chain Index when node child receives `mci_became_stable` event
-
----------------------------------------
-
 #### __`node.waitForNewJoint()`__ *`: Promise<joint>`*
 
 __Returns__ *Promise* that resolves to `joint` object when node child receives and validates new joint
@@ -511,6 +596,10 @@ __Returns__ *Promise* that resolves to `joint` object when node child receives a
 ```
 
 </details>
+
+#### __`node.waitForUnit(unit)`__ *`: Promise<>`*
+
+__Returns__ *Promise* that resolves when node receives joint with specified `unit` hash
 
 ---------------------------------------
 
@@ -572,7 +661,7 @@ Receive details about unit from node. Uses `ocore/storage.readJoint` method
 const { Testkit } = require('aa-testkit')
 
 const { Network } = Testkit()
-const network = await Network.create()
+const network = await Network.create().run()
 
 const genesis = await network.getGenesisNode().ready()
 
@@ -668,7 +757,7 @@ Receive unit props.
 const { Testkit } = require('aa-testkit')
 
 const { Network } = Testkit()
-const network = await Network.create()
+const network = await Network.create().run()
 
 const genesis = await network.getGenesisNode().ready()
 
@@ -727,6 +816,18 @@ See [Agent deployment test example](#Test-Examples)
 
 ---------------------------------------
 
+#### __`node.waitAaResponseToUnit(unit)`__ *`: Promise<{ vars }>`*
+
+Retrieve autonomous agent execution response from `unit`. No wintnesses will be posted while waiting.
+
+__Returns__ *Promise* that resolves to `{ response }`. Refer to
+
+#### Parameters
+
+*`unit : String`* - unit of aa execution to retrieve response from
+
+---------------------------------------
+
 ## GenesisNode
 
 Genesis node main function is to start new network and create genesis unit. After this, genesis node serves as witness and source of Bytes. At the moment of network genesis, this node puts on its account `10e15` Bytes
@@ -779,11 +880,11 @@ __Returns__ *Promise* that resolves when node connected to hub
 
 ---------------------------------------
 
-#### __`genesis.postWitness()`__ *`: Nothing`*
+#### __`genesis.postWitness()`__ *`: Promise<unit>`*
 
-Broadcast new witness to network. Returns nothing and does not wait for joint to be broadcasted to other nodes. To wait for stabilization use `stabilize` method from [Common node methods](#Common-node-methods)
+Broadcast new witness to network. Returns Promise that resolves to witness unit hash after broadcasting. Although it does not mean other nodes already received it
 
-__Returns__ nothing
+__Returns__ *Promise* that resolves to witness unit hash
 
 <details>
 <summary>Example</summary>
@@ -825,9 +926,9 @@ const walletAddress = await wallet.getAddress()
 // get something to witness
 const { unit, error } = await genesisNode.sendBytes({ toAddress: walletAddress, amount: 1000000 })
 
-const stabilization = Promise.all([genesisNode.stabilize(), hub.stabilize()])
-genesisNode.postWitness()
-await stabilization
+const witnessUnit = await genesisNode.postWitness()
+await Promise.all([genesisNode.waitForUnit(witnessUnit), wallet.waitForUnit(witnessUnit)])
+
 await genesisNode.stop()
 await hub.stop()
 await wallet.stop()
@@ -987,7 +1088,7 @@ __Returns__ *Promise* that resolves to `{ address, unit, error }`, where `addres
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const deployer = await network.newHeadlessWallet().ready()
@@ -1037,7 +1138,7 @@ __Returns__ *Promise* that resolves to `{ unit, error }`, where `unit` determine
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const creator = await network.newHeadlessWallet().ready()
@@ -1099,7 +1200,7 @@ ObyteExplorer node does not have any special methods except [common node methods
 const { Testkit } = require('aa-testkit')
 
 const { Network } = Testkit()
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 // to have something to display in explorer
@@ -1171,7 +1272,7 @@ __Returns__ Returns `Promise` that resolves to Array of `HeadlessWallets`:
 const { Testkit, Utils } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const [wallet1, wallet2, wallet3] = await Utils.asyncStartHeadlessWallets(network, 3)
@@ -1185,7 +1286,7 @@ await network.stop()
 This could be helpfull if you want to assign created wallets to `this` in `mocha` tests
 
 ```javascript
-this.network = await Network.create()
+this.network = await Network.create().run()
 this.genesis = await this.network.getGenesisNode().ready()
 
 this.teamRed = {}
@@ -1241,7 +1342,7 @@ __Returns__ Returns `Promise` that resolves to object:
 const { Testkit, Utils } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const wallet = await network.newHeadlessWallet().ready()
@@ -1285,7 +1386,7 @@ where `address` is the recipient address, `amount` the amount sent, `asset` is t
 const { Testkit, Utils } = require('aa-testkit')
 const { Network, Utils } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 const sender = await network.newHeadlessWallet().ready()
 
@@ -1354,7 +1455,7 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const alice = await network.newHeadlessWallet().ready()
@@ -1422,7 +1523,7 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 // agent deployment
@@ -1509,7 +1610,7 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 // agent deployment
@@ -1568,7 +1669,7 @@ const { Network } = Testkit({
   TESTDATA_DIR: testdata,
 })
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const wallet = await network.newHeadlessWallet().ready()
@@ -1693,7 +1794,7 @@ const assert = require('assert')
 const { Testkit } = require('aa-testkit')
 const { Network } = Testkit()
 
-const network = await Network.create()
+const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 const explorer = await network.newObyteExplorer().ready()
 

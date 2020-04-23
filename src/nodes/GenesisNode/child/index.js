@@ -5,6 +5,7 @@ const {
 	MessageSentBytes,
 	MessageChildReady,
 	MessageChildError,
+	MessageWitnessPosted,
 	MessageConnectedToHub,
 	MessageGenesisCreated,
 	MessagePasswordRequired,
@@ -73,6 +74,7 @@ class GenesisNodeChild extends AbstractChild {
 			ifError: (err) => this.sendToParent(new MessageChildError(err)),
 			ifOk: (objJoint) => {
 				this.network.broadcastJoint(objJoint)
+				this.sendToParent(new MessageWitnessPosted({ unit: objJoint.unit.unit }))
 			},
 		})
 

@@ -24,6 +24,8 @@ class AbstractNode extends EventEmitter {
 			toUnit: {},
 		}
 
+		this.receivedUnits = []
+
 		const { error, value } = Joi.validate(
 			params,
 			(schema instanceof Function) ? schema() : schema,
@@ -61,6 +63,7 @@ class AbstractNode extends EventEmitter {
 			.on('child_ready', () => this.handleChildReady())
 			.on('aa_response', (m) => this.handleAaResponse(m))
 			.on('child_error', (m) => this.handleChildError(m.error))
+			.on('new_joint', ({ joint }) => this.receivedUnits.push(joint.unit.unit))
 	}
 
 	async stop () {
@@ -82,18 +85,26 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
+	waitForUnit (unit) {
+		return new Promise(resolve => {
+			if (this.receivedUnits.includes(unit)) {
+				resolve()
+			} else {
+				const cb = ({ joint }) => {
+					if (joint.unit.unit === unit) {
+						this.off('new_joint', cb)
+						resolve()
+					}
+				}
+				this.on('new_joint', cb)
+			}
+		})
+	}
+
 	waitForNewJoint () {
 		return new Promise(resolve => {
 			this.once('new_joint', ({ joint }) => {
 				resolve(joint)
-			})
-		})
-	}
-
-	stabilize () {
-		return new Promise(resolve => {
-			this.once('mci_became_stable', ({ mci }) => {
-				resolve(mci)
 			})
 		})
 	}
@@ -164,6 +175,16 @@ class AbstractNode extends EventEmitter {
 				resolve(m.mci)
 			})
 			this.sendToChild(new CommandGetLastMCI())
+		})
+	}
+
+	waitAaResponseToUnit (unit) {
+		return new Promise(resolve => {
+			if (this.aaResponses.toUnit[unit]) {
+				resolve(this.aaResponses.toUnit[unit])
+			} else {
+				this.once('aa_response_to_unit-' + unit, resolve)
+			}
 		})
 	}
 

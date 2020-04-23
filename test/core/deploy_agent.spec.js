@@ -6,7 +6,7 @@ describe('Check agent deployment feature', function () {
 	this.timeout(60000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 		this.genesis = await this.network.getGenesisNode().ready()
 		this.deployer = await this.network.newHeadlessWallet().ready()
 

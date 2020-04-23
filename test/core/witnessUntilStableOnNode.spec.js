@@ -5,7 +5,7 @@ describe('Check network.witnessUntilStableOnNode function', function () {
 	this.timeout(60000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 	})
 
 	it('Check witnessUntilStableOnNode', async () => {

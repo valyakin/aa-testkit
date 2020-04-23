@@ -54,7 +54,10 @@ class GenesisNode extends AbstractNode {
 	}
 
 	postWitness () {
-		this.sendToChild(new CommandPostWitness())
+		return new Promise(resolve => {
+			this.once('witness_posted', ({ unit }) => resolve(unit))
+			this.sendToChild(new CommandPostWitness())
+		})
 	}
 
 	getAddress () {

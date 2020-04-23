@@ -5,7 +5,7 @@ describe('Get unit info feature', function () {
 	this.timeout(60000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 	})
 
 	it('Check getUnitInfo', async () => {

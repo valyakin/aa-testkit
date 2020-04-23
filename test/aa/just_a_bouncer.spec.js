@@ -6,7 +6,7 @@ describe('Check `just a bouncer` AA', function () {
 	this.timeout(120000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 	})
 
 	it('Check agent deployment', async () => {

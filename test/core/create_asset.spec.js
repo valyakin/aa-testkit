@@ -5,7 +5,7 @@ describe('Check asset creation feature', function () {
 	this.timeout(60000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 		this.genesis = await this.network.getGenesisNode().ready()
 		this.creator = await this.network.newHeadlessWallet().ready()
 

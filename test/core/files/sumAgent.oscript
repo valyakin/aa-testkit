@@ -1,0 +1,11 @@
+{
+	bounce_fees: { base: 10000 },
+	messages: [
+		{
+			app: 'state',
+			state: `{
+				response['result'] = trigger.data.a + trigger.data.b;
+			}`
+		}
+	]
+}

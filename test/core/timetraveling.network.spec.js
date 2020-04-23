@@ -5,7 +5,8 @@ describe('Check timetravel network feature', function () {
 	this.timeout(60000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
+
 		this.expectTimeInNodes = async (expectedTime) => {
 			for (const node of this.nodes) {
 				const { time } = await node.getTime()

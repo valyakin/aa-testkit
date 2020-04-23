@@ -6,7 +6,7 @@ describe('Check receiving AA response feature', function () {
 	this.timeout(120000)
 
 	before(async () => {
-		this.network = await Network.create()
+		this.network = await Network.create().run()
 		this.genesis = await this.network.getGenesisNode().ready()
 		this.deployer = await this.network.newHeadlessWallet().ready()
 		this.wallet = await this.network.newHeadlessWallet().ready()

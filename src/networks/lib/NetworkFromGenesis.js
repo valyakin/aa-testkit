@@ -1,28 +1,26 @@
-const Joi = require('joi')
 const path = require('path')
 const mkdirp = require('mkdirp')
 const config = require('config')['aa-testkit']
 
 const { getIdForPrefix, sleep } = require('../../utils')
 const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
+const NetworkInitializer = require('./NetworkInitializer')
 
-const paramsSchema = () => ({
-	runid: Joi.string().required(),
-	genesisUnit: Joi.string().required(),
-	initialWitnesses: Joi.array().items(Joi.string()).min(1),
-})
+const network = null
 
 class NetworkFromGenesis {
-	constructor (params) {
-		const { error, value } = Joi.validate(params, paramsSchema(), {})
-		if (error) throw new Error(`${error}`)
-		Object.assign(this, value)
+	constructor ({ genesisParams, hubParams }) {
+		this.genesisParams = genesisParams
+		this.hubParams = hubParams
 
-		this.rundir = path.join(config.TESTDATA_DIR, this.runid)
+		this.hub = null
+		this.genesisNode = null
+		this.rundir = null
 		this.nodes = {
 			headlessWallets: [],
 			obyteExplorers: [],
 		}
+		this.initializer = null
 	}
 
 	getGenesisNode () {
@@ -79,9 +77,8 @@ class NetworkFromGenesis {
 
 	async witnessAndStabilize () {
 		await this.sync()
-		const stabilization = Promise.all(this.nodesList.map(n => n.stabilize()))
-
-		await this.genesisNode.postWitness()
+		const unit = await this.genesisNode.postWitness()
+		const stabilization = Promise.all([this.hub, ...this.nodes.headlessWallets, ...this.nodes.obyteExplorers].map(n => n.waitForUnit(unit)))
 		return stabilization
 	}
 
@@ -103,9 +100,8 @@ class NetworkFromGenesis {
 
 		const { unitProps } = await node.getUnitProps({ unit })
 		if (!unitProps.is_stable) {
-			const stabilization = node.stabilize()
-			await this.genesisNode.postWitness()
-			await stabilization
+			const witnessUnit = await this.genesisNode.postWitness()
+			await node.waitForUnit(witnessUnit)
 			return this.witnessUntilStableOnNode(node, unit)
 		}
 	}
@@ -117,6 +113,16 @@ class NetworkFromGenesis {
 			return { response }
 		} else {
 			return this.getAaResponseToUnit(unit)
+		}
+	}
+
+	async getAaResponseToUnitOnNode (node, unit) {
+		await this.witnessAndStabilize()
+		const response = node.getAaResponseToUnit(unit)
+		if (response) {
+			return { response }
+		} else {
+			return this.getAaResponseToUnitOnNode(node, unit)
 		}
 	}
 
@@ -142,42 +148,72 @@ class NetworkFromGenesis {
 		this.nodes.headlessWallets.push(wallet)
 		return wallet
 	}
+
+	get with () {
+		this.initializer = this.initializer
+			? this.initializer
+			: new NetworkInitializer({ network: this })
+		return this.initializer
+	}
+
+	get readiedInitializer () {
+		if (!this.initializer) throw new Error("Network was not started with any of 'with' initializers")
+		if (!this.initializer.isInitialized) throw new Error("Network was not initialized yet. Did you forgot to call '.run()'?")
+		return this.initializer
+	}
+
+	get wallet () {
+		return this.readiedInitializer.wallets
+	}
+
+	get agent () {
+		return this.readiedInitializer.agents
+	}
+
+	get asset () {
+		return this.readiedInitializer.assets
+	}
+
+	get deployer () {
+		return this.readiedInitializer.deployer
+	}
+
+	async run () {
+		mkdirp.sync(config.TESTDATA_DIR)
+		this.runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
+		this.rundir = path.join(config.TESTDATA_DIR, this.runid)
+		console.log('rundir', this.rundir)
+
+		const genesisNode = new GenesisNode({
+			rundir: this.rundir,
+			id: 'genesis-node',
+			...this.genesisParams,
+		})
+		const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
+
+		const hub = new ObyteHub({
+			rundir: this.rundir,
+			genesisUnit: genesisUnit,
+			initialWitnesses: [genesisAddress],
+			id: getIdForPrefix(this.rundir, 'obyte-hub-'),
+			...this.hubParams,
+		})
+
+		this.genesisUnit = genesisUnit
+		this.initialWitnesses = [genesisAddress]
+
+		await genesisNode.ready()
+		await hub.ready()
+		await genesisNode.loginToHub()
+
+		this.genesisNode = genesisNode
+		this.hub = hub
+		return this
+	}
 }
 
-const genesis = async (genesisParams, hubParams) => {
-	mkdirp.sync(config.TESTDATA_DIR)
-	const runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
-	const rundir = path.join(config.TESTDATA_DIR, runid)
-	console.log('rundir', rundir)
-
-	const genesisNode = new GenesisNode({
-		rundir,
-		id: 'genesis-node',
-		...genesisParams,
-	})
-	const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
-
-	const hub = new ObyteHub({
-		rundir: rundir,
-		genesisUnit: genesisUnit,
-		initialWitnesses: [genesisAddress],
-		id: getIdForPrefix(rundir, 'obyte-hub-'),
-		...hubParams,
-	})
-
-	const network = new NetworkFromGenesis({
-		runid,
-		genesisUnit,
-		initialWitnesses: [genesisAddress],
-	})
-
-	await genesisNode.ready()
-	await hub.ready()
-	await genesisNode.loginToHub()
-
-	network.genesisNode = genesisNode
-	network.hub = hub
-	return network
+const create = (genesisParams, hubParams) => {
+	return network || new NetworkFromGenesis({ genesisParams, hubParams })
 }
 
-module.exports = genesis
+module.exports = create
