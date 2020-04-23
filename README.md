@@ -376,7 +376,7 @@ await network.witnessUntilStableOnNode(wallet, unit)
 
 #### __`network.getAaResponseToUnit(unit)`__ *`: Promise<{ response }>`*
 
-Retrieve autonomous agent execution response from `unit`. Method will make network to post witnesses until response is being received.
+Retrieve autonomous agent execution response from `unit`. Method will make network to post witnesses until response is being received. Waits for the response on genesis node.
 
 __Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
 
@@ -429,6 +429,20 @@ See [Agent AA response test example](#Test-Examples)
 }
 ```
 </details>
+
+---------------------------------------
+
+#### __`getAaResponseToUnitOnNode(node, unit) `__ *`: Promise<{ response }>`*
+
+Same as `network.getAaResponseToUnit` but with the parameter to specify a node
+
+__Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
+
+#### Parameters
+
+*`node : Node`* - node to wait AA response on
+
+*`unit : String`* - unit of aa execution to retrieve response from
 
 ---------------------------------------
 
