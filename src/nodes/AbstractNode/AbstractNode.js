@@ -178,16 +178,6 @@ class AbstractNode extends EventEmitter {
 		})
 	}
 
-	waitAaResponseToUnit (unit) {
-		return new Promise(resolve => {
-			if (this.aaResponses.toUnit[unit]) {
-				resolve(this.aaResponses.toUnit[unit])
-			} else {
-				this.once('aa_response_to_unit-' + unit, resolve)
-			}
-		})
-	}
-
 	sendToChild (message) {
 		this.child.send(message.serialize())
 	}

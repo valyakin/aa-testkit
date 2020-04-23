@@ -142,7 +142,7 @@ A set of helpers for running network with some preconditions e.g. wallets runnin
 
 Create a wallet with some bytes or assets balances on its account.
 
-`walletName` - a name for the wallet, wallet node is avaliable in `network.wallet.walletName`
+`walletName` - a name for the wallet; the wallet node will be available as `network.wallet.walletName`
 
 `balances` - initial balances of this wallet. Could be a number for the Bytes balance or object
 
@@ -160,7 +160,7 @@ Create a wallet with some bytes or assets balances on its account.
 
 Create an agent. Multiple agents creation is supported
 
-`agentName` - a name for the agent, agent address is avaliable in `network.agents.agentName`
+`agentName` - a name for the agent; agent address will be avaliable in `network.agents.agentName`
 
 `source` - string with agent or absolute path to the file with agent or anything supported by `wallet.deployAgent(source)`
 
@@ -168,7 +168,7 @@ Create an agent. Multiple agents creation is supported
 
 Create an asset. Multiple assets creation is supported
 
-`assetName` - a name for the asset, asset unit hash is avaliable in `network.asset.assetName`
+`assetName` - a name for the asset; asset unit hash will be avaliable avaliable in `network.asset.assetName`
 
 `assetDefinition` - object containing asset definition. Refer to `wallet.createAsset(assetDefinition)` for example. Any required field of the definition can be omitted, omitted fields will be replaced with default values
 
@@ -186,7 +186,7 @@ Create an asset. Multiple assets creation is supported
 
 #### __`.network.deployer`__
 
-Asset or agents deployed with `with` helpers are deployed with extra node called `deployer`. Deployer node is avaliable in `network.deployer`
+Asset or agents deployed with `with` helpers are deployed with extra node called `deployer`. Deployer node will be avaliable as `network.deployer` only if `with.agent` or `with.asset` was used
 
 <details>
 <summary>Example</summary>
@@ -318,7 +318,7 @@ Wait for MCI on every node to be synchronized. Returns `Promise` that will be re
 
 #### __`network.witnessUntilStable(unit)`__ *`: Promise<>`*
 
-Post witnesse until `unit` become stable. `Promise` will be resolved when `unit` become stable.
+Post witnesse until `unit` becomes stable. `Promise` will be resolved when `unit` becomes stable.
 
 #### Parameters
 
@@ -827,18 +827,6 @@ __Returns__ *Promise* that resolves to `{ vars }` where `vars` - state object of
 
 See [Agent deployment test example](#Test-Examples)
 </details>
-
----------------------------------------
-
-#### __`node.waitAaResponseToUnit(unit)`__ *`: Promise<{ vars }>`*
-
-Retrieve autonomous agent execution response from `unit`. No wintnesses will be posted while waiting.
-
-__Returns__ *Promise* that resolves to `{ response }`. Refer to
-
-#### Parameters
-
-*`unit : String`* - unit of aa execution to retrieve response from
 
 ---------------------------------------
 

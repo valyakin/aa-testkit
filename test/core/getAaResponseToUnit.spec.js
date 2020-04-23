@@ -29,24 +29,6 @@ describe('Check getting Aa Response feature', function () {
 		expect(response.response.responseVars.result).to.be.equal(77)
 	}).timeout(30000)
 
-	it('Check node.waitAaResponseToUnit', async () => {
-		const { unit, error } = await this.network.wallet.alice.triggerAaWithData({
-			toAddress: this.network.agent.simple,
-			amount: 10000,
-			data: {
-				a: 111,
-				b: 555,
-			},
-		})
-
-		expect(error).to.be.null
-		expect(unit).to.be.validUnit
-
-		this.network.witnessUntilStableOnNode(this.network.wallet.alice, unit)
-		const { response } = await this.network.wallet.alice.waitAaResponseToUnit(unit)
-		expect(response.response.responseVars.result).to.be.equal(666)
-	}).timeout(30000)
-
 	it('Check network.getAaResponseToUnitOnNode', async () => {
 		const { unit, error } = await this.network.wallet.alice.triggerAaWithData({
 			toAddress: this.network.agent.simple,
