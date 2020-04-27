@@ -1,6 +1,0 @@
-Wed Sep 18 2019 15:04:19 GMT+0500 (Yekaterinburg Standard Time): lock acquired [ 'saved_private' ]
-Wed Sep 18 2019 15:04:19 GMT+0500 (Yekaterinburg Standard Time): lock released [ 'saved_private' ]
-Wed Sep 18 2019 15:04:19 GMT+0500 (Yekaterinburg Standard Time): handleQueue 0 items
-Wed Sep 18 2019 15:04:19 GMT+0500 (Yekaterinburg Standard Time): handleQueue done 0 items
-Wed Sep 18 2019 15:04:20 GMT+0500 (Yekaterinburg Standard Time): RECEIVED ["justsaying",{"subject":"exchange_rates","body":{"BTC_USD":10178.49,"GBYTE_BTC":0.00227828,"GBYTE_USD":23.1894501972,"NMuNvOJRO2ZY9L17uKtsa7OYkgsV8LfSBIV9BUoVJPQ=_BTC":3e-8,"NMuNvOJRO2ZY9L17uKtsa7OYkgsV8LfSBIV9BUoVJPQ=_USD":0.00030535469999999994,"NMuNvOJRO2ZY9L17uKtsa7OYkgsV8LfSBIV9BUoVJPQ=_GBYTE":0.000013167828361746578}}] from ws://localhost:6611
-Wed Sep 18 2019 15:04:20 GMT+0500 (Yekaterinburg Standard Time): 0 incoming connections, 1 outgoing connections, 0 outgoing connections being opened
