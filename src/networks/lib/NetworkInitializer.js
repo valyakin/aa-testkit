@@ -8,19 +8,23 @@ class NetworkInitializer {
 		this.agents = {}
 		this.wallets = {}
 		this.deployer = null
+		this.obyteExplorer = null
 
 		this.initializer = {
 			wallets: {},
 			assets: {},
 			agents: {},
 			deployer: null,
+			explorer: null,
 		}
 
 		this.isInitialized = false
 	}
 
-	async initialize ({ wallets, agents, deployer, assets } = {}) {
+	async initialize ({ wallets, agents, deployer, assets, explorer } = {}) {
 		await this.network.genesisNode.ready()
+
+		if (explorer) await this.initializeExplorer(explorer)
 
 		const walletNodes = await asyncStartHeadlessWallets(this.network, Object.keys(wallets).length + (deployer ? 1 : 0))
 		if (deployer) this.deployer = walletNodes.shift()
@@ -85,7 +89,20 @@ class NetworkInitializer {
 		}))
 	}
 
+	async initializeExplorer (explorer = {}) {
+		this.obyteExplorer = await this.network.newObyteExplorer({ webPort: explorer.port })
+		return this.obyteExplorer.ready()
+	}
+
 	get with () {
+		return this
+	}
+
+	explorer ({ port } = {}) {
+		this.initializer.deployer = true
+		this.initializer.explorer = {
+			port,
+		}
 		return this
 	}
 

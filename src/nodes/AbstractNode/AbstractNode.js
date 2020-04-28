@@ -92,7 +92,7 @@ class AbstractNode extends EventEmitter {
 			} else {
 				const cb = ({ joint }) => {
 					if (joint.unit.unit === unit) {
-						this.off('new_joint', cb)
+						this.removeListener('new_joint', cb)
 						resolve()
 					}
 				}

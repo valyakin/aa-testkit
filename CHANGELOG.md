@@ -1,5 +1,14 @@
 # Change Log
 
+## v0.2.2
+
+### Features
+1. Update ocore
+2. with.explorer() network initializer
+
+### Fixes
+1. Fix `AbstractNode` for node v8
+
 ## v0.2.0
 
 ### Breaking Changes

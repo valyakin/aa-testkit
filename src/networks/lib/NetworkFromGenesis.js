@@ -178,6 +178,10 @@ class NetworkFromGenesis {
 		return this.readiedInitializer.deployer
 	}
 
+	get explorer () {
+		return this.readiedInitializer.obyteExplorer
+	}
+
 	async run () {
 		mkdirp.sync(config.TESTDATA_DIR)
 		this.runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')

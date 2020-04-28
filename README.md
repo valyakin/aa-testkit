@@ -223,6 +223,12 @@ const deployer = network.deployer
 
 Also refer to [withFeature](./test/core/withFeature.spec.js) test code example
 
+#### __`.with.explorer({ port })`__
+
+Start network with the Obyte Explorer node
+
+`port` - port to run Obyte Explorer on. Default 8080
+
 ---------------------------------------
 
 #### __`network.getGenesisNode()`__ *`: <GenesisNode>`*

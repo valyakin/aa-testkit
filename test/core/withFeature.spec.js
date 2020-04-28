@@ -13,6 +13,7 @@ describe('Check NetworkInitializer with function (everything together)', functio
 			.with.wallet({ bob: { base: 1000 } })
 			.with.wallet({ eva: { base: 1e9, notrealmoney: 1e9 } })
 			.with.wallet({ mark: { notrealmoney: 1e10 } })
+			.with.explorer()
 			.run()
 	})
 
@@ -74,6 +75,12 @@ describe('Check NetworkInitializer with function (everything together)', functio
 		const balance = await this.network.wallet.alice.getBalance()
 		expect(balance.base.pending).to.be.equal(0)
 		expect(balance.base.stable).to.be.equal(998756)
+	}).timeout(30000)
+
+	it('Check explorer is accessible', async () => {
+		expect(this.network.explorer).is.not.null
+		const id = this.network.explorer.id
+		expect(id).to.be.equal('obyte-explorer-0001')
 	}).timeout(30000)
 
 	after(async () => {
