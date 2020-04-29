@@ -1,6 +1,8 @@
 const Joi = require('joi')
+const { isString } = require('lodash')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const {
+	MessageSentMulti,
 	MessageMyAddress,
 	MessageSentBytes,
 	MessageChildReady,
@@ -22,8 +24,9 @@ class GenesisNodeChild extends AbstractChild {
 		super(params, paramsSchema)
 
 		this
-			.on('command_login_to_hub', () => this.loginToHub())
 			.on('command_send_bytes', (m) => this.sendBytes(m))
+			.on('command_send_multi', (m) => this.sendMulti(m))
+			.on('command_login_to_hub', () => this.loginToHub())
 			.on('command_post_witness', () => this.postWitness())
 			.on('command_get_address', (m) => this.getAddress(m))
 	}
@@ -95,6 +98,18 @@ class GenesisNodeChild extends AbstractChild {
 		})
 	}
 
+	sendMulti ({ opts }) {
+		this.headlessWallet.issueChangeAddressAndSendMultiPayment(opts, (err, unit) => {
+			if (err) {
+				this.sendToParent(new MessageSentMulti({
+					unit: null,
+					...(isString(err) ? { error: err } : err),
+				}))
+			}
+			this.sendToParent(new MessageSentMulti({ unit, error: null }))
+		})
+	}
+
 	async genesis () {
 		const address = await new Promise((resolve) => {
 			this.headlessWallet.readSingleAddress(resolve)
@@ -140,11 +155,16 @@ class GenesisNodeChild extends AbstractChild {
 				witnesses: [witness],
 				paying_addresses: [witness],
 				outputs: [
-					{ address: witness, amount: 1000000 },
-					{ address: witness, amount: 1000000 },
-					{ address: witness, amount: 1000000 },
-					{ address: witness, amount: 1000000 },
-					{ address: witness, amount: 1000000 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 },
+					{ address: witness, amount: 1e14 - 821 },
 					{ address: witness, amount: 0 }, // change output
 				],
 				signer: this.headlessWallet.signer,

@@ -35,7 +35,12 @@ class NetworkInitializer {
 		if (deployer) await this.initializeDeployer()
 		await this.initializeAssets(assets)
 		await this.initializeAgents(agents)
-		await this.initializeWallets(wallets)
+		const units = await this.initializeWallets(wallets)
+
+		for (const unit of units) {
+			await this.network.witnessUntilStable(unit)
+		}
+
 		this.isInitialized = true
 	}
 
@@ -63,29 +68,49 @@ class NetworkInitializer {
 		}
 	}
 
-	initializeWallets (wallets = {}) {
-		return Promise.all(Object.keys(wallets).map(async name => {
-			return Promise.all(
-				Object.keys(wallets[name]).map(async asset => {
-					if (asset === 'base') {
-						const { unit, error } = await this.network.genesisNode.sendBytes({ toAddress: await this.wallets[name].getAddress(), amount: wallets[name].base })
-						if (error) throw new Error(`Error sending '${asset}' to '${name}': ${error}`)
-						return unit
-					} else {
-						if (!this.assets[asset]) throw new Error(`No such asset with name '${asset}'`)
-						const { unit, error } = await this.deployer.sendMulti({
-							asset_outputs: [{
-								address: await this.wallets[name].getAddress(),
-								amount: wallets[name][asset],
-							}],
-							change_address: await this.deployer.getAddress(),
-							asset: this.assets[asset],
-						})
-						if (error) throw new Error(`Error sending '${asset}' to '${name}': ${error}`)
-						return unit
-					}
-				}),
-			)
+	async initializeWallets (wallets = {}) {
+		const walletsWithAddresses = await Promise.all(Object.keys(wallets).map(async name => {
+			const address = await this.wallets[name].getAddress()
+
+			return {
+				name,
+				address,
+				balances: wallets[name],
+			}
+		}))
+
+		const outputsMap = walletsWithAddresses.reduce((acc, cur) => {
+			for (const asset in cur.balances) {
+				const entry = { address: cur.address, amount: cur.balances[asset] }
+				acc[asset] = acc[asset]
+					? [...acc[asset], entry]
+					: [entry]
+			}
+			return acc
+		}, {})
+
+		return Promise.all(Object.keys(outputsMap).map(async asset => {
+			if (asset === 'base') {
+				const { error, unit } = await this.network.genesisNode.sendMulti({
+					base_outputs: outputsMap[asset],
+					change_address: await this.network.genesisNode.getAddress(),
+					asset: 'base',
+				})
+
+				if (error) throw new Error(`Error sending bytes to wallets: ${error}`)
+				return unit
+			} else {
+				if (!this.assets[asset]) throw new Error(`No such asset with name '${asset}'`)
+
+				const { error, unit } = await this.deployer.sendMulti({
+					asset_outputs: outputsMap[asset],
+					change_address: await this.deployer.getAddress(),
+					asset: this.assets[asset],
+				})
+
+				if (error) throw new Error(`Error sending asset ${asset} to wallets: ${error}`)
+				return unit
+			}
 		}))
 	}
 
@@ -143,9 +168,6 @@ class NetworkInitializer {
 	async run () {
 		await this.network.run()
 		await this.initialize(this.initializer)
-		await this.network.genesisNode.postWitness()
-		const unit = await this.network.genesisNode.postWitness()
-		await this.network.witnessUntilStable(unit)
 		return this.network
 	}
 }

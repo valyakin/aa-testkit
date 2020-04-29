@@ -11,6 +11,7 @@ const {
 	MessageChildError,
 	CommandGetLastMCI,
 	CommandGetUnitInfo,
+	CommandGetBalanceOf,
 	CommandGetUnitProps,
 	CommandReadAAStateVars,
 } = require('../../messages')
@@ -175,6 +176,15 @@ class AbstractNode extends EventEmitter {
 				resolve(m.mci)
 			})
 			this.sendToChild(new CommandGetLastMCI())
+		})
+	}
+
+	async getBalanceOf (address) {
+		return new Promise(resolve => {
+			this.once('balance_of', (m) => {
+				resolve(m.balance)
+			})
+			this.sendToChild(new CommandGetBalanceOf({ address }))
 		})
 	}
 

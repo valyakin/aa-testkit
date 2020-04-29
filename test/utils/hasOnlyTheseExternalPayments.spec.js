@@ -272,6 +272,40 @@ describe('Response unit has only these payments', function () {
 		}])).to.be.false
 	})
 
+	it('Has only this payments', async () => {
+		const { unit } = await this.sender.sendMulti({
+			asset_outputs: [{
+				address: mockAddress1,
+				amount: 80006,
+			}, {
+				address: mockAddress2,
+				amount: 3806,
+			}],
+			base_outputs: [{
+				address: mockAddress2,
+				amount: 1875513,
+			}, {
+				address: mockAddress1,
+				amount: 185513,
+			}],
+			change_address: await this.sender.getAddress(),
+			asset: this.asset_1,
+		})
+		const { unitObj } = await this.sender.getUnitInfo({ unit })
+		await this.network.witnessUntilStable(unit)
+		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+			address: mockAddress2,
+			amount: 3806,
+			asset: this.asset_1,
+		}, {
+			address: mockAddress2,
+			amount: 1875513,
+		}, {
+			address: mockAddress1,
+			amount: 185513,
+		}])).to.be.false
+	})
+
 	after(async () => {
 		await this.network.stop()
 	})

@@ -1,6 +1,12 @@
 const Joi = require('joi')
 const config = require('config')['aa-testkit']
-const { CommandLoginToHub, CommandSendBytes, CommandPostWitness, CommandGetAddress } = require('../../messages')
+const {
+	CommandSendMulti,
+	CommandSendBytes,
+	CommandGetAddress,
+	CommandLoginToHub,
+	CommandPostWitness,
+} = require('../../messages')
 const AbstractNode = require('../AbstractNode/AbstractNode')
 
 const schemaFactory = () => ({
@@ -50,6 +56,13 @@ class GenesisNode extends AbstractNode {
 		return new Promise(resolve => {
 			this.once('sent_bytes', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendToChild(new CommandSendBytes({ toAddress, amount }))
+		})
+	}
+
+	async sendMulti (opts) {
+		return new Promise(resolve => {
+			this.once('sent_multi', (m) => resolve({ unit: m.unit, error: m.error }))
+			this.sendToChild(new CommandSendMulti({ opts }))
 		})
 	}
 

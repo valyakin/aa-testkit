@@ -6,6 +6,7 @@ const MessageSentMulti = require('./lib/MessageSentMulti')
 const MessageSentBytes = require('./lib/MessageSentBytes')
 const MessageMyAddress = require('./lib/MessageMyAddress')
 const MessageMyBalance = require('./lib/MessageMyBalance')
+const MessageBalanceOf = require('./lib/MessageBalanceOf')
 const MessageAAResponse = require('./lib/MessageAAResponse')
 const MessageChildError = require('./lib/MessageChildError')
 const MessageChildReady = require('./lib/MessageChildReady')
@@ -38,6 +39,7 @@ const CommandCreateAsset = require('./lib/CommandCreateAsset')
 const CommandPostWitness = require('./lib/CommandPostWitness')
 const CommandGetUnitInfo = require('./lib/CommandGetUnitInfo')
 const CommandGetUnitProps = require('./lib/CommandGetUnitProps')
+const CommandGetBalanceOf = require('./lib/CommandGetBalanceOf')
 const CommandGetMyAddresses = require('./lib/CommandGetMyAddresses')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
 
@@ -53,6 +55,7 @@ const fromMessage = (m) => {
 	case 'sent_bytes': return new MessageSentBytes(message)
 	case 'my_address': return new MessageMyAddress(message)
 	case 'my_balance': return new MessageMyBalance(message)
+	case 'balance_of': return new MessageBalanceOf(message)
 	case 'aa_response': return new MessageAAResponse(message)
 	case 'child_error': return new MessageChildError(message)
 	case 'child_ready': return new MessageChildReady(message)
@@ -84,6 +87,7 @@ const fromMessage = (m) => {
 	case 'command_create_asset': return new CommandCreateAsset(message)
 	case 'command_post_witness': return new CommandPostWitness(message)
 	case 'command_get_unit_info': return new CommandGetUnitInfo(message)
+	case 'command_get_balance_of': return new CommandGetBalanceOf(message)
 	case 'command_get_unit_props': return new CommandGetUnitProps(message)
 	case 'command_get_my_addresses': return new CommandGetMyAddresses(message)
 	case 'command_read_aa_state_vars': return new CommandReadAAStateVars(message)
@@ -103,6 +107,7 @@ module.exports = {
 	MessageSentBytes,
 	MessageMyAddress,
 	MessageMyBalance,
+	MessageBalanceOf,
 	MessageChildError,
 	MessageAAResponse,
 	MessageChildReady,
@@ -135,6 +140,7 @@ module.exports = {
 	CommandPostWitness,
 	CommandGetUnitInfo,
 	CommandGetUnitProps,
+	CommandGetBalanceOf,
 	CommandGetMyAddresses,
 	CommandReadAAStateVars,
 }

@@ -1,5 +1,14 @@
 # Change Log
 
+## v0.2.3
+
+### Features
+1. `node.getBalanceOf(address)` method added
+2. `genesisNode.sendMulti(opts)` method added
+
+### Fixes
+1. Increase amount of bytes given to Genesis Node
+
 ## v0.2.2
 
 ### Features

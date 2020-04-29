@@ -11,6 +11,7 @@ const {
 	MessageLastMCI,
 	MessageNewJoint,
 	MessageUnitInfo,
+	MessageBalanceOf,
 	MessageUnitProps,
 	MessageAAResponse,
 	MessageCurrentTime,
@@ -48,6 +49,7 @@ class AbstractChild extends EventEmitter {
 			.on('command_get_last_mci', (m) => this.getLastMCI(m))
 			.on('command_get_unit_info', (m) => this.getUnitInfo(m))
 			.on('command_get_unit_props', (m) => this.getUnitProps(m))
+			.on('command_get_balance_of', (m) => this.getBalanceOf(m))
 			.on('command_read_aa_state_vars', (m) => this.readAAStateVars(m))
 
 		const eventBus = require('ocore/event_bus')
@@ -205,6 +207,14 @@ class AbstractChild extends EventEmitter {
 			storage.readAAStateVars(address, (vars) => {
 				resolve(vars)
 			})
+		})
+	}
+
+	getBalanceOf ({ address }) {
+		console.log('getBalanceOf address', address)
+		const wallet = require('ocore/wallet')
+		wallet.readBalance(address, (assocBalances) => {
+			this.sendToParent(new MessageBalanceOf({ balance: assocBalances }))
 		})
 	}
 

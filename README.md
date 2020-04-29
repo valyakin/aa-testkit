@@ -113,7 +113,7 @@ Primary way to operate with network. Contains common functions for network manag
 
 #### __`Network.create(genesisParams, hubParams)`__ *`: <network>`*
 
-Creates new devnet network from the scratch. `.run()` should be called after `.create()` for network to start. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`10e15`) of Bytes on its account.
+Creates new devnet network from the scratch. `.run()` should be called after `.create()` for network to start. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`1e15 -821`) of Bytes on its account.
 
 #### Parameters
 
@@ -836,9 +836,31 @@ See [Agent deployment test example](#Test-Examples)
 
 ---------------------------------------
 
+#### __`node.getBalanceOf(address)`__ *`: Promise<balanceObject>`*
+
+Get balance of the specified address on the network
+
+__Returns__ *Promise* that resolves to node balance object
+
+<details>
+<summary>Balance object example</summary>
+
+```javascript
+{
+   base:{
+      stable:0,
+      pending:49401,
+      is_private:null
+   }
+}
+```
+</details>
+
+---------------------------------------
+
 ## GenesisNode
 
-Genesis node main function is to start new network and create genesis unit. After this, genesis node serves as witness and source of Bytes. At the moment of network genesis, this node puts on its account `10e15` Bytes
+Genesis node main function is to start new network and create genesis unit. After this, genesis node serves as witness and source of Bytes. At the moment of network genesis, this node puts on its account `1e15 - 821` Bytes
 
 ### GenesisNode constructor params
 
@@ -964,6 +986,12 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after Bytes are sent. `
 *`toAddress : String`* - address of node that will receive Bytes
 
 *`amount : Number`* - amount of Bytes to send
+
+---------------------------------------
+
+#### __`genesis.sendMulti(opts)`__ *`: Promise<{ unit, error }>`*
+
+Send arbitrary data to the network. Same as `wallet.sendMulti`
 
 ---------------------------------------
 
