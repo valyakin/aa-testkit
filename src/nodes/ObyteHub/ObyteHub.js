@@ -25,7 +25,7 @@ class ObyteHub extends AbstractNode {
 			this.port,
 			this.genesisUnit,
 			this.initialWitnesses.length,
-			this.initialWitnesses,
+			...this.initialWitnesses,
 		]
 	}
 }

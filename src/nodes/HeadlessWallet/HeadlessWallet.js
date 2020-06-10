@@ -21,15 +21,24 @@ const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
-	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
+	passphrase: Joi.string().default('0000'),
 	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 	isSingleAddress: Joi.string().default(config.WALLETS_ARE_SINGLE_ADDRESS),
+	initialWitnesses: Joi.array().items(Joi.string()).min(1),
+	mnemonic: Joi.string().default(null),
 })
 
 class HeadlessWallet extends AbstractNode {
 	constructor (params = {}) {
 		super(params, schemaFactory)
-		this.runChild(__dirname)
+		this.runChild(__dirname,
+			this.mnemonic
+				? {
+					mnemonic: this.mnemonic,
+					passphrase: this.passphrase,
+				}
+				: {},
+		)
 
 		this
 			.on('password_required', () => this.sendPassword())
@@ -41,6 +50,8 @@ class HeadlessWallet extends AbstractNode {
 			this.hub,
 			this.genesisUnit,
 			this.isSingleAddress,
+			this.initialWitnesses.length,
+			...this.initialWitnesses,
 		]
 	}
 

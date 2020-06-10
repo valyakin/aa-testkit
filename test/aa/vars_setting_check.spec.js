@@ -52,7 +52,7 @@ describe('AA state vars', function () {
 
 		expect(vars.constant_var).to.be.equal('constant_var')
 		expect(vars.trigger_var).to.be.equal('trigger_var')
-		expect(vars.sum_var).to.be.equal('579')
+		expect(vars.sum_var).to.be.equal(579)
 	}).timeout(30000)
 
 	after(async () => {

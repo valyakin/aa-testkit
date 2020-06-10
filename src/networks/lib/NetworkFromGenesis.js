@@ -2,8 +2,8 @@ const path = require('path')
 const mkdirp = require('mkdirp')
 const config = require('config')['aa-testkit']
 
-const { getIdForPrefix, sleep } = require('../../utils')
-const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer } = require('../../nodes')
+const { getIdForPrefix, sleep, generateMnemonic, getFirstPubkey } = require('../../utils')
+const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer, ObyteWitness } = require('../../nodes')
 const NetworkInitializer = require('./NetworkInitializer')
 
 const network = null
@@ -19,6 +19,7 @@ class NetworkFromGenesis {
 		this.nodes = {
 			headlessWallets: [],
 			obyteExplorers: [],
+			witnesses: [],
 		}
 		this.initializer = null
 	}
@@ -35,6 +36,7 @@ class NetworkFromGenesis {
 		return [
 			...this.nodes.headlessWallets,
 			...this.nodes.obyteExplorers,
+			...this.nodes.witnesses,
 			this.genesisNode,
 			this.hub,
 		]
@@ -77,8 +79,14 @@ class NetworkFromGenesis {
 
 	async witnessAndStabilize () {
 		await this.sync()
-		const unit = await this.genesisNode.postWitness()
-		const stabilization = Promise.all([this.hub, ...this.nodes.headlessWallets, ...this.nodes.obyteExplorers].map(n => n.waitForUnit(unit)))
+		const units = await this.postWitnesses()
+		const stabilization = Promise.all([
+			this.hub,
+			this.genesisNode,
+			...this.nodes.headlessWallets,
+			...this.nodes.obyteExplorers,
+			...this.nodes.witnesses,
+		].map(n => n.waitForUnits(units)))
 		return stabilization
 	}
 
@@ -100,10 +108,31 @@ class NetworkFromGenesis {
 
 		const { unitProps } = await node.getUnitProps({ unit })
 		if (!unitProps.is_stable) {
-			const witnessUnit = await this.genesisNode.postWitness()
-			await node.waitForUnit(witnessUnit)
+			await Promise.all([this.genesisNode, ...this.nodes.witnesses].map(n => n.waitForUnit(unit)))
+			const witnessUnits = await this.postWitnesses()
+			await node.waitForUnits(witnessUnits)
 			return this.witnessUntilStableOnNode(node, unit)
 		}
+	}
+
+	async asyncPostWitnesses () {
+		const units = await Promise.all([this.genesisNode, ...this.nodes.witnesses].map(n => n.postWitness()))
+		for (const node of [this.genesisNode, ...this.nodes.witnesses]) {
+			await node.waitForUnits(units)
+		}
+		return units
+	}
+
+	async postWitnesses () {
+		const nodes = [this.genesisNode, ...this.nodes.witnesses]
+		const units = []
+
+		for (const n of nodes) {
+			const unit = await n.postWitness()
+			await Promise.all(nodes.map(node => node.waitForUnit(unit)))
+			units.push(unit)
+		}
+		return units
 	}
 
 	async getAaResponseToUnit (unit) {
@@ -143,10 +172,23 @@ class NetworkFromGenesis {
 			rundir: this.rundir,
 			genesisUnit: this.genesisUnit,
 			id: getIdForPrefix(this.rundir, 'headless-wallet-'),
+			initialWitnesses: this.initialWitnesses,
 			...params,
 		})
 		this.nodes.headlessWallets.push(wallet)
 		return wallet
+	}
+
+	newObyteWitness (params) {
+		const witness = new ObyteWitness({
+			rundir: this.rundir,
+			genesisUnit: this.genesisUnit,
+			id: getIdForPrefix(this.rundir, 'obyte-witness-'),
+			initialWitnesses: this.initialWitnesses,
+			...params,
+		})
+		this.nodes.witnesses.push(witness)
+		return witness
 	}
 
 	get with () {
@@ -182,7 +224,33 @@ class NetworkFromGenesis {
 		return this.readiedInitializer.obyteExplorer
 	}
 
-	async run () {
+	defaultGenesisData () {
+		// default number of witnesses = 3, including genesis node
+
+		const witnesses = []
+		const transfers = []
+
+		for (let i = 0; i < 2; i++) {
+			const mnemonic = generateMnemonic()
+			const address = getFirstPubkey(mnemonic)
+			witnesses.push({
+				mnemonic,
+				address,
+			})
+
+			transfers.push({
+				address,
+				amount: 1e10,
+			})
+		}
+
+		return {
+			witnesses,
+			transfers,
+		}
+	}
+
+	async run (genesisData = this.defaultGenesisData()) {
 		mkdirp.sync(config.TESTDATA_DIR)
 		this.runid = getIdForPrefix(config.TESTDATA_DIR, 'runid-')
 		this.rundir = path.join(config.TESTDATA_DIR, this.runid)
@@ -193,22 +261,51 @@ class NetworkFromGenesis {
 			id: 'genesis-node',
 			...this.genesisParams,
 		})
-		const { genesisUnit, genesisAddress } = await genesisNode.createGenesis()
+		const { genesisUnit, genesisAddress } = await genesisNode.createGenesis(genesisData)
+
+		const witnessAddresses = genesisData.witnesses
+			? genesisData.witnesses.map(w => w.address)
+			: []
+
+		this.initialWitnesses =
+		[
+			genesisAddress,
+			...witnessAddresses,
+		]
+
+		if (genesisData.witnesses) {
+			await Promise.all(genesisData.witnesses.map(async (w) => {
+				const witness = new ObyteWitness({
+					rundir: this.rundir,
+					genesisUnit: genesisUnit,
+					hub: `localhost:${config.NETWORK_PORT}`,
+					id: getIdForPrefix(this.rundir, 'obyte-witness-'),
+					mnemonic: w.mnemonic,
+					initialWitnesses: this.initialWitnesses,
+				})
+
+				await witness.ready()
+				const address = await witness.getAddress()
+				this.nodes.witnesses.push(witness)
+				return address
+			}))
+		}
 
 		const hub = new ObyteHub({
 			rundir: this.rundir,
 			genesisUnit: genesisUnit,
-			initialWitnesses: [genesisAddress],
+			initialWitnesses: this.initialWitnesses,
 			id: getIdForPrefix(this.rundir, 'obyte-hub-'),
 			...this.hubParams,
 		})
 
 		this.genesisUnit = genesisUnit
-		this.initialWitnesses = [genesisAddress]
 
 		await genesisNode.ready()
 		await hub.ready()
 		await genesisNode.loginToHub()
+		await Promise.all(this.nodes.witnesses.map(w => w.loginToHub()))
+		await Promise.all(this.nodes.witnesses.map(w => w.waitForUnit(genesisUnit)))
 
 		this.genesisNode = genesisNode
 		this.hub = hub

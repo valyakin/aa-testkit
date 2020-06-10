@@ -13,6 +13,7 @@ const {
 	MessageUnitInfo,
 	MessageBalanceOf,
 	MessageUnitProps,
+	MessageSavedUnit,
 	MessageAAResponse,
 	MessageCurrentTime,
 	MessageAAStateVars,
@@ -57,6 +58,7 @@ class AbstractChild extends EventEmitter {
 			.on('mci_became_stable', (mci) => this.sendToParent(new MessageMciBecameStable({ mci })))
 			.on('aa_response', (objAAResponse) => this.sendToParent(new MessageAAResponse({ response: objAAResponse })))
 			.on('new_joint', (joint) => this.sendToParent(new MessageNewJoint({ joint })))
+			.on('saved_unit', (joint) => this.sendToParent(new MessageSavedUnit({ joint })))
 	}
 
 	static unpackArgv (argv) {

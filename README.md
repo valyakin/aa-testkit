@@ -62,7 +62,6 @@ Testkit constructor function. Helps to configure network defaults
 | Property                   |   Type  | Required |               Default              | Description                                                   |
 |----------------------------|:-------:|:--------:|:----------------------------------:|---------------------------------------------------------------|
 | TESTDATA_DIR               |  String |   false  | `node_modules/aa-testkit/testdata` | Absolute path to `testdata` directory                         |
-| DEFAULT_PASSPHRASE         |  String |   false  |               `0000`               | Wallet passphrase                                             |
 | NETWORK_PORT               |  Number |   false  |                6611                | Defines port, the network will be run on                      |
 | WALLETS_ARE_SINGLE_ADDRESS | Boolean |   false  |                true                | Defines if HeadlessWallet nodes are single address by default |
 
@@ -77,7 +76,6 @@ const path = require('path')
 const { Network } = Testkit({
   // should be absolute path
   TESTDATA_DIR: path.join(__dirname, '../testdata'),
-  DEFAULT_PASSPHRASE: 'secret',
   NETWORK_PORT: 5000,
 })
 
@@ -96,7 +94,6 @@ const path = require('path')
 module.exports = {
   'aa-testkit': {
     TESTDATA_DIR: path.join(__dirname, '../testdata'),
-    DEFAULT_PASSPHRASE: '0000',
     NETWORK_PORT: 6611,
   },
 }
@@ -183,6 +180,12 @@ Create an asset. Multiple assets creation is supported
   fixed_denominations: false,
 }
 ```
+
+#### __`.with.numberOfWitnesses(number)`__
+
+Specify number of witnesses defined in the network
+
+`number` - number of witnesses. Default is 3
 
 #### __`.network.deployer`__
 
@@ -619,7 +622,15 @@ __Returns__ *Promise* that resolves to `joint` object when node child receives a
 
 #### __`node.waitForUnit(unit)`__ *`: Promise<>`*
 
-__Returns__ *Promise* that resolves when node receives joint with specified `unit` hash
+__Returns__ *Promise* that resolves when node receives joint with specified `unit` id
+
+---------------------------------------
+
+#### __`node.waitForUnits(units)`__ *`: Promise<>`*
+
+__Returns__ *Promise* that resolves when node receives joint for every unit id in `units` array
+
+*`units`* - array of unit ids
 
 ---------------------------------------
 
@@ -868,7 +879,6 @@ Genesis node main function is to start new network and create genesis unit. Afte
 |:----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |     id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |   rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-| passphrase |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
 |     hub    |  String |   false  | `'localhost:6611'` | Address of hub to connect                                                   |
 
 ### GenesisNode methods
@@ -1023,7 +1033,7 @@ Headless wallet node provides common network node functionality. It can receive 
 |:---------------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |        id       |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |      rundir     |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|    passphrase   |  String |   false  |      `'0000'`      | Passphrase used for headless-wallet                                         |
+|     mnemonic    |  String |   false  |                    | Mnemonic phrase for wallet                                                  |
 |   genesisUnit   |  String |   true   |                    | The very first unit of the network                                          |
 |       hub       |  String |   false  | `'localhost:6611'` | Address of the hub to connect                                               |
 | isSingleAddress | Boolean |   false  |        true        | Defines if node will operate in single address mode                         |
@@ -1289,7 +1299,23 @@ Helper for base64 strings validation. Return `true` if passed argument is valid 
 
 ---------------------------------------
 
-#### __`Utils.asyncStartHeadlessWallets(network, n)`__ *`: Primise<Array>`*
+#### __`Utils.generateMnemonic()`__ *`: String`*
+
+Returns randomly generated mnemonic phrase valid for HeadlessWallets
+
+---------------------------------------
+
+#### __`Utils.getFirstPubkey(mnemonic)`__ *`: String`*
+
+Returns first derived pubkey for a given mnemonic pharse. Effectively, this is the first address of the HeadlessWallet(or the only address for single address wallets)
+
+#### Parameters
+
+*`mnemonic`* - valid mnemonic phrase to derive pubkey from
+
+---------------------------------------
+
+#### __`Utils.asyncStartHeadlessWallets(network, n)`__ *`: Promise<Array>`*
 
 Util that starts `n` of `HeadlessWallet` nodes asynchronously. Helps to speed up test execution when starting a lot of `HeadlessWallet` nodes.
 
@@ -1338,6 +1364,20 @@ this.teamBlue = {}; // mind the semicolon. Otherwise use of destructuring assign
 ] = await Utils.asyncStartHeadlessWallets(this.network, 7)
 ```
 </details>
+
+---------------------------------------
+
+#### __`Utils.asyncStartHeadlessWalletsWithMnemonics(network, mnemonics)`__ *`: Promise<Array>`*
+
+Same as `asyncStartHeadlessWallets`, but this function starts wallets for known array of mnemonics. Order of wallet nodes in returning array is preserved
+
+__Returns__ Returns `Promise` that resolves to Array of `HeadlessWallets`:
+
+#### Parameters
+
+*`network`* - network to start nodes on
+
+*`mnemonics`* - an array of mnemonic phrases
 
 ---------------------------------------
 

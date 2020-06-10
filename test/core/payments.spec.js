@@ -2,10 +2,11 @@ const { Testkit } = require('../../main')
 const { Network } = Testkit()
 
 describe('Check payments', function () {
-	this.timeout(60000)
+	this.timeout(60000 * 1000)
 
 	before(async () => {
-		this.network = await Network.create().run()
+		this.network = await Network.create()
+			.run()
 	})
 
 	it('Check sending bytes', async () => {
@@ -55,7 +56,7 @@ describe('Check payments', function () {
 
 		aliceBalance = await alice.getBalance()
 		expect(aliceBalance.base.stable).to.be.equal(1000049756)
-	}).timeout(30000)
+	}).timeout(30000 * 1000)
 
 	after(async () => {
 		await this.network.stop()

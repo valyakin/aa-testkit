@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+const crypto = require('crypto')
 const Joi = require('joi')
 const { isString } = require('lodash')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
@@ -19,6 +22,7 @@ const paramsSchema = () => ({
 	hub: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
 	isSingleAddress: Joi.boolean().required(),
+	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 })
 
 class HeadlessWalletChild extends AbstractChild {
@@ -43,13 +47,18 @@ class HeadlessWalletChild extends AbstractChild {
 			hub,
 			genesisUnit,
 			isSingleAddress,
+			initialWitnessesLength,
+			...rest
 		] = argv
+
+		const initialWitnesses = rest.splice(0, initialWitnessesLength)
 
 		return {
 			id,
 			hub,
 			genesisUnit,
 			isSingleAddress,
+			initialWitnesses,
 		}
 	}
 
@@ -58,6 +67,14 @@ class HeadlessWalletChild extends AbstractChild {
 
 		this.constants = require('ocore/constants.js')
 		this.constants.GENESIS_UNIT = this.genesisUnit
+
+		this.constants.COUNT_WITNESSES = this.initialWitnesses.length
+		this.constants.MAJORITY_OF_WITNESSES = this.constants.COUNT_WITNESSES % 2 === 0
+			? this.constants.COUNT_WITNESSES / 2 + 1
+			: Math.ceil(this.constants.COUNT_WITNESSES / 2)
+
+		this.myWitnesses = require('ocore/my_witnesses')
+		this.myWitnesses.insertWitnesses(this.initialWitnesses)
 
 		this.conf = require('ocore/conf.js')
 		this.conf.hub = this.hub
@@ -69,7 +86,22 @@ class HeadlessWalletChild extends AbstractChild {
 		this.composer = require('ocore/composer')
 		this.network = require('ocore/network')
 		this.storage = require('ocore/storage')
+		this.desktopApp = require('ocore/desktop_app.js')
 
+		if (process.env.mnemonic) {
+			const appDataDir = this.desktopApp.getAppDataDir()
+			const keysFilename = path.join(appDataDir, 'keys.json')
+			const deviceTempPrivKey = crypto.randomBytes(32)
+			const devicePrevTempPrivKey = crypto.randomBytes(32)
+
+			const keys = {
+				mnemonic_phrase: process.env.mnemonic,
+				temp_priv_key: deviceTempPrivKey.toString('base64'),
+				prev_temp_priv_key: devicePrevTempPrivKey.toString('base64'),
+			}
+
+			fs.writeFileSync(keysFilename, JSON.stringify(keys, null, '\t'), 'utf8')
+		}
 		this.eventBus.once('headless_wallet_need_pass', () => {
 			this.sendToParent(new MessagePasswordRequired())
 		})

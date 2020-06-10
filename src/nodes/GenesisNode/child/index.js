@@ -1,5 +1,12 @@
+/* eslint-disable camelcase */
+const path = require('path')
 const Joi = require('joi')
 const { isString } = require('lodash')
+const crypto = require('crypto')
+const Mnemonic = require('bitcore-mnemonic')
+const Bitcore = require('bitcore-lib')
+const ecdsa = require('secp256k1')
+
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const {
 	MessageSentMulti,
@@ -29,6 +36,7 @@ class GenesisNodeChild extends AbstractChild {
 			.on('command_login_to_hub', () => this.loginToHub())
 			.on('command_post_witness', () => this.postWitness())
 			.on('command_get_address', (m) => this.getAddress(m))
+			.on('command_create_genesis', (m) => this.createGenesis(m))
 	}
 
 	static unpackArgv (argv) {
@@ -56,12 +64,23 @@ class GenesisNodeChild extends AbstractChild {
 		this.constants = require('ocore/constants.js')
 		this.composer = require('ocore/composer.js')
 		this.network = require('ocore/network.js')
+		this.signature = require('ocore/signature.js')
+		this.objectHash = require('ocore/object_hash.js')
 
 		this.eventBus.once('headless_wallet_need_pass', () => {
 			this.sendToParent(new MessagePasswordRequired())
 		})
 
-		this.eventBus.once('headless_wallet_ready', () => this.genesis())
+		this.headlessWalletIsReady = false
+		this.eventBus.once('headless_wallet_ready', () => { this.headlessWalletIsReady = true })
+	}
+
+	createGenesis ({ witnesses, transfers }) {
+		if (this.headlessWalletIsReady) {
+			this.genesis({ witnesses: witnesses || [], transfers: transfers || [] })
+		} else {
+			this.eventBus.once('headless_wallet_ready', () => { this.genesis({ witnesses: witnesses || [], transfers: transfers || [] }) })
+		}
 	}
 
 	loginToHub () {
@@ -73,8 +92,8 @@ class GenesisNodeChild extends AbstractChild {
 
 	postWitness () {
 		const callbacks = this.composer.getSavingCallbacks({
-			ifNotEnoughFunds: (err) => this.sendToParent(new MessageChildError(err)),
-			ifError: (err) => this.sendToParent(new MessageChildError(err)),
+			ifNotEnoughFunds: (err) => this.sendToParent(new MessageChildError(err.error ? err : { error: err })),
+			ifError: (err) => this.sendToParent(new MessageChildError(err.error ? err : { error: err })),
 			ifOk: (objJoint) => {
 				this.network.broadcastJoint(objJoint)
 				this.sendToParent(new MessageWitnessPosted({ unit: objJoint.unit.unit }))
@@ -110,14 +129,24 @@ class GenesisNodeChild extends AbstractChild {
 		})
 	}
 
-	async genesis () {
+	async genesis ({ witnesses, transfers }) {
 		const address = await new Promise((resolve) => {
 			this.headlessWallet.readSingleAddress(resolve)
 		})
 
+		const witnessesAddresses = [
+			address,
+			...witnesses.map(w => w.address),
+		].sort()
+
 		try {
-			const genesisHash = await this.createGenesisUnit(address)
-			await this.addMyWitness(address)
+			this.constants.COUNT_WITNESSES = witnessesAddresses.length
+			this.constants.MAJORITY_OF_WITNESSES = this.constants.COUNT_WITNESSES % 2 === 0
+				? this.constants.COUNT_WITNESSES / 2 + 1
+				: Math.ceil(this.constants.COUNT_WITNESSES / 2)
+
+			const genesisHash = await this.createGenesisUnit(address, { witnesses, transfers })
+			await this.addMyWitnesses(witnessesAddresses)
 			this.composer.setGenesis(false)
 			this.address = address
 
@@ -133,44 +162,142 @@ class GenesisNodeChild extends AbstractChild {
 		}
 	}
 
-	addMyWitness (witness) {
+	addMyWitnesses (witnesses) {
 		return new Promise((resolve) => {
-			this.db.query('INSERT INTO my_witnesses (address) VALUES (?)', [witness], resolve)
+			this.db.query(`INSERT INTO my_witnesses (address) VALUES ${'(?),'.repeat(witnesses.length - 1)}(?)`, witnesses, resolve)
 		})
 	}
 
-	createGenesisUnit (witness) {
+	derivePubkey (xPubKey, path) {
+		const hdPubKey = new Bitcore.HDPublicKey(xPubKey)
+		return hdPubKey.derive(path).publicKey.toBuffer().toString('base64')
+	}
+
+	getDerivedKey (mnemonic_phrase, passphrase, account, is_change, address_index) {
+		const mnemonic = new Mnemonic(mnemonic_phrase)
+		const xPrivKey = mnemonic.toHDPrivateKey(passphrase)
+		const path = "m/44'/0'/" + account + "'/" + is_change + '/' + address_index
+		const derivedPrivateKey = xPrivKey.derive(path).privateKey
+		return derivedPrivateKey.bn.toBuffer({ size: 32 }) // return as buffer
+	}
+
+	createWallet (mnemonicPhrase) {
+		const deviceTempPrivKey = crypto.randomBytes(32)
+		const devicePrevTempPrivKey = crypto.randomBytes(32)
+		const passphrase = '0000'
+
+		const mnemonic = new Mnemonic(mnemonicPhrase)
+		const xPrivKey = mnemonic.toHDPrivateKey(passphrase)
+		const strXPubKey = Bitcore.HDPublicKey(xPrivKey.derive("m/44'/0'/0'")).toString()
+		const pubkey = this.derivePubkey(strXPubKey, 'm/' + 0 + '/' + 0)
+		const arrDefinition = ['sig', { pubkey: pubkey }]
+		const address = this.objectHash.getChash160(arrDefinition)
+		const wallet = crypto.createHash('sha256').update(strXPubKey, 'utf8').digest('base64')
+
+		const devicePrivKey = xPrivKey.derive("m/1'").privateKey.bn.toBuffer({ size: 32 })
+		const devicePubkey = ecdsa.publicKeyCreate(devicePrivKey, true).toString('base64')
+		const device_address = this.objectHash.getDeviceAddress(devicePubkey)
+
+		const obj = {}
+		obj.passphrase = passphrase
+		obj.mnemonic_phrase = mnemonic.phrase
+		obj.temp_priv_key = deviceTempPrivKey.toString('base64')
+		obj.prev_temp_priv_key = devicePrevTempPrivKey.toString('base64')
+		obj.device_address = device_address
+		obj.address = address
+		obj.wallet = wallet
+		obj.is_change = 0
+		obj.address_index = 0
+		obj.definition = arrDefinition
+
+		return obj
+	}
+
+	createGenesisUnit (genesisAddress, { witnesses, transfers }) {
 		return new Promise((resolve, reject) => {
 			const savingCallbacks = this.composer.getSavingCallbacks({
-				ifNotEnoughFunds: reject,
-				ifError: reject,
+				ifNotEnoughFunds: (...args) => {
+					reject(JSON.stringify(args))
+				},
+				ifError: (...args) => {
+					reject(JSON.stringify(args))
+				},
 				ifOk: (objJoint) => {
 					this.network.broadcastJoint(objJoint)
 					resolve(objJoint.unit.unit)
 				},
 			})
 
+			const totalTransfered = transfers.reduce((acc, cur) => {
+				return acc + cur.amount
+			}, 0)
+
+			const desktopApp = require('ocore/desktop_app.js')
+			const appDataDir = desktopApp.getAppDataDir()
+
+			const file = require(path.join(appDataDir, './keys.json'))
+			const genesisMnemonic = file.mnemonic_phrase
+
+			const mnemonics = [
+				genesisMnemonic,
+				...witnesses.map(w => w.mnemonic),
+			]
+
+			const walletData = mnemonics
+				.map(m => this.createWallet(m))
+				.reduce((acc, cur) => {
+					return {
+						...acc,
+						[cur.address]: cur,
+					}
+				}, {})
+
+			const witnessesAddresses = Object.keys(walletData).sort()
+
 			this.composer.setGenesis(true)
+
+			const signer = {
+				readSigningPaths: (conn, address, handleLengthsBySigningPaths) => {
+					handleLengthsBySigningPaths({ r: this.constants.SIG_LENGTH })
+				},
+				readDefinition: (conn, address, handleDefinition) => {
+					const wallet = walletData[address]
+					const definition = wallet.definition
+					handleDefinition(null, definition)
+				},
+				sign: (objUnsignedUnit, assocPrivatePayloads, address, signing_path, handleSignature) => {
+					const buf_to_sign = this.objectHash.getUnitHashToSign(objUnsignedUnit)
+					const wallet = walletData[address]
+					const derivedPrivateKey = this.getDerivedKey(
+						wallet.mnemonic_phrase,
+						wallet.passphrase,
+						0,
+						wallet.is_change,
+						wallet.address_index,
+					)
+					handleSignature(null, this.signature.sign(buf_to_sign, derivedPrivateKey))
+				},
+			}
+
+			const toSelf = 1e15 - totalTransfered - 1e4
+
 			this.composer.composeJoint({
-				witnesses: [witness],
-				paying_addresses: [witness],
+				witnesses: witnessesAddresses,
+				paying_addresses: witnessesAddresses,
 				outputs: [
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 },
-					{ address: witness, amount: 1e14 - 821 },
-					{ address: witness, amount: 0 }, // change output
+					...transfers,
+					{ address: genesisAddress, amount: Math.ceil(toSelf / 2) },
+					{ address: genesisAddress, amount: Math.floor(toSelf / 2) },
+					{ address: genesisAddress, amount: 0 }, // change output
 				],
-				signer: this.headlessWallet.signer,
+				signer: signer,
 				callbacks: {
-					ifNotEnoughFunds: reject,
-					ifError: reject,
+					ifNotEnoughFunds: (...args) => {
+						reject(JSON.stringify(args))
+					},
+					ifError: (...args) => {
+						reject(JSON.stringify(args))
+					},
 					ifOk: (objJoint, assocPrivatePayloads, composerUnlock) => {
 						this.constants.GENESIS_UNIT = objJoint.unit.unit
 						savingCallbacks.ifOk(objJoint, assocPrivatePayloads, composerUnlock)

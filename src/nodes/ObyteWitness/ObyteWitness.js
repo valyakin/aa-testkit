@@ -1,64 +1,75 @@
-const childProcess = require('child_process')
-const EventEmitter = require('events')
-const config = require('config')
-const uniqid = require('uniqid')
-const path = require('path')
+const AbstractNode = require('../AbstractNode/AbstractNode')
+const config = require('config')['aa-testkit']
 const Joi = require('joi')
 
-const paramsSchemaFactory = () => ({
-	id: Joi.string().default(uniqid('obyte-witness-')),
-	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
-	childHome: Joi.string().default(config.TEST_RUN_HOME),
-	genesisUnit: Joi.string().default(config.GENESIS_UNIT),
+const {
+	CommandPostWitness,
+	CommandGetAddress,
+	CommandLoginToHub,
+} = require('../../messages')
+
+const schemaFactory = () => ({
+	id: Joi.string().required(),
+	rundir: Joi.string().required(),
+	genesisUnit: Joi.string().required(),
+	passphrase: Joi.string().default('0000'),
+	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
+	mnemonic: Joi.string().default(null),
+	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 })
 
-class ObyteWitness extends EventEmitter {
+class ObyteWitness extends AbstractNode {
 	constructor (params = {}) {
-		super()
-		this.setMaxListeners(20)
+		super(params, schemaFactory)
+		this.runChild(__dirname,
+			this.mnemonic
+				? {
+					mnemonic: this.mnemonic,
+					passphrase: this.passphrase,
+				}
+				: {},
+		)
 
-		const { error, value } = Joi.validate(params, paramsSchemaFactory(), {})
-		if (error) throw new Error(`${error}`)
-		Object.assign(this, value)
+		this
+			.on('password_required', () => this.sendPassword())
+	}
 
-		const args = [
+	packArgv () {
+		return [
 			this.id,
+			this.hub,
 			this.genesisUnit,
+			this.initialWitnesses.length,
+			...this.initialWitnesses,
 		]
-
-		const options = {
-			stdio: ['pipe', 'ignore', 'inherit', 'ipc'],
-			cwd: path.join(__dirname, '/node'),
-			env: {
-				devnet: 1,
-				HOME: path.join(this.childHome, this.id),
-			},
-		}
-
-		this.node = childProcess.fork('index.js', args, options)
-
-		this.node.on('error', this.handleError.bind(this))
-		this.node.on('message', this.handleMessage.bind(this))
 	}
 
-	handleError (e) {
-		console.log(`Error in ${this.id}`, e)
+	sendPassword () {
+		this.child.stdin.write(this.passphrase + '\n')
 	}
 
-	handleMessage (message) {
-		// console.log('message', JSON.stringify(message, null, 2))
-		switch (message.topic) {
-		case 'started':
-			this.emit('started')
-			break
-		case 'password_required':
-			setTimeout(() => {
-				this.node.stdin.write(this.passphrase + '\n')
-			}, 2000)
-			break
-		default:
-			throw new Error('Unsupported message topic', message.topic)
-		}
+	async getAddress () {
+		this.sendToChild(new CommandGetAddress())
+		return new Promise((resolve) => {
+			this.once('my_address', m => resolve(m.address))
+		})
+	}
+
+	loginToHub () {
+		return new Promise(resolve => {
+			this.once('connected_to_hub', () => resolve(this))
+			this.sendToChild(new CommandLoginToHub())
+		})
+	}
+
+	postWitness () {
+		return new Promise(resolve => {
+			this.once('witness_posted', ({ unit }) => {
+				this.receivedUnits.push(unit)
+				resolve(unit)
+			})
+			this.sendToChild(new CommandPostWitness())
+		})
 	}
 }
 

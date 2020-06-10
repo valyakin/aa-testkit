@@ -1,6 +1,6 @@
 {
   "name": "aa-testkit",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "main": "main.js",
   "author": "Obyte",
   "license": "MIT",
@@ -14,7 +14,10 @@
     "lint": "node ./node_modules/.bin/eslint --ext .js --max-warnings=0 --fix src test"
   },
   "dependencies": {
+    "bitcore-lib": "^0.13.14",
+    "bitcore-mnemonic": "~1.0.0",
     "config": "^3.2.2",
+    "crypto": "^1.0.1",
     "headless-obyte": "git+https://github.com/byteball/headless-obyte",
     "joi": "^14.3.1",
     "lodash": "^4.17.15",
@@ -24,6 +27,7 @@
     "obyte-hub": "git+https://github.com/byteball/obyte-hub",
     "obyte-witness": "git+https://github.com/byteball/obyte-witness",
     "ocore": "git+https://github.com/byteball/ocore",
+    "secp256k1": "^4.0.1",
     "uniqid": "^5.0.3",
     "yargs": "^14.0.0"
   },

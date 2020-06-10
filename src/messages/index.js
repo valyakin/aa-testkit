@@ -6,6 +6,7 @@ const MessageSentMulti = require('./lib/MessageSentMulti')
 const MessageSentBytes = require('./lib/MessageSentBytes')
 const MessageMyAddress = require('./lib/MessageMyAddress')
 const MessageMyBalance = require('./lib/MessageMyBalance')
+const MessageSavedUnit = require('./lib/MessageSavedUnit')
 const MessageBalanceOf = require('./lib/MessageBalanceOf')
 const MessageAAResponse = require('./lib/MessageAAResponse')
 const MessageChildError = require('./lib/MessageChildError')
@@ -40,6 +41,7 @@ const CommandPostWitness = require('./lib/CommandPostWitness')
 const CommandGetUnitInfo = require('./lib/CommandGetUnitInfo')
 const CommandGetUnitProps = require('./lib/CommandGetUnitProps')
 const CommandGetBalanceOf = require('./lib/CommandGetBalanceOf')
+const CommandCreateGenesis = require('./lib/CommandCreateGenesis')
 const CommandGetMyAddresses = require('./lib/CommandGetMyAddresses')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
 
@@ -56,6 +58,7 @@ const fromMessage = (m) => {
 	case 'my_address': return new MessageMyAddress(message)
 	case 'my_balance': return new MessageMyBalance(message)
 	case 'balance_of': return new MessageBalanceOf(message)
+	case 'saved_unit': return new MessageSavedUnit(message)
 	case 'aa_response': return new MessageAAResponse(message)
 	case 'child_error': return new MessageChildError(message)
 	case 'child_ready': return new MessageChildReady(message)
@@ -89,6 +92,7 @@ const fromMessage = (m) => {
 	case 'command_get_unit_info': return new CommandGetUnitInfo(message)
 	case 'command_get_balance_of': return new CommandGetBalanceOf(message)
 	case 'command_get_unit_props': return new CommandGetUnitProps(message)
+	case 'command_create_genesis': return new CommandCreateGenesis(message)
 	case 'command_get_my_addresses': return new CommandGetMyAddresses(message)
 	case 'command_read_aa_state_vars': return new CommandReadAAStateVars(message)
 
@@ -108,6 +112,7 @@ module.exports = {
 	MessageMyAddress,
 	MessageMyBalance,
 	MessageBalanceOf,
+	MessageSavedUnit,
 	MessageChildError,
 	MessageAAResponse,
 	MessageChildReady,
@@ -141,6 +146,7 @@ module.exports = {
 	CommandGetUnitInfo,
 	CommandGetUnitProps,
 	CommandGetBalanceOf,
+	CommandCreateGenesis,
 	CommandGetMyAddresses,
 	CommandReadAAStateVars,
 }

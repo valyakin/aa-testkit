@@ -24,7 +24,7 @@ describe('Get unit info feature', function () {
 		expect(error).to.be.null
 
 		expect(unitObj).to.have.property('unit', unit)
-		expect(unitObj).to.have.property('main_chain_index', 1)
+		expect(unitObj).to.have.property('main_chain_index')
 
 		expect(unitObj).to.have.keys([
 			'alt',

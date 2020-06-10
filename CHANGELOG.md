@@ -1,5 +1,24 @@
 # Change Log
 
+## v0.3.0
+
+### Changes
+1. `ocore` upgraded to version `0.3.10`
+2. config `DEFAULT_PASSPHRASE` option is now obsolete. Every wallet node pass is now `'0000'`
+
+### Features
+1. `ObyteWitness` node added
+2. Added `.with.numberOfWitnesses()` feature which allows to change number of witnesses in the network. Default is `3`
+3. `await node.waitForUnits(units)` method added
+4. `mnemonic` option for wallet creation
+5. `Utils.asyncStartHeadlessWalletsWithMnemonics` Utils method added
+6. `Utils.getPubkey` method added
+7. `Utils.generateMnemonic` method added
+8. `Utils.getFirstPubkey` method added
+
+### Fixes
+1. `await node.waitForUnit(unit)` hangs test execution if `unit` issued by `node` itself
+
 ## v0.2.3
 
 ### Features

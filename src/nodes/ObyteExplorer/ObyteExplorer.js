@@ -26,7 +26,7 @@ class ObyteExplorer extends AbstractNode {
 			this.genesisUnit,
 			this.webPort,
 			this.initialWitnesses.length,
-			this.initialWitnesses,
+			...this.initialWitnesses,
 		]
 	}
 

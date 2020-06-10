@@ -65,6 +65,7 @@ class AbstractNode extends EventEmitter {
 			.on('aa_response', (m) => this.handleAaResponse(m))
 			.on('child_error', (m) => this.handleChildError(m.error))
 			.on('new_joint', ({ joint }) => this.receivedUnits.push(joint.unit.unit))
+			.on('saved_unit', ({ joint }) => this.receivedUnits.push(joint.unit.unit))
 	}
 
 	async stop () {
@@ -94,12 +95,18 @@ class AbstractNode extends EventEmitter {
 				const cb = ({ joint }) => {
 					if (joint.unit.unit === unit) {
 						this.removeListener('new_joint', cb)
+						this.removeListener('saved_unit', cb)
 						resolve()
 					}
 				}
 				this.on('new_joint', cb)
+				this.on('saved_unit', cb)
 			}
 		})
+	}
+
+	waitForUnits (units) {
+		return Promise.all(units.map(u => this.waitForUnit(u)))
 	}
 
 	waitForNewJoint () {

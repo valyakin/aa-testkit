@@ -40,6 +40,11 @@ class ObyteHubChild extends AbstractChild {
 		this.constants = require('ocore/constants.js')
 		this.constants.GENESIS_UNIT = this.genesisUnit
 
+		this.constants.COUNT_WITNESSES = this.initialWitnesses.length
+		this.constants.MAJORITY_OF_WITNESSES = this.constants.COUNT_WITNESSES % 2 === 0
+			? this.constants.COUNT_WITNESSES / 2 + 1
+			: Math.ceil(this.constants.COUNT_WITNESSES / 2)
+
 		this.conf = require('ocore/conf.js')
 		this.conf.initial_witnesses = this.initialWitnesses
 		this.conf.port = this.port

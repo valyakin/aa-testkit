@@ -6,13 +6,12 @@ exports.bLight = false
 
 // witness configuration
 exports.bSingleAddress = true
-exports.THRESHOLD_DISTANCE = 1
+exports.THRESHOLD_DISTANCE = 0
 exports.MIN_AVAILABLE_WITNESSINGS = 100
-exports.TIMESTAMPING_INTERVAL = 5 * 1000 // in milliseconds
+exports.TIMESTAMPING_INTERVAL = Infinity // in milliseconds
+exports.MIN_INTERVAL = Infinity // in milliseconds
 
 exports.admin_email = 'witness'
 exports.from_email = 'witness'
 
-exports.initial_witnesses = [
-	'ZQFHJXFWT2OCEBXF26GFXJU4MPASWPJT',
-]
+exports.initial_witnesses = []

@@ -6,13 +6,14 @@ const {
 	CommandGetAddress,
 	CommandLoginToHub,
 	CommandPostWitness,
+	CommandCreateGenesis,
 } = require('../../messages')
 const AbstractNode = require('../AbstractNode/AbstractNode')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),
 	rundir: Joi.string().required(),
-	passphrase: Joi.string().default(config.DEFAULT_PASSPHRASE),
+	passphrase: Joi.string().default('0000'),
 	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
 })
 
@@ -32,12 +33,14 @@ class GenesisNode extends AbstractNode {
 		]
 	}
 
-	createGenesis () {
+	createGenesis ({ witnesses, transfers }) {
 		return new Promise((resolve) => {
 			this.once('genesis_created', (message) => resolve({
 				genesisUnit: message.genesisUnit,
 				genesisAddress: message.address,
 			}))
+
+			this.sendToChild(new CommandCreateGenesis({ witnesses, transfers }))
 		})
 	}
 

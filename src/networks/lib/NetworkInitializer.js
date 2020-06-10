@@ -1,4 +1,4 @@
-const { asyncStartHeadlessWallets } = require('../../utils')
+const { asyncStartHeadlessWalletsWithMnemonics, generateMnemonic, getFirstPubkey } = require('../../utils')
 
 class NetworkInitializer {
 	constructor ({ network }) {
@@ -16,9 +16,65 @@ class NetworkInitializer {
 			agents: {},
 			deployer: null,
 			explorer: null,
+			numberOfWitnesses: 2, // 3, but first witness is genesis node
+			needDeployer: false,
+			witnesses: [],
 		}
 
 		this.isInitialized = false
+	}
+
+	async prepareWitnesses () {
+		for (let i = 0; i < this.initializer.numberOfWitnesses; i++) {
+			const mnemonic = generateMnemonic()
+			const address = getFirstPubkey(mnemonic, '0000')
+
+			this.initializer.witnesses.push({
+				mnemonic,
+				address,
+			})
+		}
+	}
+
+	async prepareGenesisData () {
+		const transfers = []
+
+		for (const name in this.initializer.wallets) {
+			const w = this.initializer.wallets[name]
+			if (w.balances.base && w.balances.base > 0) {
+				transfers.push({
+					address: w.address,
+					amount: w.balances.base,
+				})
+			}
+		}
+
+		for (const witness of this.initializer.witnesses) {
+			transfers.push({
+				address: witness.address,
+				amount: 1e10,
+			})
+		}
+
+		if (this.initializer.needDeployer) {
+			const mnemonic = generateMnemonic()
+			const address = getFirstPubkey(mnemonic)
+
+			this.initializer.deployer = {
+				address,
+				mnemonic,
+			}
+
+			transfers.push({
+				address: address,
+				amount: 1e10,
+			})
+		}
+
+		return {
+			witnesses: this.initializer.witnesses,
+			transfers,
+		}
 	}
 
 	async initialize ({ wallets, agents, deployer, assets, explorer } = {}) {
@@ -26,28 +82,29 @@ class NetworkInitializer {
 
 		if (explorer) await this.initializeExplorer(explorer)
 
-		const walletNodes = await asyncStartHeadlessWallets(this.network, Object.keys(wallets).length + (deployer ? 1 : 0))
-		if (deployer) this.deployer = walletNodes.shift()
+		const mnemonics = Object.keys(wallets).map(name => wallets[name].mnemonic)
+		if (deployer) mnemonics.push(deployer.mnemonic)
+
+		const walletNodes = await asyncStartHeadlessWalletsWithMnemonics(this.network, mnemonics)
+
+		await this.network.witnessAndStabilize()
+		await this.network.witnessAndStabilize()
+
+		if (deployer) this.deployer = walletNodes.pop()
+
 		for (const walletName in wallets) {
 			this.wallets[walletName] = walletNodes.shift()
 		}
 
-		if (deployer) await this.initializeDeployer()
 		await this.initializeAssets(assets)
 		await this.initializeAgents(agents)
-		const units = await this.initializeWallets(wallets)
+		const units = await this.initializeAssetBalances(wallets)
 
 		for (const unit of units) {
 			await this.network.witnessUntilStable(unit)
 		}
 
 		this.isInitialized = true
-	}
-
-	async initializeDeployer () {
-		const { unit, error } = await this.network.genesisNode.sendBytes({ toAddress: await this.deployer.getAddress(), amount: 100e9 })
-		if (error) throw new Error(error)
-		return this.network.witnessUntilStableOnNode(this.deployer, unit)
 	}
 
 	async initializeAssets (assets = {}) {
@@ -68,14 +125,14 @@ class NetworkInitializer {
 		}
 	}
 
-	async initializeWallets (wallets = {}) {
+	async initializeAssetBalances (wallets = {}) {
 		const walletsWithAddresses = await Promise.all(Object.keys(wallets).map(async name => {
 			const address = await this.wallets[name].getAddress()
 
 			return {
 				name,
 				address,
-				balances: wallets[name],
+				balances: wallets[name].balances,
 			}
 		}))
 
@@ -91,14 +148,7 @@ class NetworkInitializer {
 
 		return Promise.all(Object.keys(outputsMap).map(async asset => {
 			if (asset === 'base') {
-				const { error, unit } = await this.network.genesisNode.sendMulti({
-					base_outputs: outputsMap[asset],
-					change_address: await this.network.genesisNode.getAddress(),
-					asset: 'base',
-				})
-
-				if (error) throw new Error(`Error sending bytes to wallets: ${error}`)
-				return unit
+				return null
 			} else {
 				if (!this.assets[asset]) throw new Error(`No such asset with name '${asset}'`)
 
@@ -124,7 +174,6 @@ class NetworkInitializer {
 	}
 
 	explorer ({ port } = {}) {
-		this.initializer.deployer = true
 		this.initializer.explorer = {
 			port,
 		}
@@ -137,14 +186,21 @@ class NetworkInitializer {
 			? wallet[name]
 			: { base: wallet[name] }
 
-		this.initializer.wallets[name] = balances
+		const mnemonic = generateMnemonic()
+		const address = getFirstPubkey(mnemonic)
+
+		this.initializer.wallets[name] = {
+			address,
+			mnemonic,
+			balances,
+		}
 		return this
 	}
 
 	agent (agent) {
 		const name = Object.keys(agent)[0]
 		this.initializer.agents[name] = agent[name]
-		this.initializer.deployer = true
+		this.initializer.needDeployer = true
 		return this
 	}
 
@@ -161,12 +217,20 @@ class NetworkInitializer {
 
 		const name = Object.keys(asset)[0]
 		this.initializer.assets[name] = Object.assign({}, defaults, asset[name])
-		this.initializer.deployer = true
+		this.initializer.needDeployer = true
+		return this
+	}
+
+	numberOfWitnesses (number) {
+		this.initializer.numberOfWitnesses = number - 1 // one of the witnesses is genesis node
 		return this
 	}
 
 	async run () {
-		await this.network.run()
+		await this.prepareWitnesses()
+		const { witnesses, transfers } = await this.prepareGenesisData()
+		await this.network.run({ witnesses, transfers })
+
 		await this.initialize(this.initializer)
 		return this.network
 	}

@@ -3,8 +3,13 @@ const isValidBase64 = require('./lib/isValidBase64')
 const isValidAddress = require('./lib/isValidAddress')
 const getIdForPrefix = require('./lib/getIdForPrefix')
 const countCommissionInUnits = require('./lib/countCommissionInUnits')
-const asyncStartHeadlessWallets = require('./lib/asyncStartHeadlessWallets')
 const hasOnlyTheseExternalPayments = require('./lib/hasOnlyTheseExternalPayments')
+const {
+	getPubkey,
+	generateMnemonic,
+	getFirstPubkey,
+} = require('./lib/keys')
+const { asyncStartHeadlessWallets, asyncStartHeadlessWalletsWithMnemonics } = require('./lib/asyncStartHeadlessWallets')
 
 module.exports = {
 	sleep,
@@ -14,4 +19,9 @@ module.exports = {
 	countCommissionInUnits,
 	asyncStartHeadlessWallets,
 	hasOnlyTheseExternalPayments,
+	asyncStartHeadlessWalletsWithMnemonics,
+
+	getPubkey,
+	generateMnemonic,
+	getFirstPubkey,
 }
