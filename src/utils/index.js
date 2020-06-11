@@ -7,7 +7,7 @@ const hasOnlyTheseExternalPayments = require('./lib/hasOnlyTheseExternalPayments
 const {
 	getPubkey,
 	generateMnemonic,
-	getFirstPubkey,
+	getFirstAddress,
 } = require('./lib/keys')
 const { asyncStartHeadlessWallets, asyncStartHeadlessWalletsWithMnemonics } = require('./lib/asyncStartHeadlessWallets')
 
@@ -23,5 +23,5 @@ module.exports = {
 
 	getPubkey,
 	generateMnemonic,
-	getFirstPubkey,
+	getFirstAddress,
 }

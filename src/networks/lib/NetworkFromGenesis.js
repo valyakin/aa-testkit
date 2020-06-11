@@ -2,7 +2,7 @@ const path = require('path')
 const mkdirp = require('mkdirp')
 const config = require('config')['aa-testkit']
 
-const { getIdForPrefix, sleep, generateMnemonic, getFirstPubkey } = require('../../utils')
+const { getIdForPrefix, sleep, generateMnemonic, getFirstAddress } = require('../../utils')
 const { HeadlessWallet, GenesisNode, ObyteHub, ObyteExplorer, ObyteWitness } = require('../../nodes')
 const NetworkInitializer = require('./NetworkInitializer')
 
@@ -232,7 +232,7 @@ class NetworkFromGenesis {
 
 		for (let i = 0; i < 2; i++) {
 			const mnemonic = generateMnemonic()
-			const address = getFirstPubkey(mnemonic)
+			const address = getFirstAddress(mnemonic)
 			witnesses.push({
 				mnemonic,
 				address,

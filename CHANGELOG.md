@@ -1,5 +1,17 @@
 # Change Log
 
+## v0.3.1 (2020-06-11)
+
+### Changes
+1. Renamed `getFirstPubkey` to `getFirstAddress`
+
+### Features
+1. Added `node.getOutputsBalanceOf` method
+
+### Fixes
+1. Locked `secp256k1` version for better compatibility
+
+
 ## v0.3.0
 
 ### Changes

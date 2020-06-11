@@ -1,4 +1,4 @@
-const { asyncStartHeadlessWalletsWithMnemonics, generateMnemonic, getFirstPubkey } = require('../../utils')
+const { asyncStartHeadlessWalletsWithMnemonics, generateMnemonic, getFirstAddress } = require('../../utils')
 
 class NetworkInitializer {
 	constructor ({ network }) {
@@ -27,7 +27,7 @@ class NetworkInitializer {
 	async prepareWitnesses () {
 		for (let i = 0; i < this.initializer.numberOfWitnesses; i++) {
 			const mnemonic = generateMnemonic()
-			const address = getFirstPubkey(mnemonic, '0000')
+			const address = getFirstAddress(mnemonic)
 
 			this.initializer.witnesses.push({
 				mnemonic,
@@ -58,7 +58,7 @@ class NetworkInitializer {
 
 		if (this.initializer.needDeployer) {
 			const mnemonic = generateMnemonic()
-			const address = getFirstPubkey(mnemonic)
+			const address = getFirstAddress(mnemonic)
 
 			this.initializer.deployer = {
 				address,
@@ -187,7 +187,7 @@ class NetworkInitializer {
 			: { base: wallet[name] }
 
 		const mnemonic = generateMnemonic()
-		const address = getFirstPubkey(mnemonic)
+		const address = getFirstAddress(mnemonic)
 
 		this.initializer.wallets[name] = {
 			address,

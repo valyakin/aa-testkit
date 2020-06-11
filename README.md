@@ -869,6 +869,14 @@ __Returns__ *Promise* that resolves to node balance object
 
 ---------------------------------------
 
+#### __`node.getOutputsBalanceOf(address)`__ *`: Promise<balanceObject>`*
+
+Get outputs balance of the specified address on the network. Do not count comissions earned by this node.
+
+__Returns__ *Promise* that resolves to node balance object
+
+---------------------------------------
+
 ## GenesisNode
 
 Genesis node main function is to start new network and create genesis unit. After this, genesis node serves as witness and source of Bytes. At the moment of network genesis, this node puts on its account `1e15 - 821` Bytes
@@ -1305,9 +1313,9 @@ Returns randomly generated mnemonic phrase valid for HeadlessWallets
 
 ---------------------------------------
 
-#### __`Utils.getFirstPubkey(mnemonic)`__ *`: String`*
+#### __`Utils.getFirstAddress(mnemonic)`__ *`: String`*
 
-Returns first derived pubkey for a given mnemonic pharse. Effectively, this is the first address of the HeadlessWallet(or the only address for single address wallets)
+Returns first wallet address for a given mnemonic pharse.
 
 #### Parameters
 

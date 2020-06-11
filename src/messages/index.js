@@ -24,6 +24,7 @@ const MessageConnectedToHub = require('./lib/MessageConnectedToHub')
 const MessageGenesisCreated = require('./lib/MessageGenesisCreated')
 const MessageMciBecameStable = require('./lib/MessageMciBecameStable')
 const MessagePasswordRequired = require('./lib/MessagePasswordRequired')
+const MessageOutputsBalanceOf = require('./lib/MessageOutputsBalanceOf')
 
 const CommandGetTime = require('./lib/CommandGetTime')
 const CommandTriggerAa = require('./lib/CommandTriggerAa')
@@ -44,6 +45,7 @@ const CommandGetBalanceOf = require('./lib/CommandGetBalanceOf')
 const CommandCreateGenesis = require('./lib/CommandCreateGenesis')
 const CommandGetMyAddresses = require('./lib/CommandGetMyAddresses')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
+const CommandGetOutputsBalanceOf = require('./lib/CommandGetOutputsBalanceOf')
 
 const fromMessage = (m) => {
 	const message = JSON.parse(m)
@@ -75,6 +77,7 @@ const fromMessage = (m) => {
 	case 'connected_to_hub': return new MessageConnectedToHub(message)
 	case 'mci_became_stable': return new MessageMciBecameStable(message)
 	case 'password_required': return new MessagePasswordRequired(message)
+	case 'outputs_balance_of': return new MessageOutputsBalanceOf(message)
 
 	case 'command_get_time': return new CommandGetTime(message)
 	case 'command_trigger_aa': return new CommandTriggerAa(message)
@@ -95,6 +98,7 @@ const fromMessage = (m) => {
 	case 'command_create_genesis': return new CommandCreateGenesis(message)
 	case 'command_get_my_addresses': return new CommandGetMyAddresses(message)
 	case 'command_read_aa_state_vars': return new CommandReadAAStateVars(message)
+	case 'command_get_outputs_balance_of': return new CommandGetOutputsBalanceOf(message)
 
 	default: throw new Error(`Unsupported message topic '${message.topic}'`)
 	}
@@ -129,6 +133,7 @@ module.exports = {
 	MessageGenesisCreated,
 	MessageMciBecameStable,
 	MessagePasswordRequired,
+	MessageOutputsBalanceOf,
 
 	CommandGetTime,
 	CommandTriggerAa,
@@ -149,4 +154,5 @@ module.exports = {
 	CommandCreateGenesis,
 	CommandGetMyAddresses,
 	CommandReadAAStateVars,
+	CommandGetOutputsBalanceOf,
 }

@@ -20,6 +20,7 @@ const {
 	MessageChildStarted,
 	MessageTimeTravelDone,
 	MessageMciBecameStable,
+	MessageOutputsBalanceOf,
 } = require('../../../messages')
 
 class AbstractChild extends EventEmitter {
@@ -52,6 +53,7 @@ class AbstractChild extends EventEmitter {
 			.on('command_get_unit_props', (m) => this.getUnitProps(m))
 			.on('command_get_balance_of', (m) => this.getBalanceOf(m))
 			.on('command_read_aa_state_vars', (m) => this.readAAStateVars(m))
+			.on('command_get_outputs_balance_of', (m) => this.getOutputsBalanceOf(m))
 
 		const eventBus = require('ocore/event_bus')
 		eventBus
@@ -213,10 +215,17 @@ class AbstractChild extends EventEmitter {
 	}
 
 	getBalanceOf ({ address }) {
-		console.log('getBalanceOf address', address)
 		const wallet = require('ocore/wallet')
 		wallet.readBalance(address, (assocBalances) => {
 			this.sendToParent(new MessageBalanceOf({ balance: assocBalances }))
+		})
+	}
+
+	getOutputsBalanceOf ({ address }) {
+		console.log('getOutputsBalanceOf address', address)
+		const balances = require('ocore/balances')
+		balances.readOutputsBalance(address, (assocBalances) => {
+			this.sendToParent(new MessageOutputsBalanceOf({ balance: assocBalances }))
 		})
 	}
 

@@ -1,6 +1,6 @@
 {
   "name": "aa-testkit",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "main.js",
   "author": "Obyte",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "obyte-hub": "git+https://github.com/byteball/obyte-hub",
     "obyte-witness": "git+https://github.com/byteball/obyte-witness",
     "ocore": "git+https://github.com/byteball/ocore",
-    "secp256k1": "^4.0.1",
+    "secp256k1": "^3.1.0",
     "uniqid": "^5.0.3",
     "yargs": "^14.0.0"
   },

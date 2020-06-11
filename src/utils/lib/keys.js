@@ -18,12 +18,12 @@ function getPubkey (mnemonicPhrase, passphrase, account, isChange, addressIndex)
 	return objectHash.getChash160(['sig', { pubkey: pubkey }])
 }
 
-function getFirstPubkey (mnemonicPhrase, passphrase = '0000') {
+function getFirstAddress (mnemonicPhrase, passphrase = '0000') {
 	return getPubkey(mnemonicPhrase, passphrase, 0, 0, 0)
 }
 
 module.exports = {
 	getPubkey,
-	getFirstPubkey,
+	getFirstAddress,
 	generateMnemonic,
 }

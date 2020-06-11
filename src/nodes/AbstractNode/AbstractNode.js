@@ -14,6 +14,7 @@ const {
 	CommandGetBalanceOf,
 	CommandGetUnitProps,
 	CommandReadAAStateVars,
+	CommandGetOutputsBalanceOf,
 } = require('../../messages')
 
 class AbstractNode extends EventEmitter {
@@ -192,6 +193,13 @@ class AbstractNode extends EventEmitter {
 				resolve(m.balance)
 			})
 			this.sendToChild(new CommandGetBalanceOf({ address }))
+		})
+	}
+
+	getOutputsBalanceOf (address) {
+		return new Promise((resolve) => {
+			this.once('outputs_balance_of', m => resolve(m.balance))
+			this.sendToChild(new CommandGetOutputsBalanceOf({ address }))
 		})
 	}
 
