@@ -1,5 +1,14 @@
 # Change Log
 
+## v0.3.2 (2020-06-25)
+
+### Changes
+1. `ocore` upgraded to version `0.3.11`
+
+### Fixes
+1. Fixed `Utils.hasOnlyTheseExternalPayments` function
+
+
 ## v0.3.1 (2020-06-11)
 
 ### Changes
