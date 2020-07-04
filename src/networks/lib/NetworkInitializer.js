@@ -231,8 +231,13 @@ class NetworkInitializer {
 		const { witnesses, transfers } = await this.prepareGenesisData()
 		await this.network.run({ witnesses, transfers })
 
-		await this.initialize(this.initializer)
-		return this.network
+		try {
+			await this.initialize(this.initializer)
+			return this.network
+		} catch (e) {
+			await this.network.stop()
+			throw e
+		}
 	}
 }
 

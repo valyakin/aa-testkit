@@ -1,5 +1,5 @@
 const { Testkit } = require('../../main')
-const { Network } = Testkit()
+const { Network, Utils } = Testkit()
 
 describe('Check timetravel node feature', function () {
 	this.timeout(60000)
@@ -25,7 +25,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time } = await this.wallet.getTime()
-		expect(time).to.be.approximately(Date.now(), 500)
+		expect(time).to.be.finite.and.approximately(Date.now(), 500)
 	}).timeout(30000)
 
 	it('node timetravel to', async () => {
@@ -35,7 +35,7 @@ describe('Check timetravel node feature', function () {
 
 		const { time } = await this.wallet.getTime()
 
-		expect(time).to.be.approximately(new Date(date).getTime(), 500)
+		expect(time).to.be.finite.and.approximately(new Date(date).getTime(), 500)
 	}).timeout(30000)
 
 	it('node timetravel shift milliseconds', async () => {
@@ -45,7 +45,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 1000, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift seconds', async () => {
@@ -55,7 +55,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 30, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 1000 * 30, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift minutes', async () => {
@@ -65,7 +65,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 10, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 1000 * 60 * 10, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift hours', async () => {
@@ -75,7 +75,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 60 * 8, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 1000 * 60 * 60 * 8, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift days', async () => {
@@ -85,7 +85,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore + 1000 * 60 * 60 * 24 * 3, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 1000 * 60 * 60 * 24 * 3, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift in past', async () => {
@@ -95,7 +95,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.string('Attempt to timetravel in past')
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore, 500)
 	}).timeout(30000)
 
 	it('node timetravel shift incorrect format', async () => {
@@ -105,7 +105,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.string("Unsupported 'shift' format '10f'")
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore, 500)
 	}).timeout(30000)
 
 	it('network timetravel both "shift" and "to" params are present', async () => {
@@ -114,7 +114,7 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.null
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(new Date(date).getTime(), 500)
+		expect(timeAfter).to.be.finite.and.approximately(new Date(date).getTime(), 500)
 	}).timeout(30000)
 
 	it('node timetravel to past', async () => {
@@ -123,7 +123,65 @@ describe('Check timetravel node feature', function () {
 		expect(error).to.be.string('Attempt to timetravel in past')
 
 		const { time: timeAfter } = await this.wallet.getTime()
-		expect(timeAfter).to.be.approximately(timeBefore, 500)
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore, 500)
+	}).timeout(30000)
+
+	it('node timefreeze', async () => {
+		await this.wallet.timefreeze()
+		const { time: timeBefore } = await this.wallet.getTime()
+
+		await Utils.sleep(3000)
+
+		const { time: timeAfter } = await this.wallet.getTime()
+		expect(timeAfter).to.be.finite.and.equal(timeBefore)
+	}).timeout(30000)
+
+	it('node timerun', async () => {
+		await this.wallet.timerun()
+		const { time: timeBefore } = await this.wallet.getTime()
+
+		await Utils.sleep(3000)
+
+		const { time: timeAfter } = await this.wallet.getTime()
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 3000, 500)
+	}).timeout(30000)
+
+	it('node timefreeze and timetravel', async () => {
+		await this.wallet.timefreeze()
+		const { time: timeBefore } = await this.wallet.getTime()
+		const { error } = await this.wallet.timetravel({ shift: 86400 * 1000 })
+		expect(error).to.be.null
+
+		await Utils.sleep(3000)
+
+		const { time: timeAfter } = await this.wallet.getTime()
+		expect(timeAfter).to.be.finite.and.equal(timeBefore + 86400 * 1000)
+	}).timeout(30000)
+
+	it('node timerun after freeze and travel', async () => {
+		await this.wallet.timerun()
+		const { time: timeBefore } = await this.wallet.getTime()
+
+		await Utils.sleep(3000)
+
+		const { time: timeAfter } = await this.wallet.getTime()
+		expect(timeAfter).to.be.finite.and.approximately(timeBefore + 3000, 500)
+	}).timeout(30000)
+
+	it('timefreeze error when time already frozen', async () => {
+		const { error: error1 } = await this.wallet.timefreeze()
+		expect(error1).to.be.null
+
+		const { error: error2 } = await this.wallet.timefreeze()
+		expect(error2).to.be.equal('Time has been frozen already')
+	}).timeout(30000)
+
+	it('timerun error when time already running', async () => {
+		const { error: error1 } = await this.wallet.timerun()
+		expect(error1).to.be.null
+
+		const { error: error2 } = await this.wallet.timerun()
+		expect(error2).to.be.equal('Time is running already')
 	}).timeout(30000)
 
 	after(async () => {

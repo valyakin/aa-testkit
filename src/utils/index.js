@@ -2,6 +2,7 @@ const sleep = require('./lib/sleep')
 const isValidBase64 = require('./lib/isValidBase64')
 const isValidAddress = require('./lib/isValidAddress')
 const getIdForPrefix = require('./lib/getIdForPrefix')
+const getExternalPayments = require('./lib/getExternalPayments')
 const countCommissionInUnits = require('./lib/countCommissionInUnits')
 const hasOnlyTheseExternalPayments = require('./lib/hasOnlyTheseExternalPayments')
 const {
@@ -16,6 +17,7 @@ module.exports = {
 	isValidBase64,
 	isValidAddress,
 	getIdForPrefix,
+	getExternalPayments,
 	countCommissionInUnits,
 	asyncStartHeadlessWallets,
 	hasOnlyTheseExternalPayments,

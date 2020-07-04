@@ -5,11 +5,13 @@ const Joi = require('joi')
 
 const {
 	fromMessage,
+	CommandTimeRun,
 	CommandGetTime,
 	CommandChildStop,
 	CommandTimeTravel,
 	MessageChildError,
 	CommandGetLastMCI,
+	CommandTimeFreeze,
 	CommandGetUnitInfo,
 	CommandGetBalanceOf,
 	CommandGetUnitProps,
@@ -53,6 +55,7 @@ class AbstractNode extends EventEmitter {
 				HOME: path.join(this.rundir, this.id),
 				...env,
 			},
+			execArgv: [],
 		}
 
 		this.child = childProcess.fork('index.js', argv, options)
@@ -124,6 +127,24 @@ class AbstractNode extends EventEmitter {
 				resolve({ error: m.error })
 			})
 			this.sendToChild(new CommandTimeTravel({ to, shift }))
+		})
+	}
+
+	async timefreeze () {
+		return new Promise(resolve => {
+			this.once('time_freeze_done', (m) => {
+				resolve({ error: m.error })
+			})
+			this.sendToChild(new CommandTimeFreeze())
+		})
+	}
+
+	async timerun () {
+		return new Promise(resolve => {
+			this.once('time_run_done', (m) => {
+				resolve({ error: m.error })
+			})
+			this.sendToChild(new CommandTimeRun())
 		})
 	}
 

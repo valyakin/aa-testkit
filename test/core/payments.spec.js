@@ -34,7 +34,7 @@ describe('Check payments', function () {
 		await network.sync()
 
 		aliceBalance = await alice.getBalance()
-		expect(aliceBalance.base.pending).to.be.equal(49401)
+		expect(aliceBalance.base.pending).to.be.equal(49172)
 
 		let bobBalance = await bob.getBalance()
 		expect(bobBalance.base.pending).to.be.equal(50000)
@@ -42,7 +42,7 @@ describe('Check payments', function () {
 		await network.witnessUntilStable(unit2)
 
 		aliceBalance = await alice.getBalance()
-		expect(aliceBalance.base.stable).to.be.equal(49756)
+		expect(aliceBalance.base.stable).to.be.equal(49626)
 
 		bobBalance = await bob.getBalance()
 		expect(bobBalance.base.stable).to.be.equal(50000)
@@ -55,7 +55,7 @@ describe('Check payments', function () {
 		await network.witnessUntilStable(unit3)
 
 		aliceBalance = await alice.getBalance()
-		expect(aliceBalance.base.stable).to.be.equal(1000049756)
+		expect(aliceBalance.base.stable).to.be.equal(1000049626)
 	}).timeout(30000 * 1000)
 
 	after(async () => {

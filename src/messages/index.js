@@ -15,17 +15,20 @@ const MessageAaTriggered = require('./lib/MessageAaTriggered')
 const MessageCurrentTime = require('./lib/MessageCurrentTime')
 const MessageMyAddresses = require('./lib/MessageMyAddresses')
 const MessageAAStateVars = require('./lib/MessageAAStateVars')
+const MessageTimeRunDone = require('./lib/MessageTimeRunDone')
 const MessageChildStarted = require('./lib/MessageChildStarted')
 const MessageAssetCreated = require('./lib/MessageAssetCreated')
 const MessageAgentDeployed = require('./lib/MessageAgentDeployed')
 const MessageWitnessPosted = require('./lib/MessageWitnessPosted')
 const MessageTimeTravelDone = require('./lib/MessageTimeTravelDone')
+const MessageTimeFreezeDone = require('./lib/MessageTimeFreezeDone')
 const MessageConnectedToHub = require('./lib/MessageConnectedToHub')
 const MessageGenesisCreated = require('./lib/MessageGenesisCreated')
 const MessageMciBecameStable = require('./lib/MessageMciBecameStable')
 const MessagePasswordRequired = require('./lib/MessagePasswordRequired')
 const MessageOutputsBalanceOf = require('./lib/MessageOutputsBalanceOf')
 
+const CommandTimeRun = require('./lib/CommandTimeRun')
 const CommandGetTime = require('./lib/CommandGetTime')
 const CommandTriggerAa = require('./lib/CommandTriggerAa')
 const CommandSendMulti = require('./lib/CommandSendMulti')
@@ -35,6 +38,7 @@ const CommandGetLastMCI = require('./lib/CommandGetLastMCI')
 const CommandGetAddress = require('./lib/CommandGetAddress')
 const CommandLoginToHub = require('./lib/CommandLoginToHub')
 const CommandGetBalance = require('./lib/CommandGetBalance')
+const CommandTimeFreeze = require('./lib/CommandTimeFreeze')
 const CommandTimeTravel = require('./lib/CommandTimeTravel')
 const CommandDeployAgent = require('./lib/CommandDeployAgent')
 const CommandCreateAsset = require('./lib/CommandCreateAsset')
@@ -68,17 +72,20 @@ const fromMessage = (m) => {
 	case 'current_time': return new MessageCurrentTime(message)
 	case 'my_addresses': return new MessageMyAddresses(message)
 	case 'aa_state_vars': return new MessageAAStateVars(message)
+	case 'time_run_done': return new MessageTimeRunDone(message)
 	case 'child_started': return new MessageChildStarted(message)
 	case 'asset_created': return new MessageAssetCreated(message)
 	case 'witness_posted': return new MessageWitnessPosted(message)
 	case 'agent_deployed': return new MessageAgentDeployed(message)
 	case 'genesis_created': return new MessageGenesisCreated(message)
+	case 'time_freeze_done': return new MessageTimeFreezeDone(message)
 	case 'time_travel_done': return new MessageTimeTravelDone(message)
 	case 'connected_to_hub': return new MessageConnectedToHub(message)
 	case 'mci_became_stable': return new MessageMciBecameStable(message)
 	case 'password_required': return new MessagePasswordRequired(message)
 	case 'outputs_balance_of': return new MessageOutputsBalanceOf(message)
 
+	case 'command_time_run': return new CommandTimeRun(message)
 	case 'command_get_time': return new CommandGetTime(message)
 	case 'command_trigger_aa': return new CommandTriggerAa(message)
 	case 'command_send_multi': return new CommandSendMulti(message)
@@ -86,6 +93,7 @@ const fromMessage = (m) => {
 	case 'command_send_bytes': return new CommandSendBytes(message)
 	case 'command_get_address': return new CommandGetAddress(message)
 	case 'command_get_balance': return new CommandGetBalance(message)
+	case 'command_time_freeze': return new CommandTimeFreeze(message)
 	case 'command_time_travel': return new CommandTimeTravel(message)
 	case 'command_get_last_mci': return new CommandGetLastMCI(message)
 	case 'command_login_to_hub': return new CommandLoginToHub(message)
@@ -120,6 +128,7 @@ module.exports = {
 	MessageChildError,
 	MessageAAResponse,
 	MessageChildReady,
+	MessageTimeRunDone,
 	MessageAaTriggered,
 	MessageCurrentTime,
 	MessageMyAddresses,
@@ -129,6 +138,7 @@ module.exports = {
 	MessageWitnessPosted,
 	MessageAgentDeployed,
 	MessageConnectedToHub,
+	MessageTimeFreezeDone,
 	MessageTimeTravelDone,
 	MessageGenesisCreated,
 	MessageMciBecameStable,
@@ -136,6 +146,7 @@ module.exports = {
 	MessageOutputsBalanceOf,
 
 	CommandGetTime,
+	CommandTimeRun,
 	CommandTriggerAa,
 	CommandSendMulti,
 	CommandChildStop,
@@ -143,6 +154,7 @@ module.exports = {
 	CommandGetLastMCI,
 	CommandGetAddress,
 	CommandLoginToHub,
+	CommandTimeFreeze,
 	CommandTimeTravel,
 	CommandGetBalance,
 	CommandDeployAgent,

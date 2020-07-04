@@ -1,5 +1,5 @@
 const { Testkit } = require('../../main')
-const { Network } = Testkit()
+const { Network, Utils } = Testkit()
 
 describe('Check timetravel network feature', function () {
 	this.timeout(60000)
@@ -10,7 +10,7 @@ describe('Check timetravel network feature', function () {
 		this.expectTimeInNodes = async (expectedTime) => {
 			for (const node of this.nodes) {
 				const { time } = await node.getTime()
-				expect(time, `${node.id} time should be ${time}`).to.be.approximately(expectedTime, 500)
+				expect(time, `${node.id} time should be ${time}`).to.be.finite.and.approximately(expectedTime, 500)
 			}
 		}
 
@@ -151,6 +151,43 @@ describe('Check timetravel network feature', function () {
 		expect(error).to.include('Attempt to timetravel in past')
 
 		await this.expectTimeInNodes(timeBefore)
+	}).timeout(30000)
+
+	it('network timefreeze', async () => {
+		await this.network.timefreeze()
+		const { time: timeBefore } = await this.genesis.getTime()
+
+		await Utils.sleep(3000)
+
+		await this.expectTimeInNodes(timeBefore)
+	}).timeout(30000)
+
+	it('network timerun', async () => {
+		await this.network.timerun()
+		const { time: timeBefore } = await this.genesis.getTime()
+
+		await Utils.sleep(3000)
+
+		await this.expectTimeInNodes(timeBefore + 3000)
+	}).timeout(30000)
+
+	it('network timefreeze and timetravel', async () => {
+		await this.network.timefreeze()
+		const { time: timeBefore } = await this.genesis.getTime()
+		await this.network.timetravel({ shift: 864000 * 1000 })
+
+		await Utils.sleep(3000)
+
+		await this.expectTimeInNodes(timeBefore + 864000 * 1000)
+	}).timeout(30000)
+
+	it('network timerun after freeze and travel', async () => {
+		await this.network.timerun()
+		const { time: timeBefore } = await this.genesis.getTime()
+
+		await Utils.sleep(3000)
+
+		await this.expectTimeInNodes(timeBefore + 3000, 500)
 	}).timeout(30000)
 
 	after(async () => {

@@ -1,5 +1,15 @@
 # Change Log
 
+## v0.3.3 (2020-07-04)
+
+### Changes
+1. `ocore` upgraded to version `0.3.12`
+
+### Features
+1. `Utils.getExternalPayments` method added
+2. `network.timefreeze()` method added
+3. `network.timerun()` method added
+
 ## v0.3.2 (2020-06-25)
 
 ### Changes

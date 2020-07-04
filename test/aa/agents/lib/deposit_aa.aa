@@ -1,0 +1,83 @@
+{
+	getters: '{
+		$count_withdrawal = ($time, $deposit) => $deposit * (1 + 1/100)^(timestamp - $time); // 1 percent per second
+	}',
+	messages: {
+		cases: [
+			{
+				if: '{trigger.data.deposit}',
+				init: '{
+					if (var[trigger.address])
+						bounce('Already has a deposit');
+				}',
+				messages: [
+					{
+						app: 'state',
+						state: '{
+							var[trigger.address] = { time: timestamp, deposit: trigger.output[[asset=base]] - 10000 };
+						}'
+					}
+				]
+			},
+			{
+				if: '{trigger.data.withdraw}',
+				init: '{
+					if (!var[trigger.address])
+						bounce('You don\'t have a deposit');
+				}',
+				messages: [
+					{
+						app: 'payment',
+						payload: {
+							asset: 'base',
+							outputs: [
+								{
+									address: '{trigger.address}',
+									amount: '{
+										$data = var[trigger.address];
+										$time = $data.time;
+										$deposit = $data.deposit;
+										$count_withdrawal($time, $deposit)
+									}'
+								}
+							]
+						}
+					},
+					{
+						app: 'state',
+						state: '{
+							var[trigger.address] = false;
+						}'
+					},
+				]
+			},
+			{
+				if: '{!trigger.data.withdraw AND !trigger.data.deposit}',
+				init: '{
+					if (!var[trigger.address])
+						bounce('You don\'t have a deposit in this bank');
+					$data = var[trigger.address];
+					$time = $data.time;
+					$deposit = $data.deposit;
+					response['time'] = $time;
+					response['deposit'] = $deposit;
+					response['withdraw'] = $count_withdrawal($time, $deposit);
+				}',
+				messages: [
+					{
+						app: 'payment',
+						payload: {
+							asset: 'base',
+							outputs: [
+								{
+									address: '{trigger.address}',
+									amount: '{trigger.output[[asset=base]] - 10000}'
+								}
+							]
+						}
+					},
+				]
+			}
+		]
+	}
+}

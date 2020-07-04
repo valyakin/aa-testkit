@@ -1,4 +1,4 @@
-const mockdate = require('mockdate')
+const timekeeper = require('timekeeper')
 const EventEmitter = require('events')
 const Joi = require('joi')
 const util = require('util')
@@ -17,7 +17,9 @@ const {
 	MessageAAResponse,
 	MessageCurrentTime,
 	MessageAAStateVars,
+	MessageTimeRunDone,
 	MessageChildStarted,
+	MessageTimeFreezeDone,
 	MessageTimeTravelDone,
 	MessageMciBecameStable,
 	MessageOutputsBalanceOf,
@@ -27,6 +29,7 @@ class AbstractChild extends EventEmitter {
 	constructor (params, paramsSchema, options) {
 		super()
 		this.setMaxListeners(20)
+		this.isTimeFrozen = false
 
 		const { error, value } = Joi.validate(
 			params,
@@ -47,6 +50,8 @@ class AbstractChild extends EventEmitter {
 		this
 			.on('command_child_stop', () => this.stop())
 			.on('command_get_time', (m) => this.getTime(m))
+			.on('command_time_run', (m) => this.timerun(m))
+			.on('command_time_freeze', (m) => this.timefreeze(m))
 			.on('command_time_travel', (m) => this.timetravel(m))
 			.on('command_get_last_mci', (m) => this.getLastMCI(m))
 			.on('command_get_unit_info', (m) => this.getUnitInfo(m))
@@ -77,6 +82,29 @@ class AbstractChild extends EventEmitter {
 		process.exit()
 	}
 
+	timefreeze () {
+		if (this.isTimeFrozen) {
+			this.sendToParent(new MessageTimeFreezeDone({ error: 'Time has been frozen already' }))
+		} else {
+			this.isTimeFrozen = true
+			timekeeper.freeze(Date.now())
+			this.sendToParent(new MessageTimeFreezeDone({ error: null }))
+		}
+	}
+
+	timerun () {
+		if (this.isTimeFrozen) {
+			this.isTimeFrozen = false
+			const currentDate = Date.now()
+			timekeeper.reset()
+			timekeeper.travel(new Date(currentDate))
+
+			this.sendToParent(new MessageTimeRunDone({ error: null }))
+		} else {
+			this.sendToParent(new MessageTimeRunDone({ error: 'Time is running already' }))
+		}
+	}
+
 	timetravel ({ to, shift }) {
 		const currentDate = Date.now()
 
@@ -88,7 +116,7 @@ class AbstractChild extends EventEmitter {
 			if (newDate < currentDate) {
 				throw new Error('Attempt to timetravel in past')
 			}
-			mockdate.set(newDate)
+			timekeeper.travel(new Date(newDate))
 			this.sendToParent(new MessageTimeTravelDone({ error: null }))
 		} catch (error) {
 			this.sendToParent(new MessageTimeTravelDone({ error: error.message }))

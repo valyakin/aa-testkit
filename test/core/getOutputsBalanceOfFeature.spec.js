@@ -48,7 +48,7 @@ describe('getOutputsBalanceOf AbstractNode feature', function () {
 		expect(error).to.be.null
 
 		const aliceBalanceBefore = await this.network.wallet.alice.getOutputsBalanceOf(await this.network.wallet.alice.getAddress())
-		expect(aliceBalanceBefore.base.pending).to.be.equal(49989998779)
+		expect(aliceBalanceBefore.base.pending).to.be.equal(49989998297)
 		expect(aliceBalanceBefore.base.stable).to.be.equal(0)
 
 		await this.network.wallet.bob.waitForUnit(unit)
@@ -60,7 +60,7 @@ describe('getOutputsBalanceOf AbstractNode feature', function () {
 		await this.network.witnessUntilStable(unit)
 
 		const aliceBalanceAfter = await this.network.wallet.alice.getOutputsBalanceOf(await this.network.wallet.alice.getAddress())
-		expect(aliceBalanceAfter.base.stable).to.be.equal(49989998779)
+		expect(aliceBalanceAfter.base.stable).to.be.equal(49989998297)
 		expect(aliceBalanceAfter.base.pending).to.be.equal(0)
 
 		const bobBalanceAfter = await this.network.wallet.bob.getOutputsBalanceOf(await this.network.wallet.bob.getAddress())

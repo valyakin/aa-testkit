@@ -59,6 +59,32 @@ class NetworkFromGenesis {
 		})
 	}
 
+	async timefreeze () {
+		return Promise.all(this.nodesList.map(n => n.timefreeze())).then(errors => {
+			return {
+				error:
+					errors
+						.filter(e => e.error)
+						.map(e => `${e.id}: ${e.error}`)
+						.join(',') ||
+					null,
+			}
+		})
+	}
+
+	async timerun () {
+		return Promise.all(this.nodesList.map(n => n.timerun())).then(errors => {
+			return {
+				error:
+					errors
+						.filter(e => e.error)
+						.map(e => `${e.id}: ${e.error}`)
+						.join(',') ||
+					null,
+			}
+		})
+	}
+
 	async sync () {
 		const arrayMci = await Promise.all(this.nodesList.map(n => n.getLastMCI()))
 		const maxMci = Math.max(...arrayMci)

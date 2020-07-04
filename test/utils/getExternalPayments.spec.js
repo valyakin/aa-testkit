@@ -1,7 +1,7 @@
 const { Testkit } = require('../../main')
 const { Network, Utils } = Testkit()
 
-describe('Response unit has only these payments', function () {
+describe('Get response unit external payments', function () {
 	this.timeout(60000)
 
 	const mockAddress1 = 'WDZZ6AGCHI5HTS6LJD3LYLPNBWZ72DZI'
@@ -32,10 +32,10 @@ describe('Response unit has only these payments', function () {
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
 
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.true
+		}])
 	})
 
 	it('one asset payment match', async () => {
@@ -49,11 +49,11 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 80006,
 			asset: this.asset_1,
-		}])).to.be.true
+		}])
 	})
 
 	it('two asset two base payment match', async () => {
@@ -77,7 +77,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 80006,
 			asset: this.asset_1,
@@ -91,7 +91,7 @@ describe('Response unit has only these payments', function () {
 		}, {
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.true
+		}])
 	})
 
 	it('expected one less base payment - 1', async () => {
@@ -107,10 +107,10 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.false
+		}])
 	})
 
 	it('expected one less base payment - 2', async () => {
@@ -126,10 +126,10 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.false
+		}])
 	})
 
 	it('expected one less asset payment', async () => {
@@ -153,7 +153,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 80006,
 			asset: this.asset_1,
@@ -163,7 +163,7 @@ describe('Response unit has only these payments', function () {
 		}, {
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.false
+		}])
 	})
 
 	it('two base payments match - 1', async () => {
@@ -179,13 +179,13 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
 		}, {
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.true
+		}])
 	})
 
 	it('two base payments match - 2', async () => {
@@ -201,13 +201,13 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
 		}, {
 			address: mockAddress2,
 			amount: 1855138,
-		}])).to.be.true
+		}])
 	})
 
 	it('two base payments match - 3', async () => {
@@ -223,13 +223,13 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
 		}, {
 			address: mockAddress2,
 			amount: 1855138,
-		}])).to.be.true
+		}])
 	})
 
 	it('expected one more base payment - 1', async () => {
@@ -242,13 +242,13 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
 		}, {
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.false
+		}])
 	})
 
 	it('expected one more asset payment - 2', async () => {
@@ -261,17 +261,17 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 185513,
 		}, {
 			address: mockAddress1,
 			amount: 185513,
 			asset: 'LEZs/hW7YDPD0TwkplMSI11UveaFuZ3qI8WxG/fdOps=',
-		}])).to.be.false
+		}])
 	})
 
-	it('Has only this payments', async () => {
+	it('expect less payments than in Response', async () => {
 		const { unit } = await this.sender.sendMulti({
 			asset_outputs: [{
 				address: mockAddress1,
@@ -292,7 +292,7 @@ describe('Response unit has only these payments', function () {
 		})
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress2,
 			amount: 3806,
 			asset: this.asset_1,
@@ -302,7 +302,7 @@ describe('Response unit has only these payments', function () {
 		}, {
 			address: mockAddress1,
 			amount: 185513,
-		}])).to.be.false
+		}])
 	})
 
 	it('send asset and base, expect has asset only', async () => {
@@ -321,11 +321,11 @@ describe('Response unit has only these payments', function () {
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
 
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 90000,
 			asset: this.asset_1,
-		}])).to.be.false
+		}])
 	})
 
 	it('send asset and base, expect has base only', async () => {
@@ -344,10 +344,10 @@ describe('Response unit has only these payments', function () {
 		const { unitObj } = await this.sender.getUnitInfo({ unit })
 		await this.network.witnessUntilStable(unit)
 
-		expect(Utils.hasOnlyTheseExternalPayments(unitObj, [{
+		expect(Utils.getExternalPayments(unitObj)).to.not.deep.equalInAnyOrder([{
 			address: mockAddress1,
 			amount: 200000,
-		}])).to.be.false
+		}])
 	})
 
 	after(async () => {

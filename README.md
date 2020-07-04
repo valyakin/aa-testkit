@@ -457,10 +457,13 @@ __Returns__ *Promise* that resolves to `{ response }` where `response` is the ob
 
 #### __`network.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
 
-allows you to set the current network time in the future. This can be helpful for testing time-dependent AA.
-> **Note:** Timetravel should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
+Allows to set the current network time in the future. This can be helpful for testing time-dependent AA.
 
-__Returns__ *Promise* that resolves to `{ error }` after timetravel is done. `error` will be null if timetravel was successfull
+> **Note:** `timetravel` should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
+
+> **Note:** If traveling when time is frozen, the time will be frozen to the new traveled time
+
+__Returns__ *Promise* that resolves to `{ error }` after `timetravel` is done. `error` will be null if `timetravel` call was successfull
 
 #### Parameters
 
@@ -492,6 +495,26 @@ const { error } = await network.timetravel({ to: '2050-01-01' })
 
 Also check in [Test Examples](#Test-Examples)
 </details>
+
+---------------------------------------
+
+#### __`network.timefreeze()`__ *`: Promise<{ error: string }>`*
+
+Allows to stop time running on the nodes in the network. This can be helpful for testing time-dependent AA.
+
+> **Note:** `timefreeze` should be used only after every node has been started. Running a node after `timefreeze` call can lead to network inconsistency.
+
+> **Note:** If traveling when time is frozen, the time will be frozen to the new traveled time
+
+__Returns__ *Promise* that resolves to `{ error }` after `timefreeze` is done. `error` will be null if `timefreeze` was successfull
+
+---------------------------------------
+
+#### __`network.timerun()`__ *`: Promise<{ error: string }>`*
+
+This function resumes time running on the nodes in the network. Time resumes from the last time-traveled position.
+
+__Returns__ *Promise* that resolves to `{ error }` after `timerun` is done. `error` will be null if `timerun` was successfull
 
 ---------------------------------------
 
@@ -1442,7 +1465,7 @@ await network.stop()
 
 ---------------------------------------
 
-#### __`Utils.hasOnlyTheseExternalPayments(unit, arrExpectedPayments)`__ *`: Promise(Boolean)`*
+#### __`Utils.hasOnlyTheseExternalPayments(unit, arrExpectedPayments)`__ *`: Boolean`*
 
 Helper to check the outputs of a response unit. Returns `true` if the unit contains exclusively the payment described in arrExpectedPayments.
 
@@ -1521,6 +1544,16 @@ const isValid = Utils.hasOnlyTheseExternalPayments(unitObj, [{
 }])
 ```
 </details>
+
+---------------------------------------
+
+#### __`Utils.getExternalPayments(unit)`__ *`: Array`*
+
+Returns an array of external payments for a given unit object
+
+#### Parameters
+
+*`unit`* - unit object
 
 ---------------------------------------
 

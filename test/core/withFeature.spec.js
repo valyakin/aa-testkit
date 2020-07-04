@@ -74,7 +74,7 @@ describe('Check NetworkInitializer with function (everything together)', functio
 
 		const balance = await this.network.wallet.alice.getBalance()
 		expect(balance.base.pending).to.be.equal(0)
-		expect(balance.base.stable).to.be.equal(998756)
+		expect(balance.base.stable).to.be.equal(998626)
 	}).timeout(30000)
 
 	it('Check explorer is accessible', async () => {

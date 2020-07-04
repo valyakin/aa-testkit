@@ -3,7 +3,7 @@ const { Testkit } = require('../../main')
 const { Network } = Testkit()
 const { justABouncer } = require('../aa/agents')
 
-describe('Check NetworkInitializer with function (everything together)', function () {
+describe('Check NetworkInitializer with agent function', function () {
 	this.timeout(60000)
 
 	before(async () => {
