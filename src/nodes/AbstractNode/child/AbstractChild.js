@@ -30,6 +30,8 @@ class AbstractChild extends EventEmitter {
 		super()
 		this.setMaxListeners(20)
 		this.isTimeFrozen = false
+		this.writeStream = null
+		this.isShuttingDown = false
 
 		const { error, value } = Joi.validate(
 			params,
@@ -66,6 +68,13 @@ class AbstractChild extends EventEmitter {
 			.on('aa_response', (objAAResponse) => this.sendToParent(new MessageAAResponse({ response: objAAResponse })))
 			.on('new_joint', (joint) => this.sendToParent(new MessageNewJoint({ joint })))
 			.on('saved_unit', (joint) => this.sendToParent(new MessageSavedUnit({ joint })))
+
+		process.on('SIGINT', () => {
+			this.shutdown()
+		})
+		process.on('SIGTERM', () => {
+			this.shutdown()
+		})
 	}
 
 	static unpackArgv (argv) {
@@ -79,7 +88,21 @@ class AbstractChild extends EventEmitter {
 
 	stop () {
 		console.log('Received command to stop')
-		process.exit()
+		this.shutdown()
+	}
+
+	shutdown () {
+		if (!this.isShuttingDown) {
+			this.isShuttingDown = true
+			const network = require('ocore/network')
+			network.closeAllWsConnections()
+			console.log('process shutdown')
+			const stream = this.writeStream
+			this.writeStream = null
+			stream.end('end', () => {
+				process.exit()
+			})
+		}
 	}
 
 	timefreeze () {
@@ -264,10 +287,12 @@ class AbstractChild extends EventEmitter {
 		mkdirp.sync(appDataDir)
 
 		const logFilename = conf.LOG_FILENAME || (appDataDir + '/log.txt')
-		const writeStream = fs.createWriteStream(logFilename, { flags: 'a' })
+		this.writeStream = fs.createWriteStream(logFilename, { flags: 'a' })
 		console.log = (...args) => {
-			writeStream.write(this.logPrefix())
-			writeStream.write(util.format.apply(null, args) + '\n')
+			if (this.writeStream) {
+				this.writeStream.write(this.logPrefix())
+				this.writeStream.write(util.format.apply(null, args) + '\n')
+			}
 		}
 		console.error = console.log
 		console.warn = console.log

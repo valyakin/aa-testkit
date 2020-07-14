@@ -1,9 +1,10 @@
 # Change Log
 
-## v0.3.4 (2020-07-14)
+## v0.3.5 (2020-07-14)
 
 ### Fixes
 1. Child processes cleanup on `testkit` exiting
+2. Flush node log buffer on exit
 
 ## v0.3.3 (2020-07-04)
 
