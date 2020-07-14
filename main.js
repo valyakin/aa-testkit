@@ -1,4 +1,5 @@
 const Utils = require('./src/utils')
+const { ChildrenManager } = require('./src/sevices')
 
 process.env.SUPPRESS_NO_CONFIG_WARNING = 'y'
 const config = require('config')
@@ -16,5 +17,16 @@ function Testkit (configs = {}) {
 		Utils,
 	}
 }
+
+process.on('exit', () => {
+	ChildrenManager.stop()
+})
+process.on('SIGINT', () => {
+	process.exit()
+})
+
+process.on('SIGTERM', () => {
+	process.exit()
+})
 
 module.exports = { Testkit, Utils }

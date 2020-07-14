@@ -1,7 +1,7 @@
-const childProcess = require('child_process')
 const EventEmitter = require('events')
 const path = require('path')
 const Joi = require('joi')
+const { ChildrenManager } = require('../../sevices')
 
 const {
 	fromMessage,
@@ -58,7 +58,7 @@ class AbstractNode extends EventEmitter {
 			execArgv: [],
 		}
 
-		this.child = childProcess.fork('index.js', argv, options)
+		this.child = ChildrenManager.fork('index.js', argv, options)
 			.on('exit', this.handleChildExit.bind(this))
 			.on('error', this.handleChildError.bind(this))
 			.on('message', this.handleChildMessage.bind(this))
