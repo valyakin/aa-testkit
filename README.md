@@ -3,6 +3,7 @@
 Instant Obyte devnet network set up and testing
 
 ## Table of contents
+* [Quick Start](#Quick-Start)
 * [Usage](#Usage)
 * [Testkit API](#Testkit-API)
 * [Network API](#Network-API)
@@ -23,6 +24,19 @@ Instant Obyte devnet network set up and testing
 * [Utils](#Utils)
 * [Test Examples](#Test-Examples)
 * [Writing Tests With Mocha](#Writing-Tests-With-Mocha)
+
+## Quick Start
+
+To quick start with autonomous agent development run the following command:
+
+```bash
+# requires npm 5.2+ installed
+npx create-aa my-agent
+```
+
+This command will prepare the project and the environment from template for AA development.
+
+Also check the [VScode extension](https://marketplace.visualstudio.com/items?itemName=obyte.oscript-vscode-plugin) for AA development and testing
 
 ## Usage
 ```javascript

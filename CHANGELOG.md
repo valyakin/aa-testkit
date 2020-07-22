@@ -1,5 +1,10 @@
 # Change Log
 
+## v0.3.6 (2020-07-22)
+
+1. Added Quick Start section to README
+2. Fixed node log stream end
+
 ## v0.3.5 (2020-07-14)
 
 ### Fixes

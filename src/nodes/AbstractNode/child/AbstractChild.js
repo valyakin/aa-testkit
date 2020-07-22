@@ -99,7 +99,7 @@ class AbstractChild extends EventEmitter {
 			console.log('process shutdown')
 			const stream = this.writeStream
 			this.writeStream = null
-			stream.end('end', () => {
+			stream.end('', () => {
 				process.exit()
 			})
 		}
