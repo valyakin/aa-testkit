@@ -1,6 +1,6 @@
 {
   "name": "aa-testkit",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "main": "main.js",
   "author": "Obyte",
   "license": "MIT",
@@ -13,20 +13,23 @@
     "test:all": "mocha test/**/**spec.js",
     "lint": "node ./node_modules/.bin/eslint --ext .js --max-warnings=0 --fix src test"
   },
+  "engines": {
+		"node": ">=8"
+	},
   "dependencies": {
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte",
+    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer",
+    "obyte-hub": "git+https://github.com/byteball/obyte-hub",
+    "obyte-witness": "git+https://github.com/byteball/obyte-witness",
+    "ocore": "git+https://github.com/byteball/ocore",
     "bitcore-lib": "^0.13.14",
     "bitcore-mnemonic": "~1.0.0",
     "config": "^3.2.2",
     "crypto": "^1.0.1",
     "deep-equal-in-any-order": "^1.0.27",
-    "headless-obyte": "git+https://github.com/byteball/headless-obyte",
     "joi": "^14.3.1",
     "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
-    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer",
-    "obyte-hub": "git+https://github.com/byteball/obyte-hub",
-    "obyte-witness": "git+https://github.com/byteball/obyte-witness",
-    "ocore": "git+https://github.com/byteball/ocore",
     "secp256k1": "^3.1.0",
     "timekeeper": "^2.2.0",
     "uniqid": "^5.0.3",
@@ -44,6 +47,10 @@
     "eslint-plugin-standard": "^4.0.1",
     "mocha": "^6.2.0",
     "pre-commit": "^1.2.2"
+  },
+  "resolutions": {
+		"chalk": "^3.0.0",
+    "cli-width": "^2.2.1"
   },
   "pre-commit": [
     "lint"

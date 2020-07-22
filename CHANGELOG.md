@@ -1,9 +1,10 @@
 # Change Log
 
-## v0.3.6 (2020-07-22)
+## v0.3.7 (2020-07-22)
 
 1. Added Quick Start section to README
 2. Fixed node log stream end
+3. Fix node 8 dev dependencies incompatibility
 
 ## v0.3.5 (2020-07-14)
 
