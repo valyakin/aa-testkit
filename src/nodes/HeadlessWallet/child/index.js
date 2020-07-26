@@ -12,8 +12,9 @@ const {
 	MessageChildReady,
 	MessageMyAddresses,
 	MessageAaTriggered,
-	MessageAgentDeployed,
 	MessageAssetCreated,
+	MessageAgentDeployed,
+	MessageSignedPackage,
 	MessagePasswordRequired,
 } = require('../../../messages')
 
@@ -38,6 +39,7 @@ class HeadlessWalletChild extends AbstractChild {
 			.on('command_get_balance', (m) => this.getBalance(m))
 			.on('command_deploy_agent', (m) => this.deployAgent(m))
 			.on('command_create_asset', (m) => this.createAsset(m))
+			.on('command_sign_message', (m) => this.signMessage(m))
 			.on('command_get_my_addresses', (m) => this.getMyAddresses(m))
 	}
 
@@ -248,6 +250,14 @@ class HeadlessWalletChild extends AbstractChild {
 			messages: [objMessage],
 			signer: signer,
 			callbacks: callbacks,
+		})
+	}
+
+	signMessage ({ message }) {
+		this.headlessWallet.readFirstAddress(myAddress => {
+			this.headlessWallet.signMessage(myAddress, message, (error, signedPackage) => {
+				if (error) { this.sendToParent(new MessageSignedPackage({ error })) } else { this.sendToParent(new MessageSignedPackage({ signedPackage })) }
+			})
 		})
 	}
 }

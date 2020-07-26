@@ -20,6 +20,7 @@ const MessageChildStarted = require('./lib/MessageChildStarted')
 const MessageAssetCreated = require('./lib/MessageAssetCreated')
 const MessageAgentDeployed = require('./lib/MessageAgentDeployed')
 const MessageWitnessPosted = require('./lib/MessageWitnessPosted')
+const MessageSignedPackage = require('./lib/MessageSignedPackage')
 const MessageTimeTravelDone = require('./lib/MessageTimeTravelDone')
 const MessageTimeFreezeDone = require('./lib/MessageTimeFreezeDone')
 const MessageConnectedToHub = require('./lib/MessageConnectedToHub')
@@ -44,6 +45,7 @@ const CommandDeployAgent = require('./lib/CommandDeployAgent')
 const CommandCreateAsset = require('./lib/CommandCreateAsset')
 const CommandPostWitness = require('./lib/CommandPostWitness')
 const CommandGetUnitInfo = require('./lib/CommandGetUnitInfo')
+const CommandSignMessage = require('./lib/CommandSignMessage')
 const CommandGetUnitProps = require('./lib/CommandGetUnitProps')
 const CommandGetBalanceOf = require('./lib/CommandGetBalanceOf')
 const CommandCreateGenesis = require('./lib/CommandCreateGenesis')
@@ -77,6 +79,7 @@ const fromMessage = (m) => {
 	case 'asset_created': return new MessageAssetCreated(message)
 	case 'witness_posted': return new MessageWitnessPosted(message)
 	case 'agent_deployed': return new MessageAgentDeployed(message)
+	case 'signed_package': return new MessageSignedPackage(message)
 	case 'genesis_created': return new MessageGenesisCreated(message)
 	case 'time_freeze_done': return new MessageTimeFreezeDone(message)
 	case 'time_travel_done': return new MessageTimeTravelDone(message)
@@ -100,6 +103,7 @@ const fromMessage = (m) => {
 	case 'command_deploy_agent': return new CommandDeployAgent(message)
 	case 'command_create_asset': return new CommandCreateAsset(message)
 	case 'command_post_witness': return new CommandPostWitness(message)
+	case 'command_sign_message': return new CommandSignMessage(message)
 	case 'command_get_unit_info': return new CommandGetUnitInfo(message)
 	case 'command_get_balance_of': return new CommandGetBalanceOf(message)
 	case 'command_get_unit_props': return new CommandGetUnitProps(message)
@@ -137,6 +141,7 @@ module.exports = {
 	MessageAssetCreated,
 	MessageWitnessPosted,
 	MessageAgentDeployed,
+	MessageSignedPackage,
 	MessageConnectedToHub,
 	MessageTimeFreezeDone,
 	MessageTimeTravelDone,
@@ -161,6 +166,7 @@ module.exports = {
 	CommandCreateAsset,
 	CommandPostWitness,
 	CommandGetUnitInfo,
+	CommandSignMessage,
 	CommandGetUnitProps,
 	CommandGetBalanceOf,
 	CommandCreateGenesis,

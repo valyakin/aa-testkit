@@ -1,0 +1,14 @@
+{
+	messages: [
+		{
+			init: '{
+				if (!is_valid_signed_package(trigger.data.signedPackage, trigger.address))
+					bounce('invalid signature');
+			}',
+			app: 'state',
+			state: '{
+				response['status'] = 'signature ok';
+			}'
+		},
+	]
+}
