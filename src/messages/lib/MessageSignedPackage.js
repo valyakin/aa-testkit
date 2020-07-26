@@ -1,10 +1,11 @@
 const AbstractMessage = require('./AbstractMessage')
 
 class MessageSignedPackage extends AbstractMessage {
-	constructor ({ signedPackage }) {
+	constructor ({ error, signedPackage }) {
 		super()
 		this.topic = 'signed_package'
 		this.signedPackage = signedPackage
+		this.error = error
 	}
 }
 

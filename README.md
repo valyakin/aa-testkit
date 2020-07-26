@@ -1265,6 +1265,19 @@ __Returns__ *Promise* that resolves to array of string associated with `wallet` 
 
 ---------------------------------------
 
+#### __`wallet.signMessage(message)`__ *`: Promise<{ signedPackage }>`*
+
+Sign a message with the wallet address
+
+__Returns__ *Promise* that resolves to `{ signedPackage, error }`, where `signedPackage` is an object containing the signed message and its authentifiers. `error` will be null on success
+
+#### Parameters
+
+*`source : String | Object | Array | Number`* - something that has to be signed
+
+---------------------------------------
+
+
 ## ObyteExplorer
 
 Obyte explorer node provides DAG explorer of the network for visualization and debugging purposes
