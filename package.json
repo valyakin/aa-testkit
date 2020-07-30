@@ -14,8 +14,8 @@
     "lint": "node ./node_modules/.bin/eslint --ext .js --max-warnings=0 --fix src test"
   },
   "engines": {
-		"node": ">=8"
-	},
+    "node": ">=8"
+  },
   "dependencies": {
     "headless-obyte": "git+https://github.com/byteball/headless-obyte",
     "obyte-explorer": "git+https://github.com/byteball/obyte-explorer",
@@ -49,7 +49,7 @@
     "pre-commit": "^1.2.2"
   },
   "resolutions": {
-		"chalk": "^3.0.0",
+    "chalk": "^3.0.0",
     "cli-width": "^2.2.1"
   },
   "pre-commit": [

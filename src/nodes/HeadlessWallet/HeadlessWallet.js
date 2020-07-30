@@ -14,6 +14,7 @@ const {
 	CommandGetBalance,
 	CommandDeployAgent,
 	CommandCreateAsset,
+	CommandSignMessage,
 	CommandGetMyAddresses,
 } = require('../../messages')
 
@@ -143,6 +144,17 @@ class HeadlessWallet extends AbstractNode {
 			return new Promise((resolve) => {
 				this.once('asset_created', m => resolve({ unit: m.unit, error: m.error }))
 				this.sendToChild(new CommandCreateAsset({ assetDefinition }))
+			})
+		} catch (error) {
+			return { error: error.message || error }
+		}
+	}
+
+	async signMessage (message) {
+		try {
+			return new Promise((resolve) => {
+				this.once('signed_package', m => resolve({ signedPackage: m.signedPackage, error: m.error }))
+				this.sendToChild(new CommandSignMessage({ message }))
 			})
 		} catch (error) {
 			return { error: error.message || error }
