@@ -1,5 +1,10 @@
 # Change Log
 
+## v0.3.8 (2020-07-30)
+
+1. `node.executeGetter` method added
+2. `wallet.signMessage` method added
+
 ## v0.3.7 (2020-07-22)
 
 1. Added Quick Start section to README

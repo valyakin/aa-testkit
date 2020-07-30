@@ -914,6 +914,22 @@ __Returns__ *Promise* that resolves to node balance object
 
 ---------------------------------------
 
+#### __`node.executeGetter({ aaAddress, getter, args })`__ *`: Promise<{ result, error }>`*
+
+Execute getter of given AA.
+
+__Returns__ *Promise* that resolves to `{ result, error }`, where `result` a result of getter execution. `error` will be null on success
+
+#### Parameters
+
+*`aaAddress : String`* - address of the AA 
+
+*`getter : String`* - getter identifier
+ 
+*`args : Array`* - array of parameters to pass to getter for execution
+
+---------------------------------------
+
 ## GenesisNode
 
 Genesis node main function is to start new network and create genesis unit. After this, genesis node serves as witness and source of Bytes. At the moment of network genesis, this node puts on its account `1e15 - 821` Bytes
@@ -1273,7 +1289,7 @@ __Returns__ *Promise* that resolves to `{ signedPackage, error }`, where `signed
 
 #### Parameters
 
-*`source : String | Object | Array | Number`* - something that has to be signed
+*`message : String | Object | Array | Number`* - something that has to be signed
 
 ---------------------------------------
 

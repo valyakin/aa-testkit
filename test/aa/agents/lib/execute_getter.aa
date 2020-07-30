@@ -1,0 +1,25 @@
+{
+	getters: '{
+		$sum = ($a, $b) => $a + $b;
+		$string_concat = ($a, $b) => $a || $b;
+		$array_test = ($a, $arr) => {
+			$res = reduce($arr, 5, ($acc, $x) => $acc + $x, 0);
+			$a + $res
+		};
+		$obj_test = ($obj) => {
+			$res = reduce($obj, 5, ($acc, $x) => $acc || $x, '');
+			$res
+		};
+	}',
+	init: `{
+		bounce("library only");
+	}`,
+	messages: [
+		{
+			app: 'state',
+			state: `{ 
+				bounce("library only!");
+			}`
+		}
+	]
+}

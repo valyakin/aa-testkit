@@ -15,6 +15,7 @@ const {
 	CommandGetUnitInfo,
 	CommandGetBalanceOf,
 	CommandGetUnitProps,
+	CommandExecuteGetter,
 	CommandReadAAStateVars,
 	CommandGetOutputsBalanceOf,
 } = require('../../messages')
@@ -221,6 +222,15 @@ class AbstractNode extends EventEmitter {
 		return new Promise((resolve) => {
 			this.once('outputs_balance_of', m => resolve(m.balance))
 			this.sendToChild(new CommandGetOutputsBalanceOf({ address }))
+		})
+	}
+
+	executeGetter ({ aaAddress, getter, args }) {
+		return new Promise(resolve => {
+			this.once('execute_getter_done', (m) => {
+				resolve({ result: m.result, error: m.error })
+			})
+			this.sendToChild(new CommandExecuteGetter({ aaAddress, getter, args }))
 		})
 	}
 

@@ -28,6 +28,7 @@ const MessageGenesisCreated = require('./lib/MessageGenesisCreated')
 const MessageMciBecameStable = require('./lib/MessageMciBecameStable')
 const MessagePasswordRequired = require('./lib/MessagePasswordRequired')
 const MessageOutputsBalanceOf = require('./lib/MessageOutputsBalanceOf')
+const MessageExecuteGetterDone = require('./lib/MessageExecuteGetterDone')
 
 const CommandTimeRun = require('./lib/CommandTimeRun')
 const CommandGetTime = require('./lib/CommandGetTime')
@@ -48,6 +49,7 @@ const CommandGetUnitInfo = require('./lib/CommandGetUnitInfo')
 const CommandSignMessage = require('./lib/CommandSignMessage')
 const CommandGetUnitProps = require('./lib/CommandGetUnitProps')
 const CommandGetBalanceOf = require('./lib/CommandGetBalanceOf')
+const CommandExecuteGetter = require('./lib/CommandExecuteGetter')
 const CommandCreateGenesis = require('./lib/CommandCreateGenesis')
 const CommandGetMyAddresses = require('./lib/CommandGetMyAddresses')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
@@ -87,6 +89,7 @@ const fromMessage = (m) => {
 	case 'mci_became_stable': return new MessageMciBecameStable(message)
 	case 'password_required': return new MessagePasswordRequired(message)
 	case 'outputs_balance_of': return new MessageOutputsBalanceOf(message)
+	case 'execute_getter_done': return new MessageExecuteGetterDone(message)
 
 	case 'command_time_run': return new CommandTimeRun(message)
 	case 'command_get_time': return new CommandGetTime(message)
@@ -107,6 +110,7 @@ const fromMessage = (m) => {
 	case 'command_get_unit_info': return new CommandGetUnitInfo(message)
 	case 'command_get_balance_of': return new CommandGetBalanceOf(message)
 	case 'command_get_unit_props': return new CommandGetUnitProps(message)
+	case 'command_execute_getter': return new CommandExecuteGetter(message)
 	case 'command_create_genesis': return new CommandCreateGenesis(message)
 	case 'command_get_my_addresses': return new CommandGetMyAddresses(message)
 	case 'command_read_aa_state_vars': return new CommandReadAAStateVars(message)
@@ -149,6 +153,7 @@ module.exports = {
 	MessageMciBecameStable,
 	MessagePasswordRequired,
 	MessageOutputsBalanceOf,
+	MessageExecuteGetterDone,
 
 	CommandGetTime,
 	CommandTimeRun,
@@ -169,6 +174,7 @@ module.exports = {
 	CommandSignMessage,
 	CommandGetUnitProps,
 	CommandGetBalanceOf,
+	CommandExecuteGetter,
 	CommandCreateGenesis,
 	CommandGetMyAddresses,
 	CommandReadAAStateVars,

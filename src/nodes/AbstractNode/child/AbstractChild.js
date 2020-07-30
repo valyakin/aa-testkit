@@ -23,6 +23,7 @@ const {
 	MessageTimeTravelDone,
 	MessageMciBecameStable,
 	MessageOutputsBalanceOf,
+	MessageExecuteGetterDone,
 } = require('../../../messages')
 
 class AbstractChild extends EventEmitter {
@@ -59,6 +60,7 @@ class AbstractChild extends EventEmitter {
 			.on('command_get_unit_info', (m) => this.getUnitInfo(m))
 			.on('command_get_unit_props', (m) => this.getUnitProps(m))
 			.on('command_get_balance_of', (m) => this.getBalanceOf(m))
+			.on('command_execute_getter', (m) => this.executeGetter(m))
 			.on('command_read_aa_state_vars', (m) => this.readAAStateVars(m))
 			.on('command_get_outputs_balance_of', (m) => this.getOutputsBalanceOf(m))
 
@@ -273,11 +275,21 @@ class AbstractChild extends EventEmitter {
 	}
 
 	getOutputsBalanceOf ({ address }) {
-		console.log('getOutputsBalanceOf address', address)
 		const balances = require('ocore/balances')
 		balances.readOutputsBalance(address, (assocBalances) => {
 			this.sendToParent(new MessageOutputsBalanceOf({ balance: assocBalances }))
 		})
+	}
+
+	async executeGetter ({ aaAddress, getter, args }) {
+		const db = require('ocore/db')
+		const { executeGetter } = require('ocore/formula/evaluation')
+		try {
+			const result = await executeGetter(db, aaAddress, getter, args)
+			this.sendToParent(new MessageExecuteGetterDone({ result, error: null }))
+		} catch (error) {
+			this.sendToParent(new MessageExecuteGetterDone({ result: null, error: error.message || error }))
+		}
 	}
 
 	replaceConsoleLog () {
