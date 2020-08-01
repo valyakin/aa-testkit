@@ -143,8 +143,9 @@ class HeadlessWalletChild extends AbstractChild {
 					unit: null,
 					...(isString(err) ? { error: err } : err),
 				}))
+			} else {
+				this.sendToParent(new MessageSentMulti({ unit, error: null }))
 			}
-			this.sendToParent(new MessageSentMulti({ unit, error: null }))
 		})
 	}
 
