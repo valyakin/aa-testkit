@@ -142,9 +142,9 @@ class AbstractChild extends EventEmitter {
 				throw new Error('Attempt to timetravel in past')
 			}
 			timekeeper.travel(new Date(newDate))
-			this.sendToParent(new MessageTimeTravelDone({ error: null }))
+			this.sendToParent(new MessageTimeTravelDone({ error: null, timestamp: Date.now() }))
 		} catch (error) {
-			this.sendToParent(new MessageTimeTravelDone({ error: error.message }))
+			this.sendToParent(new MessageTimeTravelDone({ error: error.message, timestamp: null }))
 		}
 	}
 

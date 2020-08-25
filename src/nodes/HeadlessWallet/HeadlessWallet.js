@@ -16,6 +16,8 @@ const {
 	CommandCreateAsset,
 	CommandSignMessage,
 	CommandGetMyAddresses,
+	CommandIssueDivisibleAsset,
+	CommandIssueIndivisibleAsset,
 } = require('../../messages')
 
 const schemaFactory = () => ({
@@ -78,6 +80,20 @@ class HeadlessWallet extends AbstractNode {
 		return new Promise(resolve => {
 			this.once('sent_multi', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendToChild(new CommandSendMulti({ opts }))
+		})
+	}
+
+	async issueDivisibleAsset (opts) {
+		return new Promise(resolve => {
+			this.once('issue_divisible_asset_done', (m) => resolve({ unit: m.unit, error: m.error }))
+			this.sendToChild(new CommandIssueDivisibleAsset({ opts }))
+		})
+	}
+
+	async issueIndivisibleAsset (opts) {
+		return new Promise(resolve => {
+			this.once('issue_indivisible_asset_done', (m) => resolve({ unit: m.unit, error: m.error }))
+			this.sendToChild(new CommandIssueIndivisibleAsset({ opts }))
 		})
 	}
 

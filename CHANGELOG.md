@@ -1,5 +1,14 @@
 # Change Log
 
+## v0.3.9 (2020-08-25)
+
+1. `network.timetravel` method returns timestamp
+2. `wallet.issueDivisibleAsset` method added
+3. `wallet.issueIndivisibleAsset` method added
+
+### Fixes
+1. `with.asset` fixed for capped assets
+
 ## v0.3.8 (2020-07-30)
 
 1. `node.executeGetter` method added

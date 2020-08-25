@@ -125,7 +125,7 @@ class AbstractNode extends EventEmitter {
 	async timetravel ({ to, shift } = {}) {
 		return new Promise(resolve => {
 			this.once('time_travel_done', (m) => {
-				resolve({ error: m.error })
+				resolve({ error: m.error, timestamp: m.timestamp })
 			})
 			this.sendToChild(new CommandTimeTravel({ to, shift }))
 		})

@@ -16,6 +16,8 @@ const {
 	MessageAgentDeployed,
 	MessageSignedPackage,
 	MessagePasswordRequired,
+	MessageIssueDivisibleAssetDone,
+	MessageIssueIndivisibleAssetDone,
 } = require('../../../messages')
 
 const paramsSchema = () => ({
@@ -41,6 +43,8 @@ class HeadlessWalletChild extends AbstractChild {
 			.on('command_create_asset', (m) => this.createAsset(m))
 			.on('command_sign_message', (m) => this.signMessage(m))
 			.on('command_get_my_addresses', (m) => this.getMyAddresses(m))
+			.on('command_issue_divisible_asset', (m) => this.issueDivisibleAsset(m))
+			.on('command_issue_indivisible_asset', (m) => this.issueIndivisibleAsset(m))
 	}
 
 	static unpackArgv (argv) {
@@ -146,6 +150,56 @@ class HeadlessWalletChild extends AbstractChild {
 			} else {
 				this.sendToParent(new MessageSentMulti({ unit, error: null }))
 			}
+		})
+	}
+
+	issueDivisibleAsset ({ opts }) {
+		const divisibleAsset = require('ocore/divisible_asset.js')
+		const network = require('ocore/network')
+
+		const onError = (err) => {
+			this.sendToParent(new MessageIssueDivisibleAssetDone({
+				unit: null,
+				...(isString(err) ? { error: err } : err),
+			}))
+		}
+
+		divisibleAsset.composeAndSaveDivisibleAssetPaymentJoint({
+			signer: this.headlessWallet.signer,
+			callbacks: {
+				ifError: onError,
+				ifNotEnoughFunds: onError,
+				ifOk: (objJoint) => {
+					network.broadcastJoint(objJoint)
+					this.sendToParent(new MessageIssueDivisibleAssetDone({ unit: objJoint.unit.unit, error: null }))
+				},
+			},
+			...opts,
+		})
+	}
+
+	issueIndivisibleAsset ({ opts }) {
+		const indivisibleAsset = require('ocore/indivisible_asset.js')
+		const network = require('ocore/network')
+
+		const onError = (err) => {
+			this.sendToParent(new MessageIssueIndivisibleAssetDone({
+				unit: null,
+				...(isString(err) ? { error: err } : err),
+			}))
+		}
+
+		indivisibleAsset.composeAndSaveIndivisibleAssetPaymentJoint({
+			signer: this.headlessWallet.signer,
+			callbacks: {
+				ifError: onError,
+				ifNotEnoughFunds: onError,
+				ifOk: (objJoint) => {
+					network.broadcastJoint(objJoint)
+					this.sendToParent(new MessageIssueIndivisibleAssetDone({ unit: objJoint.unit.unit, error: null }))
+				},
+			},
+			...opts,
 		})
 	}
 

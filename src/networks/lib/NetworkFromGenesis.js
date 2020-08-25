@@ -47,14 +47,34 @@ class NetworkFromGenesis {
 	}
 
 	async timetravel ({ to, shift } = {}) {
-		return Promise.all(this.nodesList.map(n => n.timetravel({ to, shift }))).then(errors => {
-			return {
-				error:
-					errors
-						.filter(e => e.error)
-						.map(e => `${e.id}: ${e.error}`)
-						.join(',') ||
-					null,
+		return Promise.all(this.nodesList.map(
+			async n => {
+				const res = await n.timetravel({ to, shift })
+				return {
+					id: n.id,
+					error: res.error,
+					timestamp: res.timestamp,
+				}
+			},
+		)).then(result => {
+			const timestamp = result[0].timestamp
+
+			if (result.map(r => r.timestamp).find(t => Math.abs(t - timestamp) > 100)) {
+				return {
+					error:
+					'Inconsistent time on nodes: ' +
+					result.map(r => `${r.id}: ${r.timestamp}`).join(','),
+				}
+			} else {
+				return {
+					error:
+						result
+							.filter(r => r.error)
+							.map(r => `${r.id}: ${r.error}`)
+							.join(',') ||
+						null,
+					timestamp,
+				}
 			}
 		})
 	}

@@ -113,6 +113,22 @@ class NetworkInitializer {
 			if (error) throw new Error(error)
 			this.assets[name] = unit
 			await this.network.witnessUntilStable(unit)
+
+			const assetSettings = assets[name]
+			if (assetSettings.cap && !assetSettings.fixed_denominations) {
+				// issueDivisibleAsset
+				const myAddress = await this.deployer.getAddress()
+				const { unit: issueUnit } = await this.deployer.issueDivisibleAsset({
+					asset: this.assets[name],
+					paying_addresses: [myAddress],
+					fee_paying_addresses: [myAddress],
+					change_address: myAddress,
+					to_address: myAddress,
+					amount: assetSettings.cap,
+				})
+
+				await this.network.witnessUntilStable(issueUnit)
+			}
 		}
 	}
 
@@ -152,14 +168,32 @@ class NetworkInitializer {
 			} else {
 				if (!this.assets[asset]) throw new Error(`No such asset with name '${asset}'`)
 
-				const { error, unit } = await this.deployer.sendMulti({
-					asset_outputs: outputsMap[asset],
-					change_address: await this.deployer.getAddress(),
-					asset: this.assets[asset],
-				})
+				const assetSettings = this.initializer.assets[asset]
+				if (assetSettings.cap && assetSettings.fixed_denominations) {
+					// issueIndivisibleAsset
+					const myAddress = await this.deployer.getAddress()
+					const { unit, error } = await this.deployer.issueIndivisibleAsset({
+						asset: this.assets[asset],
+						asset_outputs: outputsMap[asset],
+						paying_addresses: [myAddress],
+						fee_paying_addresses: [myAddress],
+						change_address: myAddress,
+						tolerance_plus: 0,
+						tolerance_minus: 0,
+					})
 
-				if (error) throw new Error(`Error sending asset ${asset} to wallets: ${error}`)
-				return unit
+					if (error) throw new Error(`Error sending indivisible asset ${asset} to wallets: ${error}`)
+					return unit
+				} else {
+					const { error, unit } = await this.deployer.sendMulti({
+						asset_outputs: outputsMap[asset],
+						change_address: await this.deployer.getAddress(),
+						asset: this.assets[asset],
+					})
+
+					if (error) throw new Error(`Error sending asset ${asset} to wallets: ${error}`)
+					return unit
+				}
 			}
 		}))
 	}

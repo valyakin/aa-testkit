@@ -29,6 +29,8 @@ const MessageMciBecameStable = require('./lib/MessageMciBecameStable')
 const MessagePasswordRequired = require('./lib/MessagePasswordRequired')
 const MessageOutputsBalanceOf = require('./lib/MessageOutputsBalanceOf')
 const MessageExecuteGetterDone = require('./lib/MessageExecuteGetterDone')
+const MessageIssueDivisibleAssetDone = require('./lib/MessageIssueDivisibleAssetDone')
+const MessageIssueIndivisibleAssetDone = require('./lib/MessageIssueIndivisibleAssetDone')
 
 const CommandTimeRun = require('./lib/CommandTimeRun')
 const CommandGetTime = require('./lib/CommandGetTime')
@@ -54,6 +56,8 @@ const CommandCreateGenesis = require('./lib/CommandCreateGenesis')
 const CommandGetMyAddresses = require('./lib/CommandGetMyAddresses')
 const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
 const CommandGetOutputsBalanceOf = require('./lib/CommandGetOutputsBalanceOf')
+const CommandIssueDivisibleAsset = require('./lib/CommandIssueDivisibleAsset')
+const CommandIssueIndivisibleAsset = require('./lib/CommandIssueIndivisibleAsset')
 
 const fromMessage = (m) => {
 	const message = JSON.parse(m)
@@ -90,6 +94,8 @@ const fromMessage = (m) => {
 	case 'password_required': return new MessagePasswordRequired(message)
 	case 'outputs_balance_of': return new MessageOutputsBalanceOf(message)
 	case 'execute_getter_done': return new MessageExecuteGetterDone(message)
+	case 'issue_divisible_asset_done': return new MessageIssueDivisibleAssetDone(message)
+	case 'issue_indivisible_asset_done': return new MessageIssueIndivisibleAssetDone(message)
 
 	case 'command_time_run': return new CommandTimeRun(message)
 	case 'command_get_time': return new CommandGetTime(message)
@@ -115,6 +121,8 @@ const fromMessage = (m) => {
 	case 'command_get_my_addresses': return new CommandGetMyAddresses(message)
 	case 'command_read_aa_state_vars': return new CommandReadAAStateVars(message)
 	case 'command_get_outputs_balance_of': return new CommandGetOutputsBalanceOf(message)
+	case 'command_issue_divisible_asset': return new CommandIssueDivisibleAsset(message)
+	case 'command_issue_indivisible_asset': return new CommandIssueIndivisibleAsset(message)
 
 	default: throw new Error(`Unsupported message topic '${message.topic}'`)
 	}
@@ -154,6 +162,8 @@ module.exports = {
 	MessagePasswordRequired,
 	MessageOutputsBalanceOf,
 	MessageExecuteGetterDone,
+	MessageIssueDivisibleAssetDone,
+	MessageIssueIndivisibleAssetDone,
 
 	CommandGetTime,
 	CommandTimeRun,
@@ -179,4 +189,6 @@ module.exports = {
 	CommandGetMyAddresses,
 	CommandReadAAStateVars,
 	CommandGetOutputsBalanceOf,
+	CommandIssueDivisibleAsset,
+	CommandIssueIndivisibleAsset,
 }

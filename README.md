@@ -469,7 +469,7 @@ __Returns__ *Promise* that resolves to `{ response }` where `response` is the ob
 
 ---------------------------------------
 
-#### __`network.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
+#### __`network.timetravel({ to, shift })`__ *`: Promise<{ error: String, timestamp: Number }>`*
 
 Allows to set the current network time in the future. This can be helpful for testing time-dependent AA.
 
@@ -477,7 +477,7 @@ Allows to set the current network time in the future. This can be helpful for te
 
 > **Note:** If traveling when time is frozen, the time will be frozen to the new traveled time
 
-__Returns__ *Promise* that resolves to `{ error }` after `timetravel` is done. `error` will be null if `timetravel` call was successfull
+__Returns__ *Promise* that resolves to `{ error, timestamp }` after `timetravel` is done. `timestamp` is current timestamp on network after `timetravel`. `error` will be null if `timetravel` call was successfull
 
 #### Parameters
 
@@ -671,13 +671,13 @@ __Returns__ *Promise* that resolves when node receives joint for every unit id i
 
 ---------------------------------------
 
-#### __`node.timetravel({ to, shift })`__ *`: Promise<{ error: string }>`*
+#### __`node.timetravel({ to, shift })`__ *`: Promise<{ error: String, timestamp: Number }>`*
 
 Send the command to node child to change its time. This can be helpful for testing time-dependent AA.
 
 > **Note:** Timetravel should be used only after every node has been started. Running a node after timetravel can lead to network inconsistency.
 
-__Returns__ *Promise* that resolves to `{ error }` when node child receives `mci_became_stable` event. `error` will be null if timetravel was successfull
+__Returns__ *Promise* that resolves to `{ error, timestamp }` when node child receives `mci_became_stable` event. `timestamp` is current timestamp on network after `timetravel`. `error` will be null if timetravel was successfull
 
 #### Parameters
 
@@ -1170,6 +1170,65 @@ __Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. 
 #### Parameters
 
 *`opts : Object`* - arbitrary message to broadcast
+
+---------------------------------------
+
+#### __`wallet.issueDivisibleAsset(opts)`__ *`: Promise<{ unit, error }>`*
+
+Issue divisible asset
+
+__Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. `error` will be null if sending was successfull
+
+#### Parameters
+
+*`opts : Object`* - issue params
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const opts = {
+  asset: this.assets[name],
+  paying_addresses: [myAddress],
+  fee_paying_addresses: [myAddress],
+  change_address: myAddress,
+  to_address: myAddress,
+  amount: assetSettings.cap,
+}
+
+const { unit, error } = await this.deployer.issueDivisibleAsset(opts)
+```
+</details>
+
+---------------------------------------
+
+#### __`wallet.issueInivisibleAsset(opts)`__ *`: Promise<{ unit, error }>`*
+
+Issue indivisible asset
+
+__Returns__ *Promise* that resolves to `{ unit, error }` after message is sent. `error` will be null if sending was successfull
+
+#### Parameters
+
+*`opts : Object`* - issue params
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const opts = {
+  asset: this.assets[asset],
+  asset_outputs: outputsMap[asset],
+  paying_addresses: [myAddress],
+  fee_paying_addresses: [myAddress],
+  change_address: myAddress,
+  tolerance_plus: 0,
+  tolerance_minus: 0,
+}
+
+const { unit, error } = await this.deployer.issueIndivisibleAsset(opts)
+```
+</details>
 
 ---------------------------------------
 

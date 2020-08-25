@@ -60,25 +60,30 @@ describe('Check timetravel network feature', function () {
 	}).timeout(30000)
 
 	it('network timetravel without params', async () => {
-		const { error } = await this.network.timetravel()
+		const time = Date.now()
+		const { error, timestamp } = await this.network.timetravel()
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(time, 100)
 
 		await this.expectTimeInNodes(Date.now())
 	}).timeout(30000)
 
 	it('network timetravel to', async () => {
 		const date = '2030-01-01 07:00'
-		const { error } = await this.network.timetravel({ to: date })
+		const time = new Date(date).getTime()
+		const { error, timestamp } = await this.network.timetravel({ to: date })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(time, 100)
 
-		await this.expectTimeInNodes(new Date(date).getTime())
+		await this.expectTimeInNodes(time)
 	}).timeout(30000)
 
 	it('network timetravel shift milliseconds', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: 1000 })
+		const { error, timestamp } = await this.network.timetravel({ shift: 1000 })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(timeBefore + 1000, 100)
 
 		await this.expectTimeInNodes(timeBefore + 1000)
 	}).timeout(30000)
@@ -86,8 +91,9 @@ describe('Check timetravel network feature', function () {
 	it('network timetravel shift seconds', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: '30s' })
+		const { error, timestamp } = await this.network.timetravel({ shift: '30s' })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(timeBefore + 1000 * 30, 100)
 
 		await this.expectTimeInNodes(timeBefore + 1000 * 30)
 	}).timeout(30000)
@@ -95,8 +101,9 @@ describe('Check timetravel network feature', function () {
 	it('network timetravel shift minutes', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: '10m' })
+		const { error, timestamp } = await this.network.timetravel({ shift: '10m' })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(timeBefore + 1000 * 60 * 10, 100)
 
 		await this.expectTimeInNodes(timeBefore + 1000 * 60 * 10)
 	}).timeout(30000)
@@ -104,8 +111,9 @@ describe('Check timetravel network feature', function () {
 	it('network timetravel shift hours', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: '8h' })
+		const { error, timestamp } = await this.network.timetravel({ shift: '8h' })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(timeBefore + 1000 * 60 * 60 * 8, 100)
 
 		await this.expectTimeInNodes(timeBefore + 1000 * 60 * 60 * 8)
 	}).timeout(30000)
@@ -113,8 +121,9 @@ describe('Check timetravel network feature', function () {
 	it('network timetravel shift days', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: '3d' })
+		const { error, timestamp } = await this.network.timetravel({ shift: '3d' })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(timeBefore + 1000 * 60 * 60 * 24 * 3, 100)
 
 		await this.expectTimeInNodes(timeBefore + 1000 * 60 * 60 * 24 * 3)
 	}).timeout(30000)
@@ -122,8 +131,9 @@ describe('Check timetravel network feature', function () {
 	it('network timetravel shift in past', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: -10000 })
+		const { error, timestamp } = await this.network.timetravel({ shift: -10000 })
 		expect(error).to.include('Attempt to timetravel in past')
+		expect(timestamp).to.be.null
 
 		await this.expectTimeInNodes(timeBefore)
 	}).timeout(30000)
@@ -131,24 +141,28 @@ describe('Check timetravel network feature', function () {
 	it('network timetravel shift incorrect format', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
 
-		const { error } = await this.network.timetravel({ shift: '10f' })
+		const { error, timestamp } = await this.network.timetravel({ shift: '10f' })
 		expect(error).to.include("Unsupported 'shift' format '10f'")
+		expect(timestamp).to.be.null
 
 		await this.expectTimeInNodes(timeBefore)
 	}).timeout(30000)
 
 	it('network timetravel both "shift" and "to" params are present', async () => {
 		const date = '2040-01-01 7:00'
-		const { error } = await this.network.timetravel({ to: date, shift: '10d' })
+		const time = new Date(date).getTime()
+		const { error, timestamp } = await this.network.timetravel({ to: date, shift: '10d' })
 		expect(error).to.be.null
+		expect(timestamp).to.be.finite.and.approximately(time, 100)
 
-		await this.expectTimeInNodes(new Date(date).getTime())
+		await this.expectTimeInNodes(time)
 	}).timeout(30000)
 
 	it('network timetravel to past', async () => {
 		const { time: timeBefore } = await this.genesis.getTime()
-		const { error } = await this.network.timetravel({ to: '2007-01-01 07:00' })
+		const { error, timestamp } = await this.network.timetravel({ to: '2007-01-01 07:00' })
 		expect(error).to.include('Attempt to timetravel in past')
+		expect(timestamp).to.be.null
 
 		await this.expectTimeInNodes(timeBefore)
 	}).timeout(30000)
