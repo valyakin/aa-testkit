@@ -2,3 +2,4 @@ node_modules
 testdata/*/
 !testdata/run-predefined
 .vscode
+yarn.lock

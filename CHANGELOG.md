@@ -3,7 +3,7 @@
 ## v0.3.10 (2020-08-31)
 
 1. Remove `yarn.lock` file
-2. Remove `crypto` module from dependencies(and use built-in crypto)
+2. Remove `crypto` module from dependencies(and use built-in `crypto`)
 
 ## v0.3.9 (2020-08-25)
 
