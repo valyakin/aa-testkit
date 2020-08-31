@@ -17,11 +17,6 @@
     "node": ">=8"
   },
   "dependencies": {
-    "headless-obyte": "git+https://github.com/byteball/headless-obyte",
-    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer",
-    "obyte-hub": "git+https://github.com/byteball/obyte-hub",
-    "obyte-witness": "git+https://github.com/byteball/obyte-witness",
-    "ocore": "git+https://github.com/byteball/ocore",
     "bitcore-lib": "^0.13.14",
     "bitcore-mnemonic": "~1.0.0",
     "config": "^3.2.2",
@@ -54,5 +49,12 @@
   },
   "pre-commit": [
     "lint"
-  ]
+  ],
+  "peerDependencies": {
+    "ocore": "git+https://github.com/byteball/ocore",
+    "headless-obyte": "git+https://github.com/byteball/headless-obyte",
+    "obyte-explorer": "git+https://github.com/byteball/obyte-explorer",
+    "obyte-hub": "git+https://github.com/byteball/obyte-hub",
+    "obyte-witness": "git+https://github.com/byteball/obyte-witness"
+  }
 }
