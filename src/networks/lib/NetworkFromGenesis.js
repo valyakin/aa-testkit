@@ -19,6 +19,7 @@ class NetworkFromGenesis {
 		this.nodes = {
 			headlessWallets: [],
 			obyteExplorers: [],
+			customNodes: [],
 			witnesses: [],
 		}
 		this.initializer = null
@@ -34,6 +35,7 @@ class NetworkFromGenesis {
 
 	get nodesList () {
 		return [
+			...this.nodes.customNodes,
 			...this.nodes.headlessWallets,
 			...this.nodes.obyteExplorers,
 			...this.nodes.witnesses,
@@ -126,13 +128,7 @@ class NetworkFromGenesis {
 	async witnessAndStabilize () {
 		await this.sync()
 		const units = await this.postWitnesses()
-		const stabilization = Promise.all([
-			this.hub,
-			this.genesisNode,
-			...this.nodes.headlessWallets,
-			...this.nodes.obyteExplorers,
-			...this.nodes.witnesses,
-		].map(n => n.waitForUnits(units)))
+		const stabilization = Promise.all(this.nodesList.map(n => n.waitForUnits(units)))
 		return stabilization
 	}
 
@@ -235,6 +231,18 @@ class NetworkFromGenesis {
 		})
 		this.nodes.witnesses.push(witness)
 		return witness
+	}
+
+	newCustomNode (CustomNode, params) {
+		const customNode = new CustomNode({
+			rundir: this.rundir,
+			genesisUnit: this.genesisUnit,
+			id: getIdForPrefix(this.rundir, 'custom-node-'),
+			initialWitnesses: this.initialWitnesses,
+			...params,
+		})
+		this.nodes.customNodes.push(customNode)
+		return customNode
 	}
 
 	get with () {
