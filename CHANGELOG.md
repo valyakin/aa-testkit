@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.11 (2020-09-22)
+
+1. `CustomNode` and `CustomNodeChild` added
+
 ## v0.3.10 (2020-08-31)
 
 1. Remove `yarn.lock` file

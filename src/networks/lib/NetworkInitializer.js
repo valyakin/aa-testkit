@@ -7,6 +7,7 @@ class NetworkInitializer {
 		this.assets = {}
 		this.agents = {}
 		this.wallets = {}
+		this.customs = {}
 		this.deployer = null
 		this.obyteExplorer = null
 
@@ -14,6 +15,7 @@ class NetworkInitializer {
 			wallets: {},
 			assets: {},
 			agents: {},
+			customs: {},
 			deployer: null,
 			explorer: null,
 			numberOfWitnesses: 2, // 3, but first witness is genesis node
@@ -41,6 +43,16 @@ class NetworkInitializer {
 
 		for (const name in this.initializer.wallets) {
 			const w = this.initializer.wallets[name]
+			if (w.balances.base && w.balances.base > 0) {
+				transfers.push({
+					address: w.address,
+					amount: w.balances.base,
+				})
+			}
+		}
+
+		for (const name in this.initializer.customs) {
+			const w = this.initializer.customs[name]
 			if (w.balances.base && w.balances.base > 0) {
 				transfers.push({
 					address: w.address,
@@ -77,7 +89,7 @@ class NetworkInitializer {
 		}
 	}
 
-	async initialize ({ wallets, agents, deployer, assets, explorer } = {}) {
+	async initialize ({ wallets, agents, deployer, assets, explorer, customs } = {}) {
 		await this.network.genesisNode.ready()
 
 		if (explorer) await this.initializeExplorer(explorer)
@@ -96,11 +108,22 @@ class NetworkInitializer {
 			this.wallets[walletName] = walletNodes.shift()
 		}
 
+		for (const customNodeName in customs) {
+			const c = customs[customNodeName]
+			this.customs[customNodeName] = await this.network.newCustomNode(c.node, { mnemonic: c.mnemonic }).ready()
+		}
+
 		await this.initializeAssets(assets)
 		await this.initializeAgents(agents)
-		const units = await this.initializeAssetBalances(wallets)
+		const units = await this.initializeAssetBalances(wallets, this.wallets)
 
 		for (const unit of units) {
+			await this.network.witnessUntilStable(unit)
+		}
+
+		const unitsForCustoms = await this.initializeAssetBalances(customs, this.customs)
+
+		for (const unit of unitsForCustoms) {
 			await this.network.witnessUntilStable(unit)
 		}
 
@@ -141,9 +164,9 @@ class NetworkInitializer {
 		}
 	}
 
-	async initializeAssetBalances (wallets = {}) {
+	async initializeAssetBalances (wallets = {}, walletNodes = {}) {
 		const walletsWithAddresses = await Promise.all(Object.keys(wallets).map(async name => {
-			const address = await this.wallets[name].getAddress()
+			const address = await walletNodes[name].getAddress()
 
 			return {
 				name,
@@ -224,6 +247,24 @@ class NetworkInitializer {
 		const address = getFirstAddress(mnemonic)
 
 		this.initializer.wallets[name] = {
+			address,
+			mnemonic,
+			balances,
+		}
+		return this
+	}
+
+	custom (node, custom) {
+		const name = Object.keys(custom)[0]
+		const balances = typeof custom[name] === 'object'
+			? custom[name]
+			: { base: custom[name] }
+
+		const mnemonic = generateMnemonic()
+		const address = getFirstAddress(mnemonic)
+
+		this.initializer.customs[name] = {
+			node,
 			address,
 			mnemonic,
 			balances,

@@ -60,6 +60,11 @@ class AbstractNode extends EventEmitter {
 		}
 
 		this.child = ChildrenManager.fork('index.js', argv, options)
+		this.subscribeEvents()
+	}
+
+	subscribeEvents () {
+		this.child
 			.on('exit', this.handleChildExit.bind(this))
 			.on('error', this.handleChildError.bind(this))
 			.on('message', this.handleChildMessage.bind(this))

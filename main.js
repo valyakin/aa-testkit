@@ -11,10 +11,16 @@ function Testkit (configs = {}) {
 
 	const Nodes = require('./src/nodes')
 	const Network = require('./src/networks')
+	const Custom = {
+		Node: require('./src/nodes/CustomNode/CustomNode'),
+		Child: require('./src/nodes/CustomNode/child/CustomNodeChild'),
+	}
+
 	return {
 		Nodes,
 		Network,
 		Utils,
+		Custom,
 	}
 }
 

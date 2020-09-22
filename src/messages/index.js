@@ -1,3 +1,4 @@
+const MessageCustom = require('./lib/MessageCustom')
 const MessageLastMCI = require('./lib/MessageLastMCI')
 const MessageNewJoint = require('./lib/MessageNewJoint')
 const MessageUnitInfo = require('./lib/MessageUnitInfo')
@@ -32,6 +33,7 @@ const MessageExecuteGetterDone = require('./lib/MessageExecuteGetterDone')
 const MessageIssueDivisibleAssetDone = require('./lib/MessageIssueDivisibleAssetDone')
 const MessageIssueIndivisibleAssetDone = require('./lib/MessageIssueIndivisibleAssetDone')
 
+const CommandCustom = require('./lib/CommandCustom')
 const CommandTimeRun = require('./lib/CommandTimeRun')
 const CommandGetTime = require('./lib/CommandGetTime')
 const CommandTriggerAa = require('./lib/CommandTriggerAa')
@@ -63,6 +65,7 @@ const fromMessage = (m) => {
 	const message = JSON.parse(m)
 
 	switch (message.topic) {
+	case 'custom': return new MessageCustom(message)
 	case 'last_mci': return new MessageLastMCI(message)
 	case 'new_joint': return new MessageNewJoint(message)
 	case 'unit_info': return new MessageUnitInfo(message)
@@ -97,6 +100,7 @@ const fromMessage = (m) => {
 	case 'issue_divisible_asset_done': return new MessageIssueDivisibleAssetDone(message)
 	case 'issue_indivisible_asset_done': return new MessageIssueIndivisibleAssetDone(message)
 
+	case 'command_custom': return new CommandCustom(message)
 	case 'command_time_run': return new CommandTimeRun(message)
 	case 'command_get_time': return new CommandGetTime(message)
 	case 'command_trigger_aa': return new CommandTriggerAa(message)
@@ -131,6 +135,7 @@ const fromMessage = (m) => {
 module.exports = {
 	fromMessage,
 
+	MessageCustom,
 	MessageLastMCI,
 	MessageNewJoint,
 	MessageUnitInfo,
@@ -165,6 +170,7 @@ module.exports = {
 	MessageIssueDivisibleAssetDone,
 	MessageIssueIndivisibleAssetDone,
 
+	CommandCustom,
 	CommandGetTime,
 	CommandTimeRun,
 	CommandTriggerAa,

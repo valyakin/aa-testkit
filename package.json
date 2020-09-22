@@ -1,6 +1,6 @@
 {
   "name": "aa-testkit",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "main": "main.js",
   "author": "Obyte",
   "license": "MIT",
@@ -10,6 +10,7 @@
     "test:aa": "mocha test/aa/**spec.js",
     "test:core": "mocha test/core/**spec.js",
     "test:utils": "mocha test/utils/**spec.js",
+    "test:custom-nodes": "mocha test/custom-nodes/**spec.js",
     "test:all": "mocha test/**/**spec.js",
     "lint": "node ./node_modules/.bin/eslint --ext .js --max-warnings=0 --fix src test"
   },
