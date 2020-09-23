@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.12 (2020-09-23)
+
+1. Custom Nodes documentation
+
 ## v0.3.11 (2020-09-22)
 
 1. `CustomNode` and `CustomNodeChild` added

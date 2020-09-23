@@ -4,7 +4,7 @@ const { Network } = require('./kit')
 
 const MyNode = require('./MyNode')
 
-describe('Check custom node work with user provided api', function () {
+describe('Check custom node work with user app', function () {
 	this.timeout(120000)
 
 	before(async () => {
@@ -13,13 +13,13 @@ describe('Check custom node work with user provided api', function () {
 			.run()
 	})
 
-	it('Check chash api', async () => {
+	it('Check chash app', async () => {
 		const chash = await this.network.custom.alice.getChash('123')
 
 		expect(chash).to.be.equal('MSSCC7D6OKOFWTM3764GJG4EAUQJ25BZ')
 	}).timeout(60000)
 
-	it('Check my witnesses api', async () => {
+	it('Check my witnesses app', async () => {
 		const witnesses = await this.network.custom.alice.getMyWitnesses()
 		expect(witnesses).to.be.an('array')
 		expect(witnesses).to.have.length(3)

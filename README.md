@@ -22,6 +22,10 @@ Instant Obyte devnet network set up and testing
     * [Constructor](#ObyteExplorer-constructor-params)
     * [Methods](#ObyteExplorer-methods)
 * [Utils](#Utils)
+* [Custom Nodes](#Custom-Nodes)
+    * [Custom Node](#Custom-Node)
+    * [Custom Child](#Custom-Child)
+    * [Testkit Integration](#Testkit-Integration)
 * [Test Examples](#Test-Examples)
 * [Writing Tests With Mocha](#Writing-Tests-With-Mocha)
 
@@ -124,7 +128,7 @@ Primary way to operate with network. Contains common functions for network manag
 
 #### __`Network.create(genesisParams, hubParams)`__ *`: <network>`*
 
-Creates new devnet network from the scratch. `.run()` should be called after `.create()` for network to start. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`1e15 -821`) of Bytes on its account.
+Creates new devnet network from the scratch. `.run()` should be called after `.create()` for network to start. Starts `GenesisNode` and `ObyteHub` node, the required minimum for network to operate. `GenesisNode` also provides functions of network witness. `GenesisNode` has a lot (`1e15 - 821`) of Bytes on its account.
 
 #### Parameters
 
@@ -200,6 +204,16 @@ Create an asset. Multiple assets creation is supported
 Specify number of witnesses defined in the network
 
 `number` - number of witnesses. Default is 3
+
+#### __`.with.custom(MyNode, { nodeName: balances })`__
+
+Create custom node with balances
+
+`MyNode` - class with implementation of Custom.Node
+
+`nodeName` - name for node to be available via `network.custom.nodeName`
+
+`balances` - same as for `.with.wallet`
 
 #### __`.network.deployer`__
 
@@ -328,6 +342,25 @@ const network = await Network.create().run()
 const genesis = await network.getGenesisNode().ready()
 
 const explorer = await network.newObyteExplorer().ready()
+```
+</details>
+
+---------------------------------------
+
+#### __`network.newCustomNode(MyNode)`__ *`: <Custom.Node>`*
+
+Creates and starts new `Custom.Node` node in network.
+
+#### Parameters
+
+*`MyNode`* - implementation of `Custom.Node`
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const MyNode = require('./MyNode')
+const custom = await network.newCustomNode(MyNode).ready()
 ```
 </details>
 
@@ -1658,6 +1691,136 @@ Returns an array of external payments for a given unit object
 *`unit`* - unit object
 
 ---------------------------------------
+
+## Custom Nodes
+
+Custom Node API allows to extend existing app based on [headless-obyte](https://github.com/byteball/headless-obyte) and integrate it with `aa-testkit`. This allows to automate testing of an app and run it on devnet with tools provided by `aa-testkit`.
+
+This API consits of two parts which communicate with each other via IPC: `Custom.Node` and `Custom.Child`. They are two classes that can be imported from testkit and should be extended by user
+
+To obtain the working template with example run the following command:
+
+```bash
+# requires npm 5.2+ installed
+npx create-aa my-agent -t custom-node
+```
+
+### Custom Node
+
+`Custom.Node` is responsilbe for:
+
+- providing an user defined api for `aa-testkit`
+
+- sending and receiving messages from `Custom.Child`
+
+`Custom.Node` already provides any method available in [HeadlessWallet](#HeadlessWallet) node like `getBalance`, `sendBytes`, `getAddress` etc
+
+```javascript
+const path = require('path')
+const { Testkit } = require('aa-testkit')
+
+const { Custom } = Testkit({
+	TESTDATA_DIR: path.join(process.cwd(), 'testdata'),
+})
+
+// implementation should be inherited from Custom.Node
+class MyNode extends Custom.Node {
+  
+  // `childPath` should be overloaded and return absolute path to file with Custom.Child implementation
+	childPath () {
+		return path.join(__dirname, './MyChild')
+	}
+
+  // messages that are sent from Custom.Child via `this.sendCustomMessage` can be handled in `handleCustomMessage`
+	handleCustomMessage (payload) {
+    switch (payload.type) {
+		case 'pong':
+      // use `this.sendCustomMessage` to send arbitrary JSON data to `Custom.Node`
+			this.emit('pong', payload.data)
+      break
+    }
+  }
+  
+  // any custom method declared in this class will be available in testkit 
+  myFunction () {
+    // use Promise based syntax to wait and receive data from child
+    return new Promise(resolve => {
+      this.once('pong', (data) => resolve(data))
+      // to send an arbitrary JSON data to Custom.Child use `this.sendCustomCommand` method
+      this.sendCustomCommand({ type: 'ping', data: 'hello' })
+    })
+  }
+  
+}
+
+module.exports = MyNode
+
+```
+
+### Custom Child
+
+`Custom.Child` is responsilbe for:
+
+- controlling user app and exposing its functions to testkit indirectly via `Custom.Node`
+
+- sending and receiving messages from `Custom.Node`
+
+`Custom.Child` is being run in separate process which also runs user app and exposes its functions to `Custom.Node`
+
+```javascript
+const path = require('path')
+const { Testkit } = require('aa-testkit')
+
+const { Custom } = Testkit({
+	TESTDATA_DIR: path.join(process.cwd(), 'testdata'),
+})
+
+// implementation should be inherited from Custom.Child
+class MyNodeChild extends Custom.Child {
+  run () {
+	  // any initialization code goes here
+		// this method should require and run user app
+	}
+
+  // `sendCustomCommand` from MyNode interface can be handled here
+  
+  // messages that are sent from Custom.Node via `this.sendCustomCommand` can be handled in `handleCustomCommand`
+	async handleCustomCommand (payload) {
+		switch (payload.type) {
+		case 'ping':
+			// use `this.sendCustomMessage` to send arbitrary JSON data to `Custom.Node`
+			this.sendCustomMessage({ type: 'pong', data: payload.data })
+      break
+    }
+	}
+}
+
+// this is mandatory to start child correctly on devnet
+const child = new MyNodeChild(process.argv)
+// start Custom.Child process and user app
+child.start()
+```
+
+### Testkit Integration
+
+After implementing node and child API, this node can be run inside testkit
+
+```javascript
+const MyNode = require('./MyNode')
+
+// running custom node using `.with` syntax
+this.network = await Network.create()
+  // first param is the implementation of Custom.Node, second is balances object like in `.with.wallet` syntax
+  .with.custom(MyNode, { alice: 100e9 })
+  .run()
+  
+// node is ready to execute methods from Custom.Node
+const data = await this.network.custom.alice.myFunction()
+  
+// or create custom node directly
+const custom = await this.network.newCustomNode(MyNode).ready()
+const data = await custom.myFunction()
+```
 
 ## Test Examples
 

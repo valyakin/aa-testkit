@@ -1,19 +1,19 @@
 const { Custom } = require('./kit')
-const API = require('./api')
+const APP = require('./app')
 
 class MyNodeChild extends Custom.Child {
 	run () {
-		this.api = new API()
+		this.app = new API()
 	}
 
 	async handleCustomCommand (payload) {
 		switch (payload.type) {
 		case 'get-chash':
-			this.sendCustomMessage({ type: 'chash', chash: await this.api.getChash(payload.data) })
+			this.sendCustomMessage({ type: 'chash', chash: await this.app.getChash(payload.data) })
 			break
 
 		case 'get-my-witnesses':
-			this.sendCustomMessage({ type: 'my-witnesses', witnesses: await this.api.getMyWitnesses(payload.data) })
+			this.sendCustomMessage({ type: 'my-witnesses', witnesses: await this.app.getMyWitnesses(payload.data) })
 			break
 		}
 	}
