@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.3.13 (2020-11-05)
+
+1. `.with.wallet` allows to specify wallet mnemonic
+
 ## v0.3.12 (2020-09-23)
 
 1. Custom Nodes documentation

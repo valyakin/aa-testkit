@@ -22,8 +22,13 @@ function getFirstAddress (mnemonicPhrase, passphrase = '0000') {
 	return getPubkey(mnemonicPhrase, passphrase, 0, 0, 0)
 }
 
+function isValidMnemonic (mnemonic) {
+	return Mnemonic.isValid(mnemonic)
+}
+
 module.exports = {
 	getPubkey,
 	getFirstAddress,
 	generateMnemonic,
+	isValidMnemonic,
 }

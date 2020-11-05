@@ -9,6 +9,7 @@ const {
 	getPubkey,
 	generateMnemonic,
 	getFirstAddress,
+	isValidMnemonic,
 } = require('./lib/keys')
 const { asyncStartHeadlessWallets, asyncStartHeadlessWalletsWithMnemonics } = require('./lib/asyncStartHeadlessWallets')
 
@@ -26,4 +27,5 @@ module.exports = {
 	getPubkey,
 	generateMnemonic,
 	getFirstAddress,
+	isValidMnemonic,
 }

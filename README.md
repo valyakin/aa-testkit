@@ -153,13 +153,15 @@ const network = await Network.create().run()
 
 A set of helpers for running network with some preconditions e.g. wallets running with balances, agents deployed and assets created.
 
-#### __`.with.wallet({ walletName: balances })`__
+#### __`.with.wallet({ walletName: balances }[, mnemonic: String])`__
 
 Create a wallet with some bytes or assets balances on its account.
 
 `walletName` - a name for the wallet; the wallet node will be available as `network.wallet.walletName`
 
 `balances` - initial balances of this wallet. Could be a number for the Bytes balance or object
+
+`mnemonic` - optional field. Allows to specify mnemonic of the wallet
 
 ```javascript
 {
@@ -955,10 +957,10 @@ __Returns__ *Promise* that resolves to `{ result, error }`, where `result` a res
 
 #### Parameters
 
-*`aaAddress : String`* - address of the AA 
+*`aaAddress : String`* - address of the AA
 
 *`getter : String`* - getter identifier
- 
+
 *`args : Array`* - array of parameters to pass to getter for execution
 
 ---------------------------------------
@@ -1725,7 +1727,7 @@ const { Custom } = Testkit({
 
 // implementation should be inherited from Custom.Node
 class MyNode extends Custom.Node {
-  
+
   // `childPath` should be overloaded and return absolute path to file with Custom.Child implementation
 	childPath () {
 		return path.join(__dirname, './MyChild')
@@ -1740,8 +1742,8 @@ class MyNode extends Custom.Node {
       break
     }
   }
-  
-  // any custom method declared in this class will be available in testkit 
+
+  // any custom method declared in this class will be available in testkit
   myFunction () {
     // use Promise based syntax to wait and receive data from child
     return new Promise(resolve => {
@@ -1750,7 +1752,7 @@ class MyNode extends Custom.Node {
       this.sendCustomCommand({ type: 'ping', data: 'hello' })
     })
   }
-  
+
 }
 
 module.exports = MyNode
@@ -1783,7 +1785,7 @@ class MyNodeChild extends Custom.Child {
 	}
 
   // `sendCustomCommand` from MyNode interface can be handled here
-  
+
   // messages that are sent from Custom.Node via `this.sendCustomCommand` can be handled in `handleCustomCommand`
 	async handleCustomCommand (payload) {
 		switch (payload.type) {
@@ -1813,10 +1815,10 @@ this.network = await Network.create()
   // first param is the implementation of Custom.Node, second is balances object like in `.with.wallet` syntax
   .with.custom(MyNode, { alice: 100e9 })
   .run()
-  
+
 // node is ready to execute methods from Custom.Node
 const data = await this.network.custom.alice.myFunction()
-  
+
 // or create custom node directly
 const custom = await this.network.newCustomNode(MyNode).ready()
 const data = await custom.myFunction()
@@ -2234,4 +2236,3 @@ Some examples of mocha tests set up can be found inside `test` data of `aa-testk
 [Timetravel feature](./test/aa/timetravel_check.spec.js)
 
 [Retrieving AA response](./test/aa/aa_response.feature.spec.js)
-

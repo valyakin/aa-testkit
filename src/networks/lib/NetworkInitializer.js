@@ -1,4 +1,4 @@
-const { asyncStartHeadlessWalletsWithMnemonics, generateMnemonic, getFirstAddress } = require('../../utils')
+const { asyncStartHeadlessWalletsWithMnemonics, generateMnemonic, getFirstAddress, isValidMnemonic } = require('../../utils')
 
 class NetworkInitializer {
 	constructor ({ network }) {
@@ -237,13 +237,24 @@ class NetworkInitializer {
 		return this
 	}
 
-	wallet (wallet) {
+	wallet (wallet, mnemonicPhrase) {
 		const name = Object.keys(wallet)[0]
 		const balances = typeof wallet[name] === 'object'
 			? wallet[name]
 			: { base: wallet[name] }
 
-		const mnemonic = generateMnemonic()
+		let mnemonic
+		
+		if (mnemonicPhrase) {
+			if (isValidMnemonic(mnemonicPhrase)) {
+				mnemonic = mnemonicPhrase
+			} else {
+				throw new Error (`Invalid mnemonic phrase ${mnemonicPhrase} for wallet with name ${name}`)
+			}
+		} else {
+			mnemonic = generateMnemonic()
+		}
+		
 		const address = getFirstAddress(mnemonic)
 
 		this.initializer.wallets[name] = {
