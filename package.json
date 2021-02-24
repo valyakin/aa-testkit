@@ -49,6 +49,7 @@
     "pre-commit": "^1.2.2"
   },
   "resolutions": {
+    "level-rocksdb": "^4.0.0",
     "chalk": "^3.0.0",
     "cli-width": "^2.2.1"
   },

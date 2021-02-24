@@ -27,6 +27,7 @@ class AbstractNode extends EventEmitter {
 		this.isReady = false
 		this.aaResponses = {
 			toUnit: {},
+			toUnitByAA: {},
 		}
 
 		this.receivedUnits = []
@@ -162,6 +163,8 @@ class AbstractNode extends EventEmitter {
 	handleAaResponse (m) {
 		// console.log(`[INFO][${this.id}] handleAaResponse`, JSON.stringify(m, null, 2))
 		this.aaResponses.toUnit[m.response.trigger_unit] = m.response
+		if (!this.aaResponses.toUnitByAA[m.response.trigger_unit]) { this.aaResponses.toUnitByAA[m.response.trigger_unit] = {} }
+		this.aaResponses.toUnitByAA[m.response.trigger_unit][m.response.aa_address] = m.response
 		this.emit('aa_response_to_unit-' + m.response.trigger_unit, { response: m.response })
 		this.emit('aa_response_to_address-' + m.response.trigger_address, { response: m.response })
 		this.emit('aa_response_from_aa-' + m.response.aa_address, { response: m.response })
@@ -176,6 +179,10 @@ class AbstractNode extends EventEmitter {
 
 	getAaResponseToUnit (unit) {
 		return this.aaResponses.toUnit[unit]
+	}
+
+	getAaResponseToUnitByAA (unit, aa) {
+		return this.aaResponses.toUnitByAA[unit] ? this.aaResponses.toUnitByAA[unit][aa] : undefined
 	}
 
 	async getUnitInfo ({ unit }) {

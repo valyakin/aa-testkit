@@ -244,17 +244,17 @@ class NetworkInitializer {
 			: { base: wallet[name] }
 
 		let mnemonic
-		
+
 		if (mnemonicPhrase) {
 			if (isValidMnemonic(mnemonicPhrase)) {
 				mnemonic = mnemonicPhrase
 			} else {
-				throw new Error (`Invalid mnemonic phrase ${mnemonicPhrase} for wallet with name ${name}`)
+				throw new Error(`Invalid mnemonic phrase ${mnemonicPhrase} for wallet with name ${name}`)
 			}
 		} else {
 			mnemonic = generateMnemonic()
 		}
-		
+
 		const address = getFirstAddress(mnemonic)
 
 		this.initializer.wallets[name] = {
