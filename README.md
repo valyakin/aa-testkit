@@ -434,7 +434,7 @@ await network.witnessUntilStableOnNode(wallet, unit)
 
 #### __`network.getAaResponseToUnit(unit)`__ *`: Promise<{ response }>`*
 
-Retrieve autonomous agent execution response from `unit`. Method will make network to post witnesses until response is being received. Waits for the response on genesis node.
+Retrieve autonomous agent execution response from `unit`. The method will make the network post witnesses until a response is received. Waits for the response on genesis node. If the unit `unit` triggers several AAs at the same time, the behavior of this function is undefined, use `getAaResponseToUnitByAA(unit, aa)` instead.
 
 __Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
 
@@ -501,6 +501,35 @@ __Returns__ *Promise* that resolves to `{ response }` where `response` is the ob
 *`node : Node`* - node to wait AA response on
 
 *`unit : String`* - unit of aa execution to retrieve response from
+
+---------------------------------------
+
+#### __`getAaResponseToUnitByAA(unit, aa) `__ *`: Promise<{ response }>`*
+
+Same as `network.getAaResponseToUnit` but with a parameter to specify an AA whose response to get. Use it when the triggering transaction triggers several AAs.
+
+__Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
+
+#### Parameters
+
+*`unit : String`* - unit of aa execution to retrieve response from
+
+*`aa : String`* - address of the AA whose response to get
+
+---------------------------------------
+#### __`getAaResponseToUnitByAAOnNode(node, unit, aa) `__ *`: Promise<{ response }>`*
+
+Same as `network.getAaResponseToUnit` but with parameters to specify a node to retrieve information from and an AA whose response to get.
+
+__Returns__ *Promise* that resolves to `{ response }` where `response` is the object of agent response
+
+#### Parameters
+
+*`node : Node`* - node to wait AA response on
+
+*`unit : String`* - unit of aa execution to retrieve response from
+
+*`aa : String`* - address of the AA whose response to get
 
 ---------------------------------------
 

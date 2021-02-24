@@ -197,6 +197,26 @@ class NetworkFromGenesis {
 		}
 	}
 
+	async getAaResponseToUnitByAA (unit, aa) {
+		await this.witnessAndStabilize()
+		const response = this.genesisNode.getAaResponseToUnitByAA(unit, aa)
+		if (response) {
+			return { response }
+		} else {
+			return this.getAaResponseToUnitByAA(unit, aa)
+		}
+	}
+
+	async getAaResponseToUnitByAAOnNode (node, unit, aa) {
+		await this.witnessAndStabilize()
+		const response = node.getAaResponseToUnitByAA(unit, aa)
+		if (response) {
+			return { response }
+		} else {
+			return this.getAaResponseToUnitByAAOnNode(node, unit, aa)
+		}
+	}
+
 	newObyteExplorer (params) {
 		const explorer = new ObyteExplorer({
 			rundir: this.rundir,
