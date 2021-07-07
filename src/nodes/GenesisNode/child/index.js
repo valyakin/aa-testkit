@@ -101,7 +101,7 @@ class GenesisNodeChild extends AbstractChild {
 		})
 
 		const datafeed = {
-			time: new Date().toString(),
+			// time: new Date().toString(),
 			timestamp: Date.now(),
 		}
 		this.composer.composeDataFeedJoint(this.address, datafeed, this.headlessWallet.signer, callbacks)
