@@ -128,7 +128,7 @@ class ObyteWitnessChild extends AbstractChild {
 
 		this.headlessWallet.readSingleAddress(address => {
 			const datafeed = {
-				time: new Date().toString(),
+				// time: new Date().toString(),
 				timestamp: Date.now(),
 			}
 			this.composer.composeDataFeedJoint(address, datafeed, this.headlessWallet.signer, callbacks)
