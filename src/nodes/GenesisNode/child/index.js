@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const fs = require('fs')
 const path = require('path')
 const Joi = require('joi')
 const { isString } = require('lodash')
@@ -66,6 +67,22 @@ class GenesisNodeChild extends AbstractChild {
 		this.network = require('ocore/network.js')
 		this.signature = require('ocore/signature.js')
 		this.objectHash = require('ocore/object_hash.js')
+		this.desktopApp = require('ocore/desktop_app.js')
+
+		if (process.env.mnemonic) {
+			const appDataDir = this.desktopApp.getAppDataDir()
+			const keysFilename = path.join(appDataDir, 'keys.json')
+			const deviceTempPrivKey = crypto.randomBytes(32)
+			const devicePrevTempPrivKey = crypto.randomBytes(32)
+
+			const keys = {
+				mnemonic_phrase: process.env.mnemonic,
+				temp_priv_key: deviceTempPrivKey.toString('base64'),
+				prev_temp_priv_key: devicePrevTempPrivKey.toString('base64'),
+			}
+
+			fs.writeFileSync(keysFilename, JSON.stringify(keys, null, '\t'), 'utf8')
+		}
 
 		this.eventBus.once('headless_wallet_need_pass', () => {
 			this.sendToParent(new MessagePasswordRequired())
@@ -232,9 +249,7 @@ class GenesisNodeChild extends AbstractChild {
 				return acc + cur.amount
 			}, 0)
 
-			const desktopApp = require('ocore/desktop_app.js')
-			const appDataDir = desktopApp.getAppDataDir()
-
+			const appDataDir = this.desktopApp.getAppDataDir()
 			const file = require(path.join(appDataDir, './keys.json'))
 			const genesisMnemonic = file.mnemonic_phrase
 

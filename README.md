@@ -1004,7 +1004,8 @@ Genesis node main function is to start new network and create genesis unit. Afte
 |:----------:|:-------:|:--------:|:------------------:|-----------------------------------------------------------------------------|
 |     id     |  String |   true   |                    | Unique id of this node. Also determines node folder in `testdata` directory |
 |   rundir   |  String |   true   |                    | Determines where this node will store its data. Absolute path               |
-|     hub    |  String |   false  | `'localhost:6611'` | Address of hub to connect                                                   |
+|     hub    |  String |   false  | `'localhost:6611'` | Address of hub to connect |
+|  mnemonic  |  String |   false  | 	 			   | Mnemonic to create genesis node from |
 
 ### GenesisNode methods
 
