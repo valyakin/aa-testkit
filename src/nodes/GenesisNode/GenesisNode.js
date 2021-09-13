@@ -21,7 +21,7 @@ const schemaFactory = () => ({
 class GenesisNode extends AbstractNode {
 	constructor (params = {}) {
 		super(params, schemaFactory)
-		this.runChild(__dirname, 
+		this.runChild(__dirname,
 			this.mnemonic
 				? {
 					mnemonic: this.mnemonic,
