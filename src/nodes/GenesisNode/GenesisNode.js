@@ -15,12 +15,20 @@ const schemaFactory = () => ({
 	rundir: Joi.string().required(),
 	passphrase: Joi.string().default('0000'),
 	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
+	mnemonic: Joi.string().default(null),
 })
 
 class GenesisNode extends AbstractNode {
 	constructor (params = {}) {
 		super(params, schemaFactory)
-		this.runChild(__dirname)
+		this.runChild(__dirname, 
+			this.mnemonic
+				? {
+					mnemonic: this.mnemonic,
+					passphrase: this.passphrase,
+				}
+				: {},
+		)
 
 		this
 			.on('password_required', () => this.sendPassword())
