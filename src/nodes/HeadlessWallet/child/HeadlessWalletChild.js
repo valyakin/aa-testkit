@@ -15,6 +15,7 @@ const {
 	MessageAssetCreated,
 	MessageAgentDeployed,
 	MessageSignedPackage,
+	MessageJointComposed,
 	MessagePasswordRequired,
 	MessageIssueDivisibleAssetDone,
 	MessageIssueIndivisibleAssetDone,
@@ -45,6 +46,7 @@ class HeadlessWalletChild extends AbstractChild {
 			.on('command_get_my_addresses', (m) => this.getMyAddresses(m))
 			.on('command_issue_divisible_asset', (m) => this.issueDivisibleAsset(m))
 			.on('command_issue_indivisible_asset', (m) => this.issueIndivisibleAsset(m))
+			.on('command_compose_joint', (m) => this.composeJoint(m))
 	}
 
 	static unpackArgv (argv) {
@@ -151,6 +153,30 @@ class HeadlessWalletChild extends AbstractChild {
 				this.sendToParent(new MessageSentMulti({ unit, error: null }))
 			}
 		})
+	}
+
+	async composeJoint ({ opts, saveJoint = true, broadcastJoint = true }) {
+		try {
+			const myAddress = await this.headlessWallet.readFirstAddress()
+			opts.paying_addresses = [myAddress]
+
+			opts.callbacks = {
+				ifNotEnoughFunds: (err) => this.sendToParent(new MessageJointComposed({ error: err })),
+				ifError: (err) => this.sendToParent(new MessageJointComposed({ error: err })),
+				ifOk: (objJoint, privatePayloads, unlock) => {
+					if (typeof unlock === 'function') { unlock() }
+					if (broadcastJoint) { this.network.broadcastJoint(objJoint) }
+					this.sendToParent(new MessageJointComposed({ unit: objJoint.unit.unit, error: null }))
+				},
+			}
+			if (saveJoint) { opts.callbacks = this.composer.getSavingCallbacks(opts.callbacks) }
+
+			opts.signer = this.headlessWallet.signer
+
+			this.composer.composeJoint(opts)
+		} catch (error) {
+			this.sendToParent(new MessageJointComposed({ error: error.message }))
+		}
 	}
 
 	issueDivisibleAsset ({ opts }) {
@@ -271,9 +297,7 @@ class HeadlessWalletChild extends AbstractChild {
 
 	async createAsset ({ assetDefinition }) {
 		try {
-			const myAddress = await new Promise((resolve, reject) => {
-				this.headlessWallet.readFirstAddress(address => resolve(address))
-			})
+			const myAddress = await this.headlessWallet.readFirstAddress()
 
 			const callbacks = this.composer.getSavingCallbacks({
 				ifNotEnoughFunds: (err) => this.sendToParent(new MessageAssetCreated({ error: err })),

@@ -32,6 +32,7 @@ const MessageOutputsBalanceOf = require('./lib/MessageOutputsBalanceOf')
 const MessageExecuteGetterDone = require('./lib/MessageExecuteGetterDone')
 const MessageIssueDivisibleAssetDone = require('./lib/MessageIssueDivisibleAssetDone')
 const MessageIssueIndivisibleAssetDone = require('./lib/MessageIssueIndivisibleAssetDone')
+const MessageJointComposed = require('./lib/MessageJointComposed')
 
 const CommandCustom = require('./lib/CommandCustom')
 const CommandTimeRun = require('./lib/CommandTimeRun')
@@ -60,6 +61,7 @@ const CommandReadAAStateVars = require('./lib/CommandReadAAStateVars')
 const CommandGetOutputsBalanceOf = require('./lib/CommandGetOutputsBalanceOf')
 const CommandIssueDivisibleAsset = require('./lib/CommandIssueDivisibleAsset')
 const CommandIssueIndivisibleAsset = require('./lib/CommandIssueIndivisibleAsset')
+const CommandComposeJoint = require('./lib/CommandComposeJoint')
 
 const fromMessage = (m) => {
 	const message = JSON.parse(m)
@@ -99,6 +101,7 @@ const fromMessage = (m) => {
 	case 'execute_getter_done': return new MessageExecuteGetterDone(message)
 	case 'issue_divisible_asset_done': return new MessageIssueDivisibleAssetDone(message)
 	case 'issue_indivisible_asset_done': return new MessageIssueIndivisibleAssetDone(message)
+	case 'joint_composed': return new MessageJointComposed(message)
 
 	case 'command_custom': return new CommandCustom(message)
 	case 'command_time_run': return new CommandTimeRun(message)
@@ -127,6 +130,7 @@ const fromMessage = (m) => {
 	case 'command_get_outputs_balance_of': return new CommandGetOutputsBalanceOf(message)
 	case 'command_issue_divisible_asset': return new CommandIssueDivisibleAsset(message)
 	case 'command_issue_indivisible_asset': return new CommandIssueIndivisibleAsset(message)
+	case 'command_compose_joint': return new CommandComposeJoint(message)
 
 	default: throw new Error(`Unsupported message topic '${message.topic}'`)
 	}
@@ -169,6 +173,7 @@ module.exports = {
 	MessageExecuteGetterDone,
 	MessageIssueDivisibleAssetDone,
 	MessageIssueIndivisibleAssetDone,
+	MessageJointComposed,
 
 	CommandCustom,
 	CommandGetTime,
@@ -197,4 +202,5 @@ module.exports = {
 	CommandGetOutputsBalanceOf,
 	CommandIssueDivisibleAsset,
 	CommandIssueIndivisibleAsset,
+	CommandComposeJoint,
 }

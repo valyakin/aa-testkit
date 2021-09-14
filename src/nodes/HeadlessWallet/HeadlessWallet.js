@@ -18,6 +18,7 @@ const {
 	CommandGetMyAddresses,
 	CommandIssueDivisibleAsset,
 	CommandIssueIndivisibleAsset,
+	CommandComposeJoint,
 } = require('../../messages')
 
 const schemaFactory = () => ({
@@ -108,6 +109,13 @@ class HeadlessWallet extends AbstractNode {
 		return new Promise(resolve => {
 			this.once('sent_bytes', (m) => resolve({ unit: m.unit, error: m.error }))
 			this.sendToChild(new CommandSendBytes({ toAddress, amount }))
+		})
+	}
+
+	composeJoint ({ opts, saveJoint, broadcastJoint }) {
+		return new Promise(resolve => {
+			this.once('joint_composed', (m) => resolve({ unit: m.unit, error: m.error }))
+			this.sendToChild(new CommandComposeJoint({ opts, saveJoint, broadcastJoint }))
 		})
 	}
 
