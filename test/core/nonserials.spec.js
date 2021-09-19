@@ -19,7 +19,7 @@ describe('Check nonserials', function () {
 			.run()
 	})
 
-	it('Check sending bytes', async () => {
+	it('Check non-serials & double spends', async () => {
 		const network = this.network
 		const genesis = await network.getGenesisNode().ready()
 		const genesisAddress = await genesis.getAddress()
@@ -28,42 +28,96 @@ describe('Check nonserials', function () {
 		const aliceAddress = await alice.getAddress()
 		const bob = await network.newHeadlessWallet().ready()
 		const bobAddress = await bob.getAddress()
+		console.log('Alice: ', aliceAddress, "\nBob: ", bobAddress)
 
-		await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
-		const { unit } = await genesis.sendBytes({ toAddress: bobAddress, amount: 100000 })
-		await network.sync()
-		await network.witnessUntilStable(unit)
-
-		await alice.composeJoint({
+		const {unit: aliceInputUnit1} = await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
+		const {unit: aliceInputUnit2} = await genesis.sendBytes({ toAddress: aliceAddress, amount: 99000 })
+		const {unit: bobInputUnit} = await genesis.sendBytes({ toAddress: bobAddress, amount: 111000 })
+		await network.witnessUntilStable(bobInputUnit)
+		// revel definition
+		const {unit: aliceInputUnit3, error: err} = await alice.composeJoint({
 			opts: {
-				outputs: [{ address: aliceAddress, amount: 0 }],
-			},
-			saveJoint: false,
-			broadcastJoint: true,
-		})
-		await timeout(1)
-		alice.composeJoint({
-			opts: {
+				inputs: [
+					{message_index:0,
+					output_index:0,
+					unit: aliceInputUnit1}
+				],
+				input_amount: 100000,
 				outputs: [
-					{ address: genesisAddress, amount: 1 },
 					{ address: aliceAddress, amount: 0 },
 				],
 			},
 			saveJoint: true,
 			broadcastJoint: true,
 		})
-		await bob.composeJoint({
+		await network.witnessUntilStable(aliceInputUnit3)
+
+		await timeout(1)
+
+		// non-serials
+		const aliceUnit1 = await alice.composeJoint({
+			opts: {
+				inputs: [
+					{message_index:0,
+					output_index:0,
+					unit: aliceInputUnit3}
+				],
+				input_amount: 99225,
+				outputs: [
+					{ address: aliceAddress, amount: 0 },
+				]
+			},
+			saveJoint: false,
+			broadcastJoint: true,
+		})
+
+		await timeout(1)
+
+		const bobUnit1 = await bob.composeJoint({
 			opts: {
 				outputs: [{ address: bobAddress, amount: 0 }],
 			},
 			saveJoint: true,
 			broadcastJoint: true,
 		})
-		await genesis.postWitness()
+
+		const aliceUnit2 = await alice.composeJoint({
+			opts: {
+				inputs: [
+					{message_index:0,
+					output_index:0,
+					unit: aliceInputUnit2}
+				],
+				input_amount: 99000,
+				outputs: [
+					{ address: aliceAddress, amount: 0 },
+				],
+			},
+			saveJoint: true,
+			broadcastJoint: true,
+		})
+
+		// non-serial double spends
+		const dsAliceUnit = await alice.composeJoint({
+			opts: {
+				inputs: [
+					{message_index:0,
+					output_index:0,
+					unit: aliceInputUnit3}
+				],
+				input_amount: 99225,
+				outputs: [
+					{ address: bobAddress, amount: 90000 },
+					{ address: aliceAddress, amount: 0 },
+				],
+			},
+			saveJoint: true,
+			broadcastJoint: true,
+		})
 
 		setInterval(function () {
-			genesis.postWitness()
-		}, 3 * 1000)
+			//genesis.postWitness()
+		}, 5 * 1000)
 	}).timeout(30000 * 1000)
 
 	after(async () => {
