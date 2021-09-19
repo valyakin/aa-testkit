@@ -28,19 +28,21 @@ describe('Check nonserials', function () {
 		const aliceAddress = await alice.getAddress()
 		const bob = await network.newHeadlessWallet().ready()
 		const bobAddress = await bob.getAddress()
-		console.log('Alice: ', aliceAddress, "\nBob: ", bobAddress)
+		console.log('Alice: ', aliceAddress, '\nBob: ', bobAddress)
 
-		const {unit: aliceInputUnit1} = await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
-		const {unit: aliceInputUnit2} = await genesis.sendBytes({ toAddress: aliceAddress, amount: 99000 })
-		const {unit: bobInputUnit} = await genesis.sendBytes({ toAddress: bobAddress, amount: 111000 })
+		const { unit: aliceInputUnit1 } = await genesis.sendBytes({ toAddress: aliceAddress, amount: 100000 })
+		const { unit: aliceInputUnit2 } = await genesis.sendBytes({ toAddress: aliceAddress, amount: 99000 })
+		const { unit: bobInputUnit } = await genesis.sendBytes({ toAddress: bobAddress, amount: 111000 })
 		await network.witnessUntilStable(bobInputUnit)
 		// revel definition
-		const {unit: aliceInputUnit3, error: err} = await alice.composeJoint({
+		const { unit: aliceInputUnit3, error: err } = await alice.composeJoint({
 			opts: {
 				inputs: [
-					{message_index:0,
-					output_index:0,
-					unit: aliceInputUnit1}
+					{
+						message_index: 0,
+						output_index: 0,
+						unit: aliceInputUnit1,
+					},
 				],
 				input_amount: 100000,
 				outputs: [
@@ -58,14 +60,16 @@ describe('Check nonserials', function () {
 		const aliceUnit1 = await alice.composeJoint({
 			opts: {
 				inputs: [
-					{message_index:0,
-					output_index:0,
-					unit: aliceInputUnit3}
+					{
+						message_index: 0,
+						output_index: 0,
+						unit: aliceInputUnit3,
+					},
 				],
 				input_amount: 99225,
 				outputs: [
 					{ address: aliceAddress, amount: 0 },
-				]
+				],
 			},
 			saveJoint: false,
 			broadcastJoint: true,
@@ -84,9 +88,11 @@ describe('Check nonserials', function () {
 		const aliceUnit2 = await alice.composeJoint({
 			opts: {
 				inputs: [
-					{message_index:0,
-					output_index:0,
-					unit: aliceInputUnit2}
+					{
+						message_index: 0,
+						output_index: 0,
+						unit: aliceInputUnit2,
+					},
 				],
 				input_amount: 99000,
 				outputs: [
@@ -101,9 +107,11 @@ describe('Check nonserials', function () {
 		const dsAliceUnit = await alice.composeJoint({
 			opts: {
 				inputs: [
-					{message_index:0,
-					output_index:0,
-					unit: aliceInputUnit3}
+					{
+						message_index: 0,
+						output_index: 0,
+						unit: aliceInputUnit3,
+					},
 				],
 				input_amount: 99225,
 				outputs: [
@@ -116,7 +124,7 @@ describe('Check nonserials', function () {
 		})
 
 		setInterval(function () {
-			//genesis.postWitness()
+			// genesis.postWitness()
 		}, 5 * 1000)
 	}).timeout(30000 * 1000)
 
