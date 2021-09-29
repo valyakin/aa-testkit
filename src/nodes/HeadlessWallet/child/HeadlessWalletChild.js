@@ -19,6 +19,7 @@ const {
 	MessagePasswordRequired,
 	MessageIssueDivisibleAssetDone,
 	MessageIssueIndivisibleAssetDone,
+	MessageUnitSigned,
 } = require('../../../messages')
 
 const paramsSchema = () => ({
@@ -47,6 +48,7 @@ class HeadlessWalletChild extends AbstractChild {
 			.on('command_issue_divisible_asset', (m) => this.issueDivisibleAsset(m))
 			.on('command_issue_indivisible_asset', (m) => this.issueIndivisibleAsset(m))
 			.on('command_compose_joint', (m) => this.composeJoint(m))
+			.on('command_sign_unit', (m) => this.signUnit(m))
 	}
 
 	static unpackArgv (argv) {
@@ -166,7 +168,7 @@ class HeadlessWalletChild extends AbstractChild {
 				ifOk: (objJoint, privatePayloads, unlock) => {
 					if (typeof unlock === 'function') { unlock() }
 					if (broadcastJoint) { this.network.broadcastJoint(objJoint) }
-					this.sendToParent(new MessageJointComposed({ unit: objJoint.unit.unit, error: null }))
+					this.sendToParent(new MessageJointComposed({ unit: objJoint.unit, error: null }))
 				},
 			}
 			if (saveJoint) { opts.callbacks = this.composer.getSavingCallbacks(opts.callbacks) }
@@ -338,6 +340,20 @@ class HeadlessWalletChild extends AbstractChild {
 				if (error) { this.sendToParent(new MessageSignedPackage({ error })) } else { this.sendToParent(new MessageSignedPackage({ signedPackage })) }
 			})
 		})
+	}
+
+	async signUnit ({ unit }) {
+		try {
+			for (const author of unit.authors) {
+				for (const path in author.authentifiers) {
+					const sig = await this.headlessWallet.signer.sign(unit, {}, author.address, path)
+					author.authentifiers[path] = sig
+				}
+			}
+			this.sendToParent(new MessageUnitSigned({ unit }))
+		} catch (error) {
+			this.sendToParent(new MessageUnitSigned({ error }))
+		}
 	}
 }
 

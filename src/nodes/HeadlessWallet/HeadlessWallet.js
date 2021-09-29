@@ -19,6 +19,7 @@ const {
 	CommandIssueDivisibleAsset,
 	CommandIssueIndivisibleAsset,
 	CommandComposeJoint,
+	CommandSignUnit,
 } = require('../../messages')
 
 const schemaFactory = () => ({
@@ -179,6 +180,17 @@ class HeadlessWallet extends AbstractNode {
 			return new Promise((resolve) => {
 				this.once('signed_package', m => resolve({ signedPackage: m.signedPackage, error: m.error }))
 				this.sendToChild(new CommandSignMessage({ message }))
+			})
+		} catch (error) {
+			return { error: error.message || error }
+		}
+	}
+
+	async signUnit (unit) {
+		try {
+			return new Promise((resolve) => {
+				this.once('signed_unit', m => resolve({ unit: m.unit, error: m.error }))
+				this.sendToChild(new CommandSignUnit({ unit }))
 			})
 		} catch (error) {
 			return { error: error.message || error }

@@ -33,6 +33,7 @@ const MessageExecuteGetterDone = require('./lib/MessageExecuteGetterDone')
 const MessageIssueDivisibleAssetDone = require('./lib/MessageIssueDivisibleAssetDone')
 const MessageIssueIndivisibleAssetDone = require('./lib/MessageIssueIndivisibleAssetDone')
 const MessageJointComposed = require('./lib/MessageJointComposed')
+const MessageUnitSigned = require('./lib/MessageUnitSigned')
 
 const CommandCustom = require('./lib/CommandCustom')
 const CommandTimeRun = require('./lib/CommandTimeRun')
@@ -62,6 +63,7 @@ const CommandGetOutputsBalanceOf = require('./lib/CommandGetOutputsBalanceOf')
 const CommandIssueDivisibleAsset = require('./lib/CommandIssueDivisibleAsset')
 const CommandIssueIndivisibleAsset = require('./lib/CommandIssueIndivisibleAsset')
 const CommandComposeJoint = require('./lib/CommandComposeJoint')
+const CommandSignUnit = require('./lib/CommandSignUnit')
 
 const fromMessage = (m) => {
 	const message = JSON.parse(m)
@@ -102,6 +104,7 @@ const fromMessage = (m) => {
 	case 'issue_divisible_asset_done': return new MessageIssueDivisibleAssetDone(message)
 	case 'issue_indivisible_asset_done': return new MessageIssueIndivisibleAssetDone(message)
 	case 'joint_composed': return new MessageJointComposed(message)
+	case 'signed_unit': return new MessageUnitSigned(message)
 
 	case 'command_custom': return new CommandCustom(message)
 	case 'command_time_run': return new CommandTimeRun(message)
@@ -131,6 +134,7 @@ const fromMessage = (m) => {
 	case 'command_issue_divisible_asset': return new CommandIssueDivisibleAsset(message)
 	case 'command_issue_indivisible_asset': return new CommandIssueIndivisibleAsset(message)
 	case 'command_compose_joint': return new CommandComposeJoint(message)
+	case 'command_sign_unit': return new CommandSignUnit(message)
 
 	default: throw new Error(`Unsupported message topic '${message.topic}'`)
 	}
@@ -174,6 +178,7 @@ module.exports = {
 	MessageIssueDivisibleAssetDone,
 	MessageIssueIndivisibleAssetDone,
 	MessageJointComposed,
+	MessageUnitSigned,
 
 	CommandCustom,
 	CommandGetTime,
@@ -203,4 +208,5 @@ module.exports = {
 	CommandIssueDivisibleAsset,
 	CommandIssueIndivisibleAsset,
 	CommandComposeJoint,
+	CommandSignUnit,
 }
