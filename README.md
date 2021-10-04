@@ -1147,7 +1147,15 @@ Obyte hub node serves as transport for network. Node receives incomming messages
 
 ### ObyteHub methods
 
-ObyteHub node does not have any special methods except [common node methods](#Common-node-methods)
+#### __`hub.broadcastJoint(joint)`__
+
+Broadcasts any joint to the network without validating it.
+
+#### Parameters
+
+*`joint : Object`* - joint object will be passed directly into `network.broadcastJoint()` of `ocore`
+
+---------------------------------------
 
 ## HeadlessWallet
 
@@ -1416,6 +1424,56 @@ __Returns__ *Promise* that resolves to `{ signedPackage, error }`, where `signed
 *`message : String | Object | Array | Number`* - something that has to be signed
 
 ---------------------------------------
+
+#### __`wallet.composeJoint({ opts, saveJoint = true, broadcastJoint = true })`__ *`: Promise<{ unit, error }>`*
+
+Composes new unit and returns it, optionally saving it into wallet storage and broadcasting it.
+
+__Returns__ *Promise* that resolves to `{ unit, error }`, where `unit` is the object of unit composed. `error` will be null on success
+
+#### Parameters
+
+*`opts : Object`* - options directly passed to `composer.composeJoint()`
+
+*`saveJoint : Boolean`* - whether to save joint in own storage or not
+
+*`broadcastJoint : Boolean`* - whether to broadcast the joint to the network. You can use `.broadcastJoint()` method of Hub to later broadcast it.
+
+
+<details>
+<summary>Example</summary>
+
+```javascript
+const { unit: unitObj } = await aliceWallet.composeJoint({
+	opts: {
+		inputs: [
+			{
+				message_index: 0,
+				output_index: 0,
+				unit: aliceInputUnit1,
+			},
+		],
+		input_amount: 100000,
+		outputs: [
+			{ address: aliceAddress, amount: 0 },
+		],
+	},
+	saveJoint: false,
+	broadcastJoint: false,
+})
+```
+</details>
+---------------------------------------
+
+#### __`wallet.signUnit(unit)`__ *`: Promise<{ unit, error }>`*
+
+Signs the unit using it's authors. Technically, this methods returns the same unit but with authentifiers filled for each author of the unit.
+
+__Returns__ *Promise* that resolves to `{ unit, error }`, where `unit` is the object of signed unit. `error` will be null on success
+
+#### Parameters
+
+*`unit : Object`* - unit object
 
 
 ## ObyteExplorer
