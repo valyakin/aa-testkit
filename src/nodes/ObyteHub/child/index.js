@@ -55,10 +55,24 @@ class ObyteHubChild extends AbstractChild {
 		setTimeout(() => {
 			this.sendToParent(new MessageChildReady())
 		})
+
+		this.on('command_custom', (m) => this.handleCustomCommand(m.payload))
+	}
+
+	handleCustomCommand (payload) {
+		switch (payload.topic) {
+		case 'broadcastJoint':
+			this.broadcastJoint(payload.joint)
+			break
+		}
 	}
 
 	logPrefix () {
 		return ''
+	}
+
+	broadcastJoint (objJoint) {
+		this.network.broadcastJoint(objJoint)
 	}
 }
 

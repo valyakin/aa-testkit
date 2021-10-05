@@ -1,6 +1,9 @@
 const Joi = require('joi')
 const config = require('config')['aa-testkit']
 const AbstractNode = require('../AbstractNode/AbstractNode')
+const {
+	CommandCustom,
+} = require('../../messages')
 
 const schemaFactory = () => ({
 	id: Joi.string().required(),
@@ -27,6 +30,10 @@ class ObyteHub extends AbstractNode {
 			this.initialWitnesses.length,
 			...this.initialWitnesses,
 		]
+	}
+
+	broadcastJoint (objJoint) {
+		this.sendToChild(new CommandCustom({ payload: { topic: 'broadcastJoint', joint: objJoint } }))
 	}
 }
 
