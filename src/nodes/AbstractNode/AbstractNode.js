@@ -55,6 +55,7 @@ class AbstractNode extends EventEmitter {
 				devnet: 1,
 				LOCALAPPDATA: path.join(this.rundir, this.id),
 				HOME: path.join(this.rundir, this.id),
+				pathToDist: '../obyte-explorer-frontend-build/dist',
 				...env,
 			},
 			execArgv: [],
