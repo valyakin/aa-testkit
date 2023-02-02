@@ -55,11 +55,8 @@ class ObyteExplorerChild extends AbstractChild {
 		this.conf = require('ocore/conf.js')
 		this.conf.hub = this.hub
 		this.conf.initial_peers = [`${this.conf.WS_PROTOCOL}${this.hub}`]
-		this.conf.pathToDist = process.env.pathToDist || './dist/'
 
-		this.migration = require('obyte-explorer/migration.js')
-		await this.migration.runMigration()
-
+		require('obyte-explorer/migration.js')
 		this.network = require('ocore/network.js')
 		this.explorer = require('obyte-explorer/explorer.js')
 		this.sendToParent(new MessageChildReady())
