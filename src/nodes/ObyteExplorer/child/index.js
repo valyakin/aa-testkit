@@ -37,7 +37,7 @@ class ObyteExplorerChild extends AbstractChild {
 		}
 	}
 
-	start () {
+	async start () {
 		super.start()
 
 		this.constants = require('ocore/constants.js')
@@ -56,8 +56,8 @@ class ObyteExplorerChild extends AbstractChild {
 		this.conf.hub = this.hub
 		this.conf.initial_peers = [`${this.conf.WS_PROTOCOL}${this.hub}`]
 
+		require('obyte-explorer/migration.js')
 		this.network = require('ocore/network.js')
-
 		this.explorer = require('obyte-explorer/explorer.js')
 		this.sendToParent(new MessageChildReady())
 	}
