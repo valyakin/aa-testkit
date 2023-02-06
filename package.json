@@ -34,7 +34,7 @@
     "timekeeper": "^2.2.0",
     "uniqid": "^5.0.3",
     "yargs": "^14.0.0",
-    "obyte-explorer-frontend-build": "git+https://github.com/kaiurin/obyte-explorer-frontend-build"
+    "obyte-explorer-dist": "git+https://github.com/byteball/obyte-explorer-dist"
   },
   "devDependencies": {
     "chai": "^4.2.0",

@@ -6,7 +6,7 @@ exports.webPort = 8080
 exports.initial_witnesses = []
 
 exports.balanceDumpIntervalInHours = 12
-exports.pathToDist = '../obyte-explorer-frontend-build/dist'
+exports.pathToDist = '../obyte-explorer-dist/dist'
 
 exports.selectedLanguage = 'en'
 exports.languagesAvailable = {
