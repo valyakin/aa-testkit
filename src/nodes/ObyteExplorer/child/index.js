@@ -1,6 +1,7 @@
 const Joi = require('joi')
 const AbstractChild = require('../../AbstractNode/child/AbstractChild')
 const { MessageChildReady } = require('../../../messages')
+const { dirname } = require('path')
 
 const paramsSchema = () => ({
 	id: Joi.string().required(),
@@ -59,6 +60,21 @@ class ObyteExplorerChild extends AbstractChild {
 		require('obyte-explorer/migration.js')
 		this.network = require('ocore/network.js')
 		this.explorer = require('obyte-explorer/explorer.js')
+
+		const express = require('express')
+
+		const app = express()
+
+		const pathToDist = dirname(require.resolve('obyte-explorer-dist/package.json'))
+
+		app.use(express.static(`${pathToDist}/dist`, { extensions: ['js', 'ico', 'css', 'png'] }))
+
+		app.use('*', (req, res, next) => {
+			res.sendFile('./dist/index.html', { root: pathToDist })
+		})
+
+		app.listen(3000)
+
 		this.sendToParent(new MessageChildReady())
 	}
 
