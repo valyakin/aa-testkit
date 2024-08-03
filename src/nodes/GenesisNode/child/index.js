@@ -245,9 +245,9 @@ class GenesisNodeChild extends AbstractChild {
 				},
 			})
 
-			const totalTransfered = transfers.reduce((acc, cur) => {
+			/*const totalTransfered = transfers.reduce((acc, cur) => {
 				return acc + cur.amount
-			}, 0)
+			}, 0)*/
 
 			const appDataDir = this.desktopApp.getAppDataDir()
 			const file = require(path.join(appDataDir, './keys.json'))
@@ -294,15 +294,15 @@ class GenesisNodeChild extends AbstractChild {
 				},
 			}
 
-			const toSelf = 1e15 - totalTransfered - 1e4
+			// const toSelf = 1e15 - totalTransfered - 1e4
 
 			this.composer.composeJoint({
 				witnesses: witnessesAddresses,
 				paying_addresses: witnessesAddresses,
 				outputs: [
 					...transfers,
-					{ address: genesisAddress, amount: Math.ceil(toSelf / 2) },
-					{ address: genesisAddress, amount: Math.floor(toSelf / 2) },
+					// { address: genesisAddress, amount: Math.ceil(toSelf / 2) },
+					// { address: genesisAddress, amount: Math.floor(toSelf / 2) },
 					{ address: genesisAddress, amount: 0 }, // change output
 				],
 				signer: signer,
