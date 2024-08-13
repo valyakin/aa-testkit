@@ -3,6 +3,9 @@ exports.hub = 'localhost:6611'
 
 exports.bServeAsHub = false
 exports.bLight = false
+exports.appendLogfile = true
+exports.spend_unconfirmed = 'all'
+exports.max_fee_ratio = Infinity
 
 // witness configuration
 exports.bSingleAddress = true

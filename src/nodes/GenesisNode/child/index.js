@@ -245,9 +245,9 @@ class GenesisNodeChild extends AbstractChild {
 				},
 			})
 
-			/*const totalTransfered = transfers.reduce((acc, cur) => {
+			/* const totalTransfered = transfers.reduce((acc, cur) => {
 				return acc + cur.amount
-			}, 0)*/
+			}, 0) */
 
 			const appDataDir = this.desktopApp.getAppDataDir()
 			const file = require(path.join(appDataDir, './keys.json'))
