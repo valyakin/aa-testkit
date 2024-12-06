@@ -31,7 +31,7 @@ class ObyteExplorer extends AbstractNode {
 	}
 
 	childReady (m) {
-		console.log(`Obyte Explorer is running on http://localhost:${this.webPort}`)
+		console.log(`Obyte Explorer is running on http://localhost:3000`)
 	}
 }
 
