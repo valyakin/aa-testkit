@@ -8,7 +8,7 @@ const schemaFactory = () => ({
 	genesisUnit: Joi.string().required(),
 	webPort: Joi.number().default(8080),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),
-	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
+	hub: Joi.string().default(`127.0.0.1:${config.NETWORK_PORT}`),
 })
 
 class ObyteExplorer extends AbstractNode {

@@ -13,7 +13,7 @@ const schemaFactory = () => ({
 	rundir: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
 	passphrase: Joi.string().default('0000'),
-	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
+	hub: Joi.string().default(`127.0.0.1:${config.NETWORK_PORT}`),
 	mnemonic: Joi.string().default(null),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 })
