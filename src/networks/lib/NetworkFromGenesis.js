@@ -356,7 +356,7 @@ class NetworkFromGenesis {
 				const witness = new ObyteWitness({
 					rundir: this.rundir,
 					genesisUnit: genesisUnit,
-					hub: `localhost:${config.NETWORK_PORT}`,
+					hub: `127.0.0.1:${config.NETWORK_PORT}`,
 					id: getIdForPrefix(this.rundir, 'obyte-witness-'),
 					mnemonic: w.mnemonic,
 					initialWitnesses: this.initialWitnesses,

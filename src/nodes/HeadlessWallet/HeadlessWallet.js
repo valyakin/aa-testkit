@@ -27,7 +27,7 @@ const schemaFactory = () => ({
 	rundir: Joi.string().required(),
 	genesisUnit: Joi.string().required(),
 	passphrase: Joi.string().default('0000'),
-	hub: Joi.string().default(`localhost:${config.NETWORK_PORT}`),
+	hub: Joi.string().default(`127.0.0.1:${config.NETWORK_PORT}`),
 	isSingleAddress: Joi.string().default(config.WALLETS_ARE_SINGLE_ADDRESS),
 	initialWitnesses: Joi.array().items(Joi.string()).min(1),
 	mnemonic: Joi.string().default(null),
